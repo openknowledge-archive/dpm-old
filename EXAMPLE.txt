@@ -1,0 +1,22 @@
+# Use Cases for DataPkg (or: reasons to use it in the first place)
+
+## 1. Grab two different files and use them together in some way.
+
+What data?
+
+  * Normalize data
+    * Cross country and then convert to standard (e.g. US$, GBP)
+      * Exchange rates
+      * Cost of living
+    * Changes across time and then do real present value
+  * Plot two different data sources again each other.
+    * Government expenditure in different sectors?
+
+>>> datapkg index-add file:///....
+>>> datapkg update
+>>> datapkg search "military spending"
+afjadadfajdjfkjadsf Military Spending 1890-1914
+afjadadfajdjfkjadsf Military Spending 1890-1914 (normalized)
+>>> datapkg install xyz
+...
+>>> datapkg plot xyz

@@ -3,14 +3,12 @@ import sys
 import os
 
 class DataPkgAdmin(cmd.Cmd):
-    """
-    TODO: self.verbose option and associated self._print
-    """
 
     prompt = 'datapkg > '
 
-    def __init__(self):
+    def __init__(self, verbose=False):
         cmd.Cmd.__init__(self) # cmd.Cmd is not a new style class
+        self.verbose = verbose
 
     def run_interactive(self, line=None):
         """Run an interactive session.
@@ -27,6 +25,13 @@ class DataPkgAdmin(cmd.Cmd):
 
     def do_help(self, line=None):
         cmd.Cmd.do_help(self, line)
+
+    def _print(self, msg, force=False):
+        if self.verbose or force:
+            print(msg)
+
+    ## -----------------------------------------------------------
+    ## Standard but specific
 
     def do_about(self, line=None):
         import datapkg 
@@ -57,14 +62,30 @@ open-source. For license details run the license command.
     def do_install(self):
         pass
 
+    def do_create(self, line):
+        name = line.strip()
+        import datapkg
+        msg = 'Creating new datapkg: %s' %  name
+        self._print(msg)
+        datapkg.create(name=name)
 
 def main():
-    import sys
-    adminCmd = DataPkgAdmin()
-    if len(sys.argv) < 2:
-        adminCmd.run_interactive()
+    import optparse
+    usage = \
+'''%prog [options] <command>
+
+Run about or help for details.
+'''
+    parser = optparse.OptionParser(usage)
+    parser.add_option('-v', '--verbose', dest='verbose', help='Be verbose',
+            action='store_true', default=False) 
+    options, args = parser.parse_args()
+    
+    if len(args) == 0:
+        parser.print_help()
+        return 1
     else:
-        args = ' '.join(sys.argv[1:])
-        args = args.replace('-','_')
+        adminCmd = DataPkgAdmin()
+        args = ' '.join(args)
         adminCmd.onecmd(args)
 

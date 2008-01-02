@@ -14,7 +14,7 @@ class TestTemplate:
 
     def test_1(self):
         name = 'annakarenina'
-        datapkg.create_distribution(name=name, base_path=self.tmp)
+        datapkg.create(name=name, base_path=self.tmp)
         dest = os.path.join(self.tmp, name)
         assert os.path.exists(dest)
         setuppy = os.path.join(dest, 'setup.py')

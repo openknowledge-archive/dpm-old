@@ -29,7 +29,15 @@ SOFTWARE.
 
 import os
 
-def create_distribution(name, base_path=''):
+def create(name, base_path=''):
+    '''Create a skeleton data package
+
+    >>> import datapkg
+    >>> os.chdir('/tmp')
+    >>> pkg_name = 'my-random-name'
+    >>> datapkg.create(pkg_name)
+        ...
+    '''
     cmd = 'paster create --template=datapkg '
     if base_path:
         cmd += '--output-dir %s ' % base_path
@@ -40,4 +48,15 @@ from paste.script.templates import Template
 class DataPkgTemplate(Template):
     _template_dir = 'templates/default_distribution'
     summary = 'DataPkg default distribution template'
+
+def install(name):
+    pass
+
+def upload(path='.'):
+    fns = os.listdir('.')
+    if 'setup.py' not in fns:
+        msg = '%s does not look like a data package (no setup.py ...)' % path
+        raise Exception(msg)
+    
+
 
