@@ -29,6 +29,9 @@ SOFTWARE.
 
 import os
 
+from package import Package, PackagePython
+from manager import PackageManager
+
 def create(name, base_path=''):
     '''Create a skeleton data package
 
@@ -50,7 +53,8 @@ class DataPkgTemplate(Template):
     summary = 'DataPkg default distribution template'
 
 def install(name):
-    pass
+    mgr = PackageManager()
+    mgr.install(name)
 
 def upload(path='.'):
     fns = os.listdir('.')
@@ -58,5 +62,3 @@ def upload(path='.'):
         msg = '%s does not look like a data package (no setup.py ...)' % path
         raise Exception(msg)
     
-
-
