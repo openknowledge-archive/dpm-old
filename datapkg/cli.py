@@ -39,8 +39,10 @@ class DataPkgAdmin(cmd.Cmd):
         about = \
 '''datapkg version %s.
 
-Copyright the Open Knowledge Foundation. datapkg is open-knowledge and
-open-source. For license details run the license command.
+datapkg is Open Knowledge and Open Source. For copyright and license details
+run the 'license' command.
+
+For more information about datapkg and how to use it run the `info` command.
 ''' % version
         print about
 
@@ -48,6 +50,16 @@ open-source. For license details run the license command.
         import datapkg 
         license = datapkg.__license_full__
         print license
+
+    def do_info(self, line=None):
+        import datapkg 
+        info = datapkg.__doc__
+        print
+        print '                   ## DataPkg Tutorial ##'
+        print '\n' + info
+
+    def help_info(self, line=None):
+        print 'More information about datapkg including a tutorial.'
 
     def do_quit(self, line=None):
         sys.exit()

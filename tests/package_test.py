@@ -6,7 +6,8 @@ import zipfile
 import datapkg
 
 class TestPackage:
-
+ 
+    @classmethod
     def setup_class(self):
         self.tmp = tempfile.mkdtemp()
         self.tmp2 = tempfile.mkstemp()[1]
@@ -16,6 +17,7 @@ class TestPackage:
         zf.writestr('data.csv', '1,3,5')
         zf.close()
 
+    @classmethod
     def teardown_class(self):
         shutil.rmtree(self.tmp)
         os.remove(self.tmp2)
@@ -48,6 +50,6 @@ class TestPackage:
         fo = pkg.resource_stream('__init__.py')
         out = fo.read()
         assert len(out) > 0
-        assert out.startswith('# datapkg.')
+        assert out.startswith("'''datapkg is a tool")
 
 

@@ -1,3 +1,4 @@
+import os
 import tempfile
 import shutil
 from StringIO import StringIO
@@ -8,14 +9,40 @@ from datapkg import PackageManager
 # beauty of this is we can combine items across many different systems
 # pypi, apt ...
 
-class TestPackageManager:
+class TestPackageManagerSetup:
 
+    @classmethod
+    def setup_class(self):
+        self.tmp = tempfile.mkdtemp()
+        self.init_path = os.path.join(self.tmp, '.datapkg')
+        # get default
+        # cache path = ~/var/lib/datapkg/default/index.csv
+        self.pkgmgr = PackageManager(self.init_path)
+
+    @classmethod
+    def teardown_class(self):
+        shutil.rmtree(self.tmp)
+
+    def test_paths(self):
+        config_path = os.path.join(self.init_path, 'config.ini')
+        assert config_path == self.pkgmgr.config_path
+
+    def test_init(self):
+        self.pkgmgr.init()
+        assert os.path.exists(self.pkgmgr.config_path)
+        assert os.path.exists(self.pkgmgr.index_path)
+
+
+class TestPackageManagerUse:
+
+    @classmethod
     def setup_class(self):
         self.tmp = tempfile.mkdtemp()
         # get default
         # cache path = ~/var/lib/datapkg/default/index.csv
         self.pkgmgr = PackageManager(self.tmp)
 
+    @classmethod
     def teardown_class(self):
         shutil.rmtree(self.tmp)
 

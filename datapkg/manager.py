@@ -1,16 +1,40 @@
+'''The Package Manager which handles installation and removal of packages in
+the local repository.
+
+Idea: handle the index in a mercurial repository so we can pull from elsewhere
+etc. This avoids us having to handle all the syncing stuff.
+'''
 import os
 import ConfigParser
 
-from package import Package
+import datapkg
+from datapkg.package import Package
 
 class PackageManager(object):
 
-    def __init__(self, cache_path='~/var/lib/datapkg/default'):
-        self.cache_path = os.path.abspath(os.path.expanduser(cache_path))
-        self.index_path = os.path.join(self.cache_path, 'index.ini')
-        self.installed_path = os.path.join(self.cache_path, 'installed')
+    def __init__(self, system_path=None):
+        if system_path is None:
+            system_path = os.path.join(os.path.expanduser('~'), '.datapkg')
+        self.system_path = os.path.abspath(os.path.expanduser(system_path))
+        self.config_path = os.path.join(self.system_path, 'config.ini')
+        self.index_path = os.path.join(self.system_path, 'index')
+        self.installed_path = os.path.join(self.system_path, 'installed')
         self.index = None
         self.load_index()
+
+    def init(self):
+        if not os.path.exists(self.system_path):
+            os.makedirs(self.system_path)
+            cfg = ConfigParser.SafeConfigParser()
+            cfg.set('DEFAULT', 'version', datapkg.__version__)
+            cfg.write(file(self.config_path, 'w'))
+            # TODO: use mercurial from python
+            cmd = 'hg init %s' % self.index_path
+            os.system(cmd)
+        else:
+            msg = 'init() failed. It looks like you have already ' + \
+                    'initialised a datapkg repository at %s' % self.system_path
+            raise ValueError(msg)
 
     def load_index(self):
         self.index = self._get_index_as_dict()

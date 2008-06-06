@@ -1,7 +1,62 @@
-# datapkg.
+'''datapkg is a tool for distributing, discovering and installing knowledge and
+data 'packages'.
+
+datapkg has two main distinct purposes:
+
+    1. Helping you make material available *to* others.
+    2. Helping you find and obtain material made available *by* others.
+
+NB: in what follows items prefixed with $ should be run on the command line.
+
+1. Making Your Material Available to Others
+===========================================
+
+1. Create a skeletal package::
+
+       $ datapkg create {my-new-package}
+
+   See the help for the create command for more details.
+
+2. Add material to this package::
+
+       $ cd {my-new-package}
+       $ cp {lots-of-my-data-files} .
+       $ datapkg register
+
+
+2. Obtaining Material
+=====================
+
+First set up your local repository::
+
+    $ datapkg init
+
+This will create a .datapkg directory in your home directory along with various
+files including a main configuration file (config.ini).
+
+[Optional] Edit your configuration file::
+
+    $ vi .datapkg/config
+
+Update the index::
+
+    $ datapkg update
+
+Search for a package::
+
+    $ datapkg search *
+
+
+
+3. For Developers
+=================
+
+The easiest thing (which also guarantees up-to-date-ness) is to look through
+the unit tests in ./tests/
+'''
 __version__ = '0.1dev'
 __description__ = 'Data packaging system and utilities.'
-__description_long__ = ''
+__description_long__ = __doc__
 __license__ = 'MIT'
 __license_full__ = \
 '''All material is licensed under the MIT License:
@@ -61,4 +116,5 @@ def upload(path='.'):
     if 'setup.py' not in fns:
         msg = '%s does not look like a data package (no setup.py ...)' % path
         raise Exception(msg)
+    # TODO: implement the rest of this
     

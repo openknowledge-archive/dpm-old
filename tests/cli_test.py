@@ -5,10 +5,12 @@ import shutil
 
 class TestCLI:
 
+    @classmethod
     def setup_class(self):
         self.tmp = tempfile.mkdtemp()
         self.cwd = os.getcwd()
 
+    @classmethod
     def teardown_class(self):
         shutil.rmtree(self.tmp)
         # reset cwd or problems in other tests
