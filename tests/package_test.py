@@ -38,6 +38,73 @@ class TestPackagePlain:
         assert meta == self.meta
 
 
+class TestPackageFull:
+
+    @classmethod
+    def setup_class(self):
+        self.tmp = tempfile.mkdtemp()
+        self.tmpdir2 = tempfile.mkdtemp()
+
+        self.name = 'mytestpkg2'
+        self.filepath = tempfile.mkstemp(suffix='%s-2.1.zip' % self.name)[1]
+        self.url = 'file://%s' % self.filepath
+        zf = zipfile.ZipFile(self.filepath, 'w')
+        self.meta = 'title: xyz'
+        zf.writestr('metadata.txt', self.meta)
+        zf.writestr('data.csv', '1,3,5')
+        zf.close()
+
+        self.pkg = datapkg.package.PackageFull(self.name,
+                version='1.0',
+                download_url=self.url)
+        assert self.pkg.name == self.name
+
+    @classmethod
+    def teardown_class(self):
+        shutil.rmtree(self.tmp)
+        shutil.rmtree(self.tmpdir2)
+        os.remove(self.filepath)
+
+    def test_download(self):
+        self.pkg.download(self.tmp)
+        fn = os.path.basename(self.url)
+        assert fn in os.listdir(self.tmp)
+
+    def test_is_python_package(self):
+        assert not self.pkg.is_python_package(self.filepath)
+
+    def test_unpack_and_make_python(self):
+        outpath = self.pkg.unpack(self.filepath, self.tmpdir2)
+        assert outpath == self.tmpdir2
+        assert os.path.exists(self.tmpdir2)
+        print os.listdir(self.tmpdir2)
+        assert len(os.listdir(self.tmpdir2)) > 0
+
+        self.pkg.make_into_python_package(self.tmpdir2)
+        setuppy = os.path.join(self.tmpdir2, 'setup.py')
+        assert os.path.exists(setuppy)
+        # TODO: test contents
+
+    def test_install(self):
+        install_dir = self.tmp
+        self.pkg.install(install_dir)
+        print os.listdir(install_dir)
+        exists = filter(lambda x: x.startswith(self.pkg.name) and x.endswith('.egg'),
+                os.listdir(install_dir))
+        assert len(exists) == 1
+        # TODO: check contents
+        # for some reason cannot access this dir
+        # fp = exists[0]
+        # fo = file(fp)
+        # print fo.read()
+
+    # def test_download_svn(self):
+    #    pass
+
+    # def test_make_into_python_package(self):
+    #    pass
+
+
 class TestPackagePython:
 
     def test_package_egg(self):
