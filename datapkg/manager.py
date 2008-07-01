@@ -1,5 +1,8 @@
-'''The Package Manager which handles installation and removal of packages in
-the local repository.
+'''The Package Manager which handles all general package features (index,
+search) plus installation and removal of packages in the local repository.
+
+Note that actual installation and removal is delegated to Package object to
+allow for multiple types of package (and natural OO reasons!).
 
 Idea: handle the index in a mercurial repository so we can pull from elsewhere
 etc. This avoids us having to handle all the syncing stuff.
@@ -8,7 +11,7 @@ import os
 import ConfigParser
 
 import datapkg
-from datapkg.package import Package
+from datapkg.package import PackagePlain
 
 class PackageManager(object):
 
@@ -54,14 +57,27 @@ class PackageManager(object):
         for pkg in allpkgs.values():
             for k,v in pkg.items():
                 if search_str in v:
-                    results.append(Package(pkg['id'], **pkg))
+                    results.append(PackagePlain(pkg['id'], **pkg))
         return results
 
     def install(self, name):
         pkgasdict = self.index[name]
-        pkg = Package(pkgasdict['id'], **pkgasdict)
+        pkg = PackagePlain(pkgasdict['id'], **pkgasdict)
         pkg.install(self.installed_path)
         # TODO: ? mark package as installed in the index
+
+    def install_not_from_index(self, url, type=None):
+        '''Install a package that is not yet in the index (e.g. direct from
+        url).'''
+        # take package name from file name
+        # TODO: proper filename generation
+        # file-name must not have
+        # TODO: finish
+        name = os.url.split('/')[-1]
+        # if not type:
+        # TODO: set type correctly
+        pkg = PackagePlain(name, type=type)
+
 
     def __len__(self):
         return len(self.index)
@@ -81,4 +97,7 @@ class PackageManager(object):
             results[section] = outdict
         return results
 
+
+def pkg_name_from_file_name(filename):
+    pass
 

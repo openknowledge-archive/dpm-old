@@ -1,14 +1,56 @@
 '''datapkg is a tool for distributing, discovering and installing knowledge and
 data 'packages'.
 
-datapkg has two main distinct purposes:
+datapkg has two main distinct uses:
 
-    1. Helping you make material available *to* others.
-    2. Helping you find and obtain material made available *by* others.
+    1. Find, obtaining and accessing material made available *by* others.
+    2. Assisting you to make material available *to* others.
 
 NB: in what follows items prefixed with $ should be run on the command line.
 
-1. Making Your Material Available to Others
+1. Obtaining Material
+=====================
+
+1.1 Set Up Your Local Repository
+--------------------------------
+
+First set up your local repository::
+
+    $ datapkg init
+
+This will create a .datapkg directory in your home directory along with various
+files including a main configuration file (config.ini).
+
+[Optional] Edit your configuration file::
+
+    $ vi .datapkg/config.ini
+
+1.2 Obtain and Install Material
+-------------------------------
+
+Install a package directly from a url::
+
+    $ datapkg install ${url}
+
+[NOT YET OPERATIONAL]
+
+Update the index::
+
+    $ datapkg update
+
+[NOT YET OPERATIONAL]
+
+Search for a package::
+
+    $ datapkg search *
+
+1.3 Access This Material
+------------------------
+
+[NOT YET OPERATIONAL]
+
+
+2. Making Your Material Available to Others
 ===========================================
 
 1. Create a skeletal package::
@@ -21,30 +63,13 @@ NB: in what follows items prefixed with $ should be run on the command line.
 
        $ cd {my-new-package}
        $ cp {lots-of-my-data-files} .
+
+[NOT YET OPERATIONAL]
+
+3. Register your package with registry (such as CKAN)::
+
        $ datapkg register
 
-
-2. Obtaining Material
-=====================
-
-First set up your local repository::
-
-    $ datapkg init
-
-This will create a .datapkg directory in your home directory along with various
-files including a main configuration file (config.ini).
-
-[Optional] Edit your configuration file::
-
-    $ vi .datapkg/config
-
-Update the index::
-
-    $ datapkg update
-
-Search for a package::
-
-    $ datapkg search *
 
 
 
@@ -84,9 +109,6 @@ SOFTWARE.
 
 import os
 
-from package import Package, PackagePython
-from manager import PackageManager
-
 def create(name, base_path=''):
     '''Create a skeleton data package
 
@@ -108,6 +130,7 @@ class DataPkgTemplate(Template):
     summary = 'DataPkg default distribution template'
 
 def install(name):
+    from manager import PackageManager
     mgr = PackageManager()
     mgr.install(name)
 

@@ -5,7 +5,7 @@ from StringIO import StringIO
 
 import py.test
 
-from datapkg import PackageManager
+from datapkg.manager import PackageManager
 # beauty of this is we can combine items across many different systems
 # pypi, apt ...
 

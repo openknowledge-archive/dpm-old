@@ -3,19 +3,31 @@ from StringIO import StringIO
 import urllib
 from zipfile import ZipFile
 
-
-class Package(object):
+class BasePackage(object):
+    type = 'none'
 
     def __init__(self, name, **kwargs):
-        self.type = 'datapkg'
-        self.installed = False
-        self.installed_format = 'plain'
         self.name = name
+        self.installed = False
         for k,v in kwargs.items():
             setattr(self, k, v)
 
     def install(self, cache_path=None):
-        # TODO support other download types than zip
+        raise NotImplementedError()
+
+    def resource_stream(self, path):
+        raise NotImplementedError()
+
+
+class PackagePlain(BasePackage):
+    type = 'plain'
+
+    def install(self, cache_path=None):
+        '''
+        TODO support other download types than zip
+
+        Maybe can use distutils.install_data here?
+        '''
 
         # it is a url so use posixpath
         # import posixpath
@@ -39,7 +51,7 @@ class Package(object):
             raise Exception(msg)
 
 
-class PackagePython(Package):
+class PackagePython(BasePackage):
 
     def __init__(self, name, **kwargs):
         super(PackagePython, self).__init__(name, **kwargs)
