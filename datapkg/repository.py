@@ -2,6 +2,8 @@ import os
 import ConfigParser
 
 import datapkg
+import datapkg.index
+
 class Repository(object):
 
     def __init__(self, system_path=None):
@@ -9,9 +11,10 @@ class Repository(object):
             system_path = os.path.join(os.path.expanduser('~'), '.datapkg')
         self.system_path = os.path.abspath(os.path.expanduser(system_path))
         self.config_path = os.path.join(self.system_path, 'config.ini')
-        self.index_path = os.path.join(self.system_path, 'index')
+        self.index_path = os.path.join(self.system_path, 'index.db')
+        self.index_dburi = 'sqlite://%s' % self.index_path
         self.installed_path = os.path.join(self.system_path, 'installed')
-        self.index = None
+        self.index = datapkg.index.Index(self.index_dburi)
 
     def init(self):
         if not os.path.exists(self.system_path):

@@ -3,7 +3,6 @@ from StringIO import StringIO
 import urllib
 from zipfile import ZipFile
 
-
 import os
 import shutil
 import setuptools.package_index as pi
@@ -146,4 +145,19 @@ setup(
         # except setuptools.archive_util.UnrecognizedFormat:
         #    raise 'You have not provided a recognized file format.'
 
+
+# SQLAlchemy stuff
+from sqlalchemy import Column, MetaData, Table, types, ForeignKey
+from sqlalchemy import orm
+
+# Instantiate meta data manager.
+metadata = MetaData()
+
+package_table = Table('package', metadata,
+    Column('id', types.Integer, primary_key=True),
+    Column('name', types.Unicode(255)),
+)
+
+from sqlalchemy.orm import mapper
+mapper(Package, package_table)
 
