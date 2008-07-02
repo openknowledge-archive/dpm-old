@@ -11,7 +11,6 @@ import os
 import ConfigParser
 
 import datapkg
-from datapkg.package import PackagePlain
 
 class PackageManager(object):
 

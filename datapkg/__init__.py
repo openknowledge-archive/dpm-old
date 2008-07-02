@@ -118,11 +118,9 @@ def create(name, base_path=''):
     >>> datapkg.create(pkg_name)
         ...
     '''
-    cmd = 'paster create --template=datapkg '
-    if base_path:
-        cmd += '--output-dir %s ' % base_path
-    cmd += name
-    os.system(cmd)
+    import package
+    pkg = package.Package(name)
+    pkg.create_file_structure(base_path)
 
 from paste.script.templates import Template
 class DataPkgTemplate(Template):

@@ -98,6 +98,27 @@ Install package <name>.'''
 Create a skeleton data package named <name> in the current directory.'''
         print usage
 
+    def do_install(self, line):
+        pkg_path = line.strip()
+        import datapkg
+        if not path:
+            path = '.'
+        # get repository install_dir
+        repo = datapkg.repository.Repository()
+        install_dir = repo.installed_path
+        pkg = datapkg.package.Package()
+        pkg.install(install_dir, pkg_path)
+    
+    def help_install(self, line=None):
+        usage = \
+'''datapkg install [path]
+
+Install a package located at path on disk. If path not provided default to
+current directory.
+'''
+        print usage
+
+
 def main():
     import optparse
     usage = \

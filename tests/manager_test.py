@@ -9,7 +9,7 @@ from datapkg.manager import PackageManager
 # beauty of this is we can combine items across many different systems
 # pypi, apt ...
 
-class TestPackageManagerSetup:
+class _TestPackageManagerSetup:
 
     @classmethod
     def setup_class(self):
@@ -33,7 +33,7 @@ class TestPackageManagerSetup:
         assert os.path.exists(self.pkgmgr.index_path)
 
 
-class TestPackageManagerUse:
+class _TestPackageManagerUse:
 
     @classmethod
     def setup_class(self):

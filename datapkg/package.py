@@ -3,67 +3,46 @@ from StringIO import StringIO
 import urllib
 from zipfile import ZipFile
 
-class BasePackage(object):
-    type = 'none'
-
-    def __init__(self, name, **kwargs):
-        self.name = name
-        self.version = '0.0'
-        self.installed = False
-        for k,v in kwargs.items():
-            setattr(self, k, v)
-
-    def install(self, cache_path=None):
-        raise NotImplementedError()
-
-    def resource_stream(self, path):
-        raise NotImplementedError()
-
-
-class PackagePlain(BasePackage):
-    type = 'plain'
-
-    def install(self, cache_path=None):
-        '''
-        TODO support other download types than zip
-
-        Maybe can use distutils.install_data here?
-        '''
-
-        # it is a url so use posixpath
-        # import posixpath
-        # fn = posixpath.basename(self.download_url)
-        fn = self.name
-        fp = os.path.join(cache_path, fn)
-        urllib.urlretrieve(self.download_url, fp)
-        self.installed = True
-        self.installed_path = fp
-        self.installed_format = 'zip'
-
-    def resource_stream(self, path):
-        if self.installed_format == 'plain':
-            fp = os.path.join(self.installed_path, path) 
-            return file(fp)
-        elif self.installed_format == 'zip':
-            zf = ZipFile(self.installed_path)
-            return StringIO(zf.read(path))
-        else:
-            msg = 'Installed format %s not supported' % self.installed_format
-            raise Exception(msg)
 
 import os
 import shutil
 import setuptools.package_index as pi
 import setuptools.command.easy_install
 import setuptools.archive_util
-class PackageFull(BasePackage):
-    type = 'full'
-    def __init__(self, name, **kwargs):
-        super(PackageFull, self).__init__(name, **kwargs)
+class Package(object):
+    def __init__(self, name=None, **kwargs):
+        self.name = name
+        self.version = '0.0'
+        self.installed = False
+        for k,v in kwargs.items():
+            setattr(self, k, v)
+        # self.metadata = Metadata()
+
+        # setuptools stuff
         self.pi = pi.PackageIndex('http://random.url/')
         import setuptools.dist
         tdist = setuptools.dist.Distribution()
         self.easy_install = setuptools.command.easy_install.easy_install(tdist)
+
+    def create_file_structure(self, base_path=''):
+        '''Create a skeleton data package
+
+        >>> import datapkg
+        >>> os.chdir('/tmp')
+        >>> pkg_name = 'my-random-name'
+        >>> datapkg.create(pkg_name)
+            ...
+        '''
+        cmd = 'paster create --template=datapkg '
+        if base_path:
+            cmd += '--output-dir %s ' % base_path
+        cmd += self.name
+        # TODO: catch stdout and only print if error
+        import commands
+        # os.system(cmd)
+        status, output = commands.getstatusoutput(cmd)
+        if status:
+            print output
 
     def download(self, tmpdir):
         filepath = self.pi.download(self.download_url, tmpdir)
@@ -112,6 +91,7 @@ class PackageFull(BasePackage):
             return os.path.abspath(dist_filename)
     
     def make_into_python_package(self, path):
+        # self.create
         fo = open(os.path.join(path, 'setup.py'), 'w')
         setup_dot_py = \
 '''from setuptools import setup
@@ -152,8 +132,10 @@ setup(
         # emulate
         # cmd = 'easy_install --multi-version --install-dir %s %s' % (install_dir, setup_base)
         # os.system(cmd)
+
         self.easy_install.install_dir = install_dir
         self.easy_install.multi_version = True
+        self.easy_install.zip_ok = False
         # hack to make finalize_options happy
         self.easy_install.args = True
         self.easy_install.finalize_options()
@@ -163,22 +145,5 @@ setup(
             deps, install_needed)
         # except setuptools.archive_util.UnrecognizedFormat:
         #    raise 'You have not provided a recognized file format.'
-
-
-class PackagePython(BasePackage):
-
-    def __init__(self, name, **kwargs):
-        super(PackagePython, self).__init__(name, **kwargs)
-        self.type = 'python'
-
-    def install(self, cache_path=None):
-        # TODO: use setuptools package ...
-        import os
-        cmd = 'easy_install %s' % self.name
-        os.system(cmd)
-
-    def resource_stream(self, path):
-        import pkg_resources
-        return pkg_resources.resource_stream(self.name, path)
 
 
