@@ -4,8 +4,9 @@ import tempfile
 import zipfile
 
 import datapkg.package
+from datapkg.tests.base import TestCase
 
-class TestPackage:
+class TestPackage(TestCase):
 
     def setUp(self):
         self.tmp = '/tmp/datapkg-abc'
@@ -14,8 +15,7 @@ class TestPackage:
         self.install_dir = os.path.join(self.tmp, 'installed')
         os.makedirs(self.install_dir)
         self.pkg_name = 'mytestpkg2'
-        self.pkg = datapkg.package.Package(self.pkg_name,
-                version='1.0')
+        self.pkg = datapkg.package.Package(self.pkg_name, version='1.0')
         assert self.pkg.name == self.pkg_name
 
     def tearDown(self):

@@ -11,6 +11,7 @@ setup(
     install_requires=[
         'setuptools>=0.6c',
         'PasteDeploy>=1.0', 'PasteScript>=1.0',
+        'SQLAlchemy>=0.4',
     ],
     entry_points='''
     [paste.paster_create_template]

@@ -71,18 +71,6 @@ For more information about datapkg and how to use it run the `info` command.
     # =================
     # Commands
 
-    def do_install(self, line):
-        name = line.strip()
-        import datapkg
-        datapkg.install(name)
-
-    def help_install(self):
-        usage = \
-'''install <name>
-
-Install package <name>.'''
-        print usage
-
     def do_create(self, line):
         name = line.strip()
         import datapkg

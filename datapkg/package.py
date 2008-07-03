@@ -8,7 +8,9 @@ import shutil
 import setuptools.package_index as pi
 import setuptools.command.easy_install
 import setuptools.archive_util
+
 class Package(object):
+
     def __init__(self, name=None, **kwargs):
         self.name = name
         self.version = '0.0'
