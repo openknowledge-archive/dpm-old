@@ -94,29 +94,44 @@ For more information about datapkg and how to use it run the `info` command.
     def help_ckanregister(self, line=None):
         import datapkg
         usage = \
-'''datapkg ckanregister [path]
+'''datapkg ckanregister [path] [api-key]
 
 Register a package located at path on disk with the CKAN service. If path 
-not provided, it defaults to current directory. Please use the ckanupdate
-command to update the register when the package information changes."
+not provided, it defaults to current directory. If a valid api-key is not
+provided, changes to the CKAN regsiter will not be allowed. Please use the
+ckanupdate command to update the register when the package metadata changes.
 '''
         print usage
 
     def do_ckanupdate(self, line):
-        path = line.strip()
+        args = line.strip().split(' ')
+        path = args[0]
+        if len(args) > 1:
+            api_key = args[1]
+        else:
+            api_key = None
+        if len(args) > 2:
+            base_location = args[2]
+        else:
+            base_location = None
         import datapkg
         msg = 'Updating datapkg on CKAN: %s' %  path
         self._print(msg)
-        datapkg.ckanupdate(path=path)
+        datapkg.ckanupdate(
+            path=path,
+            base_location=base_location,
+            api_key=api_key,
+        )
 
     def help_ckanupdate(self, line=None):
         import datapkg
         usage = \
-'''datapkg ckanupdate [path]
+'''datapkg ckanupdate [path] [api-key]
 
 Update a package located at path on disk with the CKAN service. If path 
-not provided, it defaults to current directory. If the package has not
-already been registered, just use the ckanregister option at first.
+not provided, it defaults to current directory. If a valid api-key is not
+provided, changes to the CKAN regsiter will not be allowed. Please use the
+ckanupdate command to update the register when the package metadata changes.
 '''
         print usage
 
