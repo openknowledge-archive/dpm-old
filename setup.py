@@ -22,7 +22,7 @@ setup(
     ''',
 
     # metadata
-    author='Open Knowledge Foundation',
+    author='Appropriate Software Foundation, Open Knowledge Foundation',
     author_email='info@okfn.org',
     license=__license__,
     description=__description__,
