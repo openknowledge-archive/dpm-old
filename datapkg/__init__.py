@@ -109,6 +109,37 @@ SOFTWARE.
 
 import os
 
+def ckanregister(path, base_location=None, api_key=None):
+    from datapkg.pypkgtools import PyPkgTools
+    tool = PyPkgTools()
+    print "Loading metadata from: %s" % path
+    data = tool.load_metadata(path)
+    name = data.get_name()
+    title = data.get_description()
+    url = data.get_url()
+    download_url = data.get_download_url()
+    # Todo: tags from keywords?
+    tags = []
+    pkg_dict = {
+        'name': name,
+        'title': title,
+        'url': url,
+        'download_url': download_url,
+        'tags': tags,
+    }
+    print "Package dict: %s" % pkg_dict
+    from ckanclient import CkanClient
+    service_kwds = {}
+    if base_location:
+        service_kwds['base_location'] = base_location
+    if api_key:
+        service_kwds['api_key'] = api_key
+    print "CKAN config: %s" % service_kwds 
+    ckan = CkanClient(**service_kwds)
+    print "Base location: %s" % ckan.base_location
+    ckan.package_register_post(pkg_dict)
+    print "Operation status: %s" % ckan.last_status
+
 def create(name, base_path=''):
     '''Create a skeleton data package
 

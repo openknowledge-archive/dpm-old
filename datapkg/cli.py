@@ -71,6 +71,55 @@ For more information about datapkg and how to use it run the `info` command.
     # =================
     # Commands
 
+    def do_ckanregister(self, line):
+        args = line.strip().split(' ')
+        path = args[0]
+        if len(args) > 1:
+            api_key = args[1]
+        else:
+            api_key = None
+        if len(args) > 2:
+            base_location = args[2]
+        else:
+            base_location = None
+        import datapkg
+        msg = 'Registering with CKAN the datapkg on path: %s' %  path
+        self._print(msg)
+        datapkg.ckanregister(
+            path=path,
+            base_location=base_location,
+            api_key=api_key,
+        )
+
+    def help_ckanregister(self, line=None):
+        import datapkg
+        usage = \
+'''datapkg ckanregister [path]
+
+Register a package located at path on disk with the CKAN service. If path 
+not provided, it defaults to current directory. Please use the ckanupdate
+command to update the register when the package information changes."
+'''
+        print usage
+
+    def do_ckanupdate(self, line):
+        path = line.strip()
+        import datapkg
+        msg = 'Updating datapkg on CKAN: %s' %  path
+        self._print(msg)
+        datapkg.ckanupdate(path=path)
+
+    def help_ckanupdate(self, line=None):
+        import datapkg
+        usage = \
+'''datapkg ckanupdate [path]
+
+Update a package located at path on disk with the CKAN service. If path 
+not provided, it defaults to current directory. If the package has not
+already been registered, just use the ckanregister option at first.
+'''
+        print usage
+
     def do_create(self, line):
         name = line.strip()
         import datapkg
