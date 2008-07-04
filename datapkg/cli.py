@@ -98,7 +98,7 @@ For more information about datapkg and how to use it run the `info` command.
 
 Register a package located at path on disk with the CKAN service. If path 
 not provided, it defaults to current directory. If a valid api-key is not
-provided, changes to the CKAN regsiter will not be allowed. Please use the
+provided, changes to the CKAN register will not be allowed. Please use the
 ckanupdate command to update the register when the package metadata changes.
 '''
         print usage
@@ -130,7 +130,7 @@ ckanupdate command to update the register when the package metadata changes.
 
 Update a package located at path on disk with the CKAN service. If path 
 not provided, it defaults to current directory. If a valid api-key is not
-provided, changes to the CKAN regsiter will not be allowed. Please use the
+provided, changes to the CKAN register will not be allowed. Please use the
 ckanupdate command to update the register when the package metadata changes.
 '''
         print usage
