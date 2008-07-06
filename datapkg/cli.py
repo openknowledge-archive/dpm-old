@@ -71,6 +71,52 @@ For more information about datapkg and how to use it run the `info` command.
     # =================
     # Commands
 
+    def do_ckanlist(self, line):
+        args = line.strip().split(' ')
+        if len(args) > 0:
+            base_location = args[0]
+        else:
+            base_location = None
+        import datapkg
+        msg = 'Listing packages registered on CKAN... %s' % base_location
+        self._print(msg)
+        datapkg.ckanlist(
+            base_location=base_location,
+        )
+
+    def help_ckanlist(self, line=None):
+        import datapkg
+        usage = \
+'''datapkg ckanlist 
+
+Prints the names of all the packages registered on the CKAN service.
+'''
+        print usage
+
+    def do_ckanshow(self, line):
+        args = line.strip().split(' ')
+        pkg_name = args[0]
+        if len(args) > 1:
+            base_location = args[1]
+        else:
+            base_location = None
+        import datapkg
+        msg = 'Showing details for \'%s\' package registered on CKAN... %s' % (pkg_name, base_location)
+        self._print(msg)
+        datapkg.ckanshow(
+            pkg_name=pkg_name,
+            base_location=base_location,
+        )
+
+    def help_ckanshow(self, line=None):
+        import datapkg
+        usage = \
+'''datapkg ckanshow name 
+
+Prints the registered details of the named package on the CKAN service.
+'''
+        print usage
+
     def do_ckanregister(self, line):
         args = line.strip().split(' ')
         path = args[0]
