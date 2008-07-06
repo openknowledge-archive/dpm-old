@@ -71,6 +71,28 @@ For more information about datapkg and how to use it run the `info` command.
     # =================
     # Commands
 
+    def do_ckantags(self, line):
+        args = line.strip().split(' ')
+        if len(args) > 0:
+            base_location = args[0]
+        else:
+            base_location = None
+        import datapkg
+        msg = 'Listing all tags registered on CKAN... %s' % base_location
+        self._print(msg)
+        datapkg.ckantags(
+            base_location=base_location,
+        )
+
+    def help_ckantags(self, line=None):
+        import datapkg
+        usage = \
+'''datapkg ckantags 
+
+Prints the all the tags in use on the CKAN service.
+'''
+        print usage
+
     def do_ckanlist(self, line):
         args = line.strip().split(' ')
         if len(args) > 0:

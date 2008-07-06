@@ -77,10 +77,11 @@ Search for a package::
 Todo: Integrate CKAN commands into above narrative.
 
     $ datapkg ckanlist
-    $ datapkg ckanshow  ${name}
     $ datapkg ckanregister ${path}
-    $ datapkg ckanupdate ${path}
     $ datapkg ckansearch *
+    $ datapkg ckanshow  ${name}
+    $ datapkg ckantags
+    $ datapkg ckanupdate ${path}
 
 
 3. For Developers
@@ -119,6 +120,82 @@ SOFTWARE.
 
 import os
 
+# Todo: Tests on these ckan- functions.
+
+def ckantags(base_location=None):
+    ckan = start_ckanclient(base_location)
+    ckan.tag_register_get()
+    print_status(ckan)
+    if ckan.last_message != None:
+        print "\n".join(ckan.last_message)
+
+def ckanlist(base_location=None):
+    ckan = start_ckanclient(base_location)
+    ckan.package_register_get()
+    print_status(ckan)
+    if ckan.last_message != None:
+        print "\n".join(ckan.last_message)
+
+def ckanshow(pkg_name, base_location=None):
+    ckan = start_ckanclient(base_location)
+    ckan.package_entity_get(pkg_name)
+    print_status(ckan)
+    if ckan.last_message != None:
+        package_dict = ckan.last_message
+        for (name, value) in package_dict.items():
+            if name == 'tags':
+                value = " ".join(value)
+            print "%s: %s" % (name, value)
+
+def ckanregister(path, base_location=None, api_key=None):
+    pkg_dict = load_pkg_metadata(path)
+    ckan = start_ckanclient(base_location, api_key)
+    ckan.package_register_post(pkg_dict)
+    print_status(ckan)
+
+def ckanupdate(path, base_location=None, api_key=None):
+    pkg_dict = load_pkg_metadata(path)
+    ckan = start_ckanclient(base_location, api_key)
+    ckan.package_entity_put(pkg_dict)
+    print_status(ckan)
+
+def load_pkg_metadata(path):
+    from datapkg.pypkgtools import PyPkgTools
+    tool = PyPkgTools()
+    #print "datapkg: Loading metadata from: %s" % path
+    data = tool.load_metadata(path)
+    name = data.get_name()
+    if name == 'UNKNOWN': name = ''
+    title = data.get_description()
+    if title == 'UNKNOWN': title = ''
+    url = data.get_url()
+    if url == 'UNKNOWN': url = ''
+    notes = data.get_long_description()
+    if notes == 'UNKNOWN': notes = ''
+    download_url = data.get_download_url()
+    if download_url == 'UNKNOWN': download_url = ''
+    tags = " ".join(data.get_keywords()).split(' ')
+    pkg_metadata = {
+        'name': name,
+        'title': title,
+        'url': url,
+        'download_url': download_url,
+        'notes': notes,
+        'tags': tags,
+    }
+    #print "datapkg: Loaded package metadata: %s" % pkg_metadata
+    return pkg_metadata
+
+def start_ckanclient(base_location=None, api_key=None):
+    from ckanclient import CkanClient
+    service_kwds = {}
+    if base_location:
+        service_kwds['base_location'] = base_location
+    if api_key:
+        service_kwds['api_key'] = api_key
+    #print "datapkg: CKAN config: %s" % service_kwds 
+    return CkanClient(**service_kwds)
+
 def print_status(ckan):
     if ckan.last_status == 200:
         pass #print "Datapkg operation was a success."
@@ -130,102 +207,6 @@ def print_status(ckan):
         print "Package already registered."
     else:
         print "Datapkg operation failed (code: %s)." % ckan.last_status
-
-def ckanlist(base_location=None):
-    from ckanclient import CkanClient
-    service_kwds = {}
-    if base_location:
-        service_kwds['base_location'] = base_location
-    #print "datapkg: CKAN config: %s" % service_kwds 
-    ckan = CkanClient(**service_kwds)
-    #print "datapkg: Base location: %s" % ckan.base_location
-    ckan.package_register_get()
-    #print "datapkg: Operation status: %s" % ckan.last_status
-    print_status(ckan)
-    if ckan.last_message != None:
-        #print "Registered names of all packages on CKAN:"
-        print "\n".join(ckan.last_message)
-
-def ckanshow(pkg_name, base_location=None):
-    from ckanclient import CkanClient
-    service_kwds = {}
-    if base_location:
-        service_kwds['base_location'] = base_location
-    #print "datapkg: CKAN config: %s" % service_kwds 
-    ckan = CkanClient(**service_kwds)
-    #print "datapkg: Base location: %s" % ckan.base_location
-    ckan.package_entity_get(pkg_name)
-    #print "datapkg: Operation status: %s" % ckan.last_status
-    print_status(ckan)
-    if ckan.last_message != None:
-        #print "Registered details for CKAN data package '%s':" % pkg_name
-        package_dict = ckan.last_message
-        for (name, value) in package_dict.items():
-            print "%s: %s" % (name, value)
-
-def ckanregister(path, base_location=None, api_key=None):
-    from datapkg.pypkgtools import PyPkgTools
-    tool = PyPkgTools()
-    #print "datapkg: Loading metadata from: %s" % path
-    data = tool.load_metadata(path)
-    name = data.get_name()
-    title = data.get_description()
-    url = data.get_url()
-    download_url = data.get_download_url()
-    # Todo: tags from keywords?
-    tags = []
-    pkg_dict = {
-        'name': name,
-        'title': title,
-        'url': url,
-        'download_url': download_url,
-        'tags': tags,
-    }
-    #print "datapkg: Package dict: %s" % pkg_dict
-    from ckanclient import CkanClient
-    service_kwds = {}
-    if base_location:
-        service_kwds['base_location'] = base_location
-    if api_key:
-        service_kwds['api_key'] = api_key
-    #print "datapkg: CKAN config: %s" % service_kwds 
-    ckan = CkanClient(**service_kwds)
-    #print "datapkg: Base location: %s" % ckan.base_location
-    ckan.package_register_post(pkg_dict)
-    #print "datapkg: Operation status: %s" % ckan.last_status
-    print_status(ckan)
-
-def ckanupdate(path, base_location=None, api_key=None):
-    from datapkg.pypkgtools import PyPkgTools
-    tool = PyPkgTools()
-    #print "datapkg: Loading metadata from: %s" % path
-    data = tool.load_metadata(path)
-    name = data.get_name()
-    title = data.get_description()
-    url = data.get_url()
-    download_url = data.get_download_url()
-    # Todo: tags from keywords?
-    tags = []
-    pkg_dict = {
-        'name': name,
-        'title': title,
-        'url': url,
-        'download_url': download_url,
-        'tags': tags,
-    }
-    #print "datapkg: Package dict: %s" % pkg_dict
-    from ckanclient import CkanClient
-    service_kwds = {}
-    if base_location:
-        service_kwds['base_location'] = base_location
-    if api_key:
-        service_kwds['api_key'] = api_key
-    #print "datapkg: CKAN config: %s" % service_kwds 
-    ckan = CkanClient(**service_kwds)
-    #print "datapkg: Base location: %s" % ckan.base_location
-    ckan.package_entity_put(pkg_dict)
-    #print "datapkg: Operation status: %s" % ckan.last_status
-    print_status(ckan)
 
 def create(name, base_path=''):
     '''Create a skeleton data package
