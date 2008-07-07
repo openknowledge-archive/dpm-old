@@ -122,30 +122,37 @@ import os
 
 # Todo: Tests on these ckan- functions.
 
-def ckantags(base_location=None):
-    ckan = start_ckanclient(base_location)
-    ckan.tag_register_get()
-    print_status(ckan)
-    if ckan.last_message != None:
-        print "\n".join(ckan.last_message)
-
 def ckanlist(base_location=None):
     ckan = start_ckanclient(base_location)
     ckan.package_register_get()
     print_status(ckan)
-    if ckan.last_message != None:
-        print "\n".join(ckan.last_message)
+    if ckan.last_status == 200:
+        if ckan.last_message != None:
+            print "\n".join(ckan.last_message)
+        else:
+            print "No response data. Check the resource location."
+
+def ckantags(base_location=None):
+    ckan = start_ckanclient(base_location)
+    ckan.tag_register_get()
+    print_status(ckan)
+    if ckan.last_status == 200:
+        if ckan.last_message != None:
+            print "\n".join(ckan.last_message)
+        else:
+            print "No response data. Check the resource location."
 
 def ckanshow(pkg_name, base_location=None):
     ckan = start_ckanclient(base_location)
     ckan.package_entity_get(pkg_name)
     print_status(ckan)
-    if ckan.last_message != None:
-        package_dict = ckan.last_message
-        for (name, value) in package_dict.items():
-            if name == 'tags':
-                value = " ".join(value)
-            print "%s: %s" % (name, value)
+    if ckan.last_status == 200:
+        if ckan.last_message != None:
+            package_dict = ckan.last_message
+            for (name, value) in package_dict.items():
+                if name == 'tags':
+                    value = " ".join(value)
+                print "%s: %s" % (name, value)
 
 def ckanregister(path, base_location=None, api_key=None):
     pkg_dict = load_pkg_metadata(path)
@@ -197,16 +204,23 @@ def start_ckanclient(base_location=None, api_key=None):
     return CkanClient(**service_kwds)
 
 def print_status(ckan):
-    if ckan.last_status == 200:
+    if ckan.last_status == None:
+        if ckan.last_url_error:
+            print "Network error: %s" % ckan.last_url_error.reason[1]
+    elif ckan.last_status == 200:
         pass #print "Datapkg operation was a success."
+    elif ckan.last_status == 400:
+        print "Bad request (400). Please check the submission."
     elif ckan.last_status == 403:
-        print "Operation not authorised."
+        print "Operation not authorised (403). Check the API key."
     elif ckan.last_status == 404:
-        print "Package not found."
+        print "Resource not found (404). Please check names and locations."
     elif ckan.last_status == 409:
-        print "Package already registered."
+        print "Package already registered (409). Update with 'ckanupdate'?"
+    elif ckan.last_status == 500:
+        print "Server error (500). Unable to service request. Seek help"
     else:
-        print "Datapkg operation failed (code: %s)." % ckan.last_status
+        print "System error (%s). Seek help." %  ckan.last_status
 
 def create(name, base_path=''):
     '''Create a skeleton data package
