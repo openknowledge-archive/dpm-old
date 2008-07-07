@@ -1,5 +1,9 @@
 import os
+
+import datapkg.util
+
 def test_simple():
     cmd = 'python setup.py egg_info'
-    os.system(cmd)
+    status, output = datapkg.util.getstatusoutput(cmd)
+    assert not status, output
 

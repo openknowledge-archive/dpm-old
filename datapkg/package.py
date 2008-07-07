@@ -9,6 +9,8 @@ import setuptools.package_index as pi
 import setuptools.command.easy_install
 import setuptools.archive_util
 
+import datapkg.util
+
 class Package(object):
 
     def __init__(self, name=None, **kwargs):
@@ -44,7 +46,7 @@ class Package(object):
         import commands
         # os.system(cmd)
         print cmd
-        status, output = commands.getstatusoutput(cmd)
+        status, output = datapkg.util.getstatusoutput(cmd)
         if status:
             print output
         return dist_path

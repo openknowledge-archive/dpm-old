@@ -6,9 +6,15 @@ class DataPkgAdmin(cmd.Cmd):
 
     prompt = 'datapkg > '
 
-    def __init__(self, verbose=False):
+    def __init__(self, repository_path=None, verbose=False):
         cmd.Cmd.__init__(self) # cmd.Cmd is not a new style class
+        self.repository_path = repository_path
         self.verbose = verbose
+
+    def default(self, line=None):
+        # change the 'default' default to return 1
+        print '** Unknown syntax: %s' % line
+        return 1
 
     def run_interactive(self, line=None):
         """Run an interactive session.
@@ -218,6 +224,26 @@ ckanupdate command to update the register when the package metadata changes.
 Create a skeleton data package named <name> in the current directory.'''
         print usage
 
+    def do_init(self, line=None):
+        import datapkg.repository
+        repo = datapkg.repository.Repository(self.repository_path)
+        repo.init()
+    
+    def help_init(self, line=None):
+        import datapkg.repository
+        usage = \
+'''init
+
+Initialize a repository.
+
+The repository will be created at the default location:
+
+    %s
+
+Unless an alternative location is specified via the --repository option.
+''' % datapkg.repository.Repository.default_path()
+        print usage
+
     def do_install(self, line):
         pkg_path = line.strip()
         import datapkg
@@ -241,6 +267,7 @@ current directory.
 
 def main():
     import optparse
+    import sys
     usage = \
 '''%prog [options] <command>
 
@@ -249,13 +276,17 @@ Run about or help for details.
     parser = optparse.OptionParser(usage)
     parser.add_option('-v', '--verbose', dest='verbose', help='Be verbose',
             action='store_true', default=False) 
+    parser.add_option('-r', '--repository', dest='repository',
+        help='Path to repository (if non-default)', default=None)
     options, args = parser.parse_args()
     
     if len(args) == 0:
         parser.print_help()
         return 1
     else:
-        adminCmd = DataPkgAdmin()
+        adminCmd = DataPkgAdmin(repository_path=options.repository,
+                verbose=options.verbose)
         args = ' '.join(args)
-        adminCmd.onecmd(args)
+        status = adminCmd.onecmd(args)
+        sys.exit(status)
 

@@ -4,28 +4,33 @@ import ConfigParser
 import datapkg
 import datapkg.index
 
+
 class Repository(object):
 
-    def __init__(self, system_path=None):
-        if system_path is None:
-            system_path = os.path.join(os.path.expanduser('~'), '.datapkg')
-        self.system_path = os.path.abspath(os.path.expanduser(system_path))
-        self.config_path = os.path.join(self.system_path, 'config.ini')
-        self.index_path = os.path.join(self.system_path, 'index.db')
+    @classmethod
+    def default_path(cls):
+        return os.path.join(os.path.expanduser('~'), '.datapkg')
+
+    def __init__(self, repo_path=None):
+        if repo_path is None:
+            repo_path = self.default_path()
+        self.repo_path = os.path.abspath(os.path.expanduser(repo_path))
+        self.config_path = os.path.join(self.repo_path, 'config.ini')
+        self.index_path = os.path.join(self.repo_path, 'index.db')
         self.index_dburi = 'sqlite://%s' % self.index_path
-        self.installed_path = os.path.join(self.system_path, 'installed')
+        self.installed_path = os.path.join(self.repo_path, 'installed')
         self.index = datapkg.index.Index(self.index_dburi)
 
     def init(self):
-        if not os.path.exists(self.system_path):
-            os.makedirs(self.system_path)
+        if not os.path.exists(self.repo_path):
+            os.makedirs(self.repo_path)
             cfg = ConfigParser.SafeConfigParser()
             cfg.set('DEFAULT', 'version', datapkg.__version__)
             cfg.write(file(self.config_path, 'w'))
             # just stub it for time being
             fo = open(self.index_path, 'w').write('')
         else:
-            msg = 'init() failed. It looks like you have already ' + \
-                    'initialised a datapkg repository at %s' % self.system_path
+            msg = 'init() failed. It looks like you already ' + \
+                    'have something at %s' % self.repo_path
             raise ValueError(msg)
 
