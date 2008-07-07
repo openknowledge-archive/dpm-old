@@ -1,3 +1,4 @@
+# TODO: remove this module (replaced by repository.py)
 '''The Package Manager which handles all general package features (index,
 search) plus installation and removal of packages in the local repository.
 

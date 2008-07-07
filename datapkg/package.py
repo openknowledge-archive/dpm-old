@@ -36,12 +36,14 @@ class Package(object):
             ...
         '''
         cmd = 'paster create --template=datapkg '
-        cmd += '--output-dir %s ' % base_path
+        if base_path:
+            cmd += '--output-dir %s ' % base_path
         cmd += self.name
         dist_path = os.path.join(os.path.abspath(base_path), self.name)
         # TODO: catch stdout and only print if error
         import commands
         # os.system(cmd)
+        print cmd
         status, output = commands.getstatusoutput(cmd)
         if status:
             print output
