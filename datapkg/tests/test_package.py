@@ -44,10 +44,13 @@ class TestPackage(TestCase):
         fo.close()
 
         self.pkg.install(self.install_dir, pkg_source_path)
-
-        exists = filter(lambda x: x.startswith(self.pkg.name) and x.endswith('.egg'),
-                os.listdir(self.install_dir))
-        assert len(exists) == 1
+            
+        in_install_dir = os.listdir(self.install_dir)
+        exists = filter(
+            lambda x: x.startswith(self.pkg.name) and x.endswith('.egg'),
+            in_install_dir
+            )
+        assert len(exists) == 1, in_install_dir
 
         installed_pkg_path = os.path.join(self.install_dir, exists[0])
         installed_pkg_pkgs_path = os.path.join(installed_pkg_path, self.pkg.name)
@@ -58,14 +61,19 @@ class TestPackage(TestCase):
 
 class TestPackageFromDisk:
 
-    @classmethod
-    def setup_class(self):
-        self.tmp = tempfile.mkdtemp()
-        self.tmpdir2 = tempfile.mkdtemp()
+    def setUp(self):
+        self.tmp_base = '/tmp/datapkg-test-from-disk'
+        if os.path.exists(self.tmp_base):
+            shutil.rmtree(self.tmp_base)
+        self.tmpdir = os.path.join(self.tmp_base, 'tmp1')
+        self.tmpdir2 = os.path.join(self.tmp_base, 'tmp2')
+        self.tmpdir3 = os.path.join(self.tmp_base, 'tmp2')
+        os.makedirs(self.tmpdir)
+        os.makedirs(self.tmpdir2)
 
         # setup for testing install from a random file
         self.pkg_name = 'mytestpkg2'
-        self.filepath = tempfile.mkstemp(suffix='%s-2.1.zip' % self.pkg_name)[1]
+        self.filepath = os.path.join(self.tmp_base, '%s-2.1.zip' % self.pkg_name)
         self.url = 'file://%s' % self.filepath
         zf = zipfile.ZipFile(self.filepath, 'w')
         self.meta = 'title: xyz'
@@ -78,42 +86,40 @@ class TestPackageFromDisk:
                 download_url=self.url)
         assert self.pkg.name == self.pkg_name
 
-    @classmethod
-    def teardown_class(self):
-        shutil.rmtree(self.tmp)
-        shutil.rmtree(self.tmpdir2)
-        os.remove(self.filepath)
-
     def test_download(self):
-        self.pkg.download(self.tmp)
+        self.pkg.download(self.tmpdir)
         fn = os.path.basename(self.url)
-        assert fn in os.listdir(self.tmp)
+        assert fn in os.listdir(self.tmpdir)
 
     def test_is_python_package(self):
         assert not self.pkg.is_python_package(self.filepath)
 
     def test_unpack_and_make_python(self):
-        outpath = self.pkg.unpack(self.filepath, self.tmpdir2)
-        assert outpath == self.tmpdir2
-        assert os.path.exists(self.tmpdir2)
-        print os.listdir(self.tmpdir2)
-        assert len(os.listdir(self.tmpdir2)) > 0
+        outpath = self.pkg.unpack(self.filepath, self.tmpdir)
+        assert outpath == self.tmpdir
+        assert os.path.exists(self.tmpdir)
+        print os.listdir(self.tmpdir)
+        assert len(os.listdir(self.tmpdir)) > 0
 
-        self.pkg.make_into_python_package(self.tmpdir2)
-        setuppy = os.path.join(self.tmpdir2, 'setup.py')
-        assert os.path.exists(setuppy)
-        # TODO: test contents
+        dest = self.pkg.make_python_distribution(self.tmpdir2, outpath)
+        pypkg_dir = os.path.join(dest, self.pkg_name)
+        datacsv_path = os.path.join(pypkg_dir, 'data.csv')
+        assert os.path.exists(pypkg_dir)
+        assert os.path.exists(datacsv_path)
 
     def test_install(self):
-        install_dir = self.tmp
-        self.pkg.install(install_dir)
+        install_dir = self.tmpdir
+        self.pkg.install(install_dir, zip_safe=False)
         print os.listdir(install_dir)
         exists = filter(lambda x: x.startswith(self.pkg.name) and x.endswith('.egg'),
                 os.listdir(install_dir))
         assert len(exists) == 1
         # TODO: check contents
         # for some reason cannot access this dir
-        # fp = exists[0]
-        # fo = file(fp)
+        pkg_path = os.path.join(install_dir, exists[0])
+        # egg/pkg-name/data.csv
+        data_csv_path = os.path.join(pkg_path, self.pkg_name, 'data.csv')
+        print data_csv_path
+        assert os.path.exists(data_csv_path)
         # print fo.read()
 

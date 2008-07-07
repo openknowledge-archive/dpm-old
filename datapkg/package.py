@@ -15,6 +15,7 @@ class Package(object):
         self.name = name
         self.version = '0.0'
         self.installed = False
+        self.download_url = None
         for k,v in kwargs.items():
             setattr(self, k, v)
         # self.metadata = Metadata()
@@ -25,7 +26,7 @@ class Package(object):
         tdist = setuptools.dist.Distribution()
         self.easy_install = setuptools.command.easy_install.easy_install(tdist)
 
-    def create_file_structure(self, base_path=''):
+    def create_file_structure(self, base_path='.'):
         '''Create a skeleton data package
 
         >>> import datapkg
@@ -35,15 +36,16 @@ class Package(object):
             ...
         '''
         cmd = 'paster create --template=datapkg '
-        if base_path:
-            cmd += '--output-dir %s ' % base_path
+        cmd += '--output-dir %s ' % base_path
         cmd += self.name
+        dist_path = os.path.join(os.path.abspath(base_path), self.name)
         # TODO: catch stdout and only print if error
         import commands
         # os.system(cmd)
         status, output = commands.getstatusoutput(cmd)
         if status:
             print output
+        return dist_path
 
     def download(self, tmpdir):
         filepath = self.pi.download(self.download_url, tmpdir)
@@ -66,14 +68,10 @@ class Package(object):
         return filepath
 
     def is_python_package(self, path):
+        # taken from easy_install.install_item
+        # could just have tried to install and caught exception
         dist_filename = path
         setup_base = path
-        # taken from easy_install.install_item
-        # could just have tried to install
-        # install_needed = True
-        # deps = False
-        # self.easy_install.install_item(None, path, tmpdir,
-        #        deps, install_needed)
         if dist_filename.lower().endswith('.egg'):
             return True
         elif dist_filename.lower().endswith('.exe'):
@@ -90,59 +88,62 @@ class Package(object):
             return extract_dir
         elif os.path.isdir(dist_filename):
             return os.path.abspath(dist_filename)
-    
-    def make_into_python_package(self, path):
-        # self.create
-        fo = open(os.path.join(path, 'setup.py'), 'w')
-        setup_dot_py = \
-'''from setuptools import setup
 
-setup(
-    name='%s',
-    version='%s',
-    )
+    def make_python_distribution(self, base_path, package_files):
+        dist_path = self.create_file_structure(base_path)
+        pypkg_inside_pkg_dir = os.path.join(dist_path, self.name)
+        if os.path.isdir(package_files):
+            for fn in os.listdir(package_files):
+                path = os.path.join(package_files, fn)
+                # TODO: move rather than copy?
+                if os.path.isdir(path):
+                    shutil.copytree(path, pypkg_inside_pkg_dir)
+                else:
+                    shutil.copy(path, pypkg_inside_pkg_dir)
+        else:
+            shutil.copy(package_files, pypkg_inside_pkg_dir)
+        return dist_path
 
-''' % ( self.name, self.version)
-        fo.write(setup_dot_py)
-        fo.close()
-
-        manifest = os.path.join(path, 'MANIFEST.in')
-        if not os.path.exists(manifest):
-            fo = open(manifest, 'w')
-            fo.write('recursive-include * *\n')
-            fo.write('include *.*\n')
-            # TODO: exclude stuff such build?
-            fo.close()
-
-    def install(self, install_dir, cached_path=None):
+    def install(self, install_dir, local_path_to_package_files=None, **kwargs):
+        dist_path = local_path_to_package_files
         import distutils.errors
         import tempfile
         # TODO: cleanup ...
         tmpdir = tempfile.mkdtemp('datapkg-')
-        extract_dir = tempfile.mkdtemp('datapkg-')
-        if not cached_path:
-            cached_path = self.download(tmpdir)
+        if not local_path_to_package_files:
+            if self.download_url:
+                dist_path = self.download(tmpdir)
+            else:
+                msg = 'No package files to install and no download url either'
+                raise Exception(msg)
 
-        if not self.is_python_package(cached_path):
-            setup_base = self.unpack(cached_path, extract_dir)
-            if not self.is_python_package(setup_base):
-                self.make_into_python_package(setup_base)
+        # support case where what we have is not yet a python package
+        extract_dir = os.path.join(tmpdir, 'extract')
+        if not self.is_python_package(dist_path):
+            dist_path = self.unpack(dist_path, extract_dir)
+            if not self.is_python_package(dist_path):
+                # this will create tmpdir/{self.name}
+                # so need to be sure that download file not named self.name
+                # to ensure no conflict when we do this
+                dist_path = self.make_python_distribution(tmpdir, extract_dir)
         else:
-            setup_base = cached_path
+            dist_path = local_path_to_package_files
+        self.install_python_package(install_dir, dist_path, tmpdir, **kwargs)
 
+    def install_python_package(self, install_dir, pkg_path, tmpdir,
+            zip_safe=False):
         # emulate
         # cmd = 'easy_install --multi-version --install-dir %s %s' % (install_dir, setup_base)
         # os.system(cmd)
-
         self.easy_install.install_dir = install_dir
         self.easy_install.multi_version = True
-        self.easy_install.zip_ok = False
+        self.easy_install.zip_ok = zip_safe
         # hack to make finalize_options happy
         self.easy_install.args = True
         self.easy_install.finalize_options()
         install_needed = True
         deps = False
-        self.easy_install.install_item(None, setup_base, tmpdir,
+        self.easy_install.install_item(None, pkg_path, tmpdir,
             deps, install_needed)
         # except setuptools.archive_util.UnrecognizedFormat:
         #    raise 'You have not provided a recognized file format.'
