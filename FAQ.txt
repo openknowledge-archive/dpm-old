@@ -1,0 +1,19 @@
+1. Why are you not using apt/yum/insert-unix-package-manager-of-your-choice
+
+Because we want and need to be cross-platform. However we do everything that we
+can to talk these kind of existing tools so we can access and use the packages
+they make available.
+
+2. Then why don't you use a package manager such as that associated with Python
+or Perl?
+
+We thought heavily about this and we do heavily re-use (conceptually and
+concretely) bits of the python setuptools system. However given the current
+state of knowledge (content/data etc) packaging it was important to be able to:
+
+a) 'install' (and access) material that was not explicitly packaged for those
+systems (e.g. are just in a tar.gz file)
+
+b) support attributes and functionality associated with data and content and
+not necessarily present in systems focused on software.
+
