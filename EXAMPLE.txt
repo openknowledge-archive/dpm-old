@@ -1,6 +1,20 @@
 # Use Cases for DataPkg (or: reasons to use it in the first place)
 
-## 1. Grab two different files and use them together in some way.
+These use cases are not necessarily implemented but are a guide to what we are
+*trying to do*.
+
+## 1. Grabbing some data from an index
+
+    >>> datapkg index-add file:///....
+    >>> datapkg update
+    >>> datapkg search "military spending"
+    afjadadfajdjfkjadsf Military Spending 1890-1914
+    afjadadfajdjfkjadsf Military Spending 1890-1914 (normalized)
+    >>> datapkg install xyz
+    ...
+    >>> datapkg plot xyz
+
+## 2. Grab two different files and use them together in some way.
 
 What data?
 
@@ -12,11 +26,16 @@ What data?
   * Plot two different data sources again each other.
     * Government expenditure in different sectors?
 
->>> datapkg index-add file:///....
->>> datapkg update
->>> datapkg search "military spending"
-afjadadfajdjfkjadsf Military Spending 1890-1914
-afjadadfajdjfkjadsf Military Spending 1890-1914 (normalized)
->>> datapkg install xyz
-...
->>> datapkg plot xyz
+    >>> datapkg install pkg-a
+    >>> datapkg install pkg-b
+    >>> datapkg create merged
+    # manual merge
+    # e.g. PPP, GDP
+    >>> datapkg register my-merged-package
+
+
+## 3. Adding and index and then installing
+
+    >>> datapkg add-index http://www.ckan.net/packages.ini
+    >>> datapkg install ckan-wikipedia
+
