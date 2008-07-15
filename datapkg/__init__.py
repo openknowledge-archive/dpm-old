@@ -222,19 +222,6 @@ def print_status(ckan):
     else:
         print "System error (%s). Seek help." %  ckan.last_status
 
-def create(name, base_path=''):
-    '''Create a skeleton data package
-
-    >>> import datapkg
-    >>> os.chdir('/tmp')
-    >>> pkg_name = 'my-random-name'
-    >>> datapkg.create(pkg_name)
-        ...
-    '''
-    import package
-    pkg = package.Package(name)
-    pkg.create_file_structure(base_path)
-
 from paste.script.templates import Template
 class DataPkgTemplate(Template):
     _template_dir = 'templates/default_distribution'

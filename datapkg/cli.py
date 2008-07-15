@@ -198,7 +198,6 @@ ckanupdate command to update the register when the package metadata changes.
         )
 
     def help_ckanupdate(self, line=None):
-        import datapkg
         usage = \
 '''datapkg ckanupdate [path] [api-key]
 
@@ -207,21 +206,6 @@ not provided, it defaults to current directory. If a valid api-key is not
 provided, changes to the CKAN register will not be allowed. Please use the
 ckanupdate command to update the register when the package metadata changes.
 '''
-        print usage
-
-    def do_create(self, line):
-        name = line.strip()
-        import datapkg
-        msg = 'Creating new datapkg: %s' %  name
-        self._print(msg)
-        datapkg.create(name=name)
-
-    def help_create(self, line=None):
-        import datapkg
-        usage = \
-'''create <name>
-
-Create a skeleton data package named <name> in the current directory.'''
         print usage
 
     def do_init(self, line=None):
@@ -243,6 +227,26 @@ The repository will be created at the default location:
 Unless an alternative location is specified via the --repository option.
 ''' % datapkg.repository.Repository.default_path()
         print usage
+
+    def do_create(self, line):
+        path = line.strip()
+        import datapkg.package
+        msg = 'Creating new datapkg: %s' %  path
+        self._print(msg)
+        datapkg.package.PackageMaker.create_on_disk(path)
+
+    def help_create(self, line=None):
+        import datapkg
+        usage = \
+'''create <path-or-name>
+
+Create a skeleton data package at path. Package Name will be taken from
+last portion of path. If path simply a name then create in the current
+directory.'''
+        print usage
+
+    def do_register(self, line):
+        path = line.strip()
 
     def do_install(self, line):
         pkg_path = line.strip()

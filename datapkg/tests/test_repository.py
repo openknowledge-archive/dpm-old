@@ -3,25 +3,16 @@ import tempfile
 import shutil
 from StringIO import StringIO
 
-import py.test
+from datapkg.tests.base import TestCase
 
 import datapkg.repository
-# beauty of this is we can combine items across many different systems
-# pypi, apt ...
 
-class TestRepository:
+class TestRepository(TestCase):
 
-    @classmethod
-    def setup_class(self):
-        self.tmp = tempfile.mkdtemp()
-        self.init_path = os.path.join(self.tmp, '.datapkg')
-        # get default
-        # cache path = ~/var/lib/datapkg/default/index.csv
+    def setUp(self):
+        self.make_tmpdir()
+        self.init_path = os.path.join(self.tmpdir, '.datapkg')
         self.repo = datapkg.repository.Repository(self.init_path)
-
-    @classmethod
-    def teardown_class(self):
-        shutil.rmtree(self.tmp)
 
     def test_paths(self):
         config_path = os.path.join(self.init_path, 'config.ini')
@@ -34,10 +25,6 @@ class TestRepository:
     def test_init(self):
         self.repo.init()
         assert os.path.exists(self.repo.config_path)
-        assert os.path.exists(self.repo.index_path)
-
-    def test_install(self):
-        # pkg = ...
-        # repo.install(pkg)
-        pass
+        # TODO: get index working
+        # assert os.path.exists(self.repo.index_path)
 

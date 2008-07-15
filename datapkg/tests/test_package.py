@@ -6,7 +6,32 @@ import zipfile
 import datapkg.package
 from datapkg.tests.base import TestCase
 
+class TestPackageMaker(TestCase):
+    __test__ = False
+
+    maker = datapkg.package.PackageMaker()
+
+    def test_info_from_path(self):
+        base = os.path.abspath('.')
+        name = 'abc'
+        path = os.path.join(base, name)
+        obase, oname = self.maker.info_from_path(path)
+        assert obase == base
+        assert oname == name
+
+    def test_create_on_disk(self):
+        self.tmp = '/tmp/datapkg-package-TestPackageMaker'
+        if os.path.exists(self.tmp):
+            shutil.rmtree(self.tmp)
+        os.makedirs(self.tmp)
+        self.pkg_name = 'mytestpkg2'
+        path = os.path.join(self.tmp, self.pkg_name)
+        pkg = self.maker.create_on_disk(path)
+        assert os.path.exists(path)
+
+
 class TestPackage(TestCase):
+    __test__ = False
 
     def setUp(self):
         self.tmp = '/tmp/datapkg-abc'
@@ -18,8 +43,22 @@ class TestPackage(TestCase):
         self.pkg = datapkg.package.Package(self.pkg_name, version='1.0')
         assert self.pkg.name == self.pkg_name
 
-    def tearDown(self):
-        pass
+    def test_package_name(self):
+        name1 = 'Abc3'
+        pkg1= datapkg.package.Package(name1)
+        assert pkg1.name == name1.lower()
+
+        name1 = 'Abc3-'
+        pkg1 = datapkg.package.Package(name1)
+        assert pkg1.name == name1.lower(), name1
+
+        name1 = 'abc:yx'
+        ok = False
+        try:
+            pkg1 = datapkg.package.Package(name1)
+        except:
+            ok = True
+        assert ok, name1
 
     def test_package_attr(self):
         assert self.pkg.name == self.pkg_name
@@ -59,10 +98,26 @@ class TestPackage(TestCase):
         assert os.path.exists(installed_text_path)
 
 
-class TestPackageFromDisk:
+class TestPackageFromPath(TestCase):
 
     def setUp(self):
-        self.tmp_base = '/tmp/datapkg-test-from-disk'
+        self.make_tmpdir()
+        self.pkg_name = 'abc'
+        self.pkg = datapkg.package.Package(self.pkg_name,
+                version='1.0')
+        self.pkg_path = self.pkg.create_file_structure(self.tmpdir)
+
+    def test_from_path(self):
+        pkg = datapkg.package.Package.from_path(self.pkg_path)
+        assert pkg.name == self.pkg_name
+        assert pkg.metadata.name == self.pkg_name
+
+
+class TestPackageFromDisk:
+    __test__ = False
+
+    def setUp(self):
+        self.tmp_base = '/tmp/datapkg-package-TestPackageFormDisk'
         if os.path.exists(self.tmp_base):
             shutil.rmtree(self.tmp_base)
         self.tmpdir = os.path.join(self.tmp_base, 'tmp1')

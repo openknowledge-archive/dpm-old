@@ -2,6 +2,7 @@ import os
 from StringIO import StringIO
 import urllib
 from zipfile import ZipFile
+import re
 
 import os
 import shutil
@@ -11,10 +12,41 @@ import setuptools.archive_util
 
 import datapkg.util
 
-class Package(object):
 
+class PackageMaker(object):
+    '''Helper class for making Packages.
+    '''
+
+    def make_from_python_distribution():
+        pass
+
+    def make_from_url():
+        pass
+
+    @classmethod
+    def info_from_path(self, path):
+        # will remove any trailing slash
+        path = os.path.normpath(path)
+        dir = os.path.dirname(path)
+        name = os.path.basename(path)
+        return dir, name
+
+    @classmethod
+    def create_on_disk(self, path):
+        dir, name = self.info_from_path(path)
+        pkg = Package(name)
+        pkg.create_file_structure(dir)
+        return pkg
+
+
+class Package(object):
     def __init__(self, name=None, **kwargs):
-        self.name = name
+        if name:
+            self.name = self._normalize_name(name)
+        else:
+            self.name = None
+        self.metadata = None
+        # TODO: most of these attributes should run off metadata
         self.version = '0.0'
         self.installed = False
         self.download_url = None
@@ -28,15 +60,18 @@ class Package(object):
         tdist = setuptools.dist.Distribution()
         self.easy_install = setuptools.command.easy_install.easy_install(tdist)
 
-    def create_file_structure(self, base_path='.'):
-        '''Create a skeleton data package
+    def _normalize_name(self, name):
+        new_name = name.lower()
+        regex = r'^[\w-]+$'
+        if not re.match(regex, new_name):
+            msg = 'Invalid package name: %s' % name
+            raise ValueError(msg)
+        return new_name
 
-        >>> import datapkg
-        >>> os.chdir('/tmp')
-        >>> pkg_name = 'my-random-name'
-        >>> datapkg.create(pkg_name)
-            ...
+    def create_file_structure(self, base_path=''):
+        '''Create a skeleton data package on disk.
         '''
+        # TODO: import PasteScript direct and use
         cmd = 'paster create --template=datapkg '
         if base_path:
             cmd += '--output-dir %s ' % base_path
@@ -151,6 +186,22 @@ class Package(object):
             deps, install_needed)
         # except setuptools.archive_util.UnrecognizedFormat:
         #    raise 'You have not provided a recognized file format.'
+    
+    @classmethod
+    def from_path(self, path):
+        '''Load a L{Package} object from a path to a package distribution.'''
+        import datapkg.pypkgtools
+        tools = datapkg.pypkgtools.PyPkgTools()
+        metadata = tools.load_metadata(path)
+        pkg = Package(metadata.name, metadata=metadata)
+        return pkg
+
+
+import distutils.dist
+class PackageMetadata(distutils.dist.DistributionMetadata):
+    # TODO: use this (perhaps from pypkgtools?)
+    # TODO: convert to form for json, to form for db etc
+    pass
 
 
 # SQLAlchemy stuff

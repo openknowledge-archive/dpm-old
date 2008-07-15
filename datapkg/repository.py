@@ -27,8 +27,8 @@ class Repository(object):
             cfg = ConfigParser.SafeConfigParser()
             cfg.set('DEFAULT', 'version', datapkg.__version__)
             cfg.write(file(self.config_path, 'w'))
-            # just stub it for time being
-            fo = open(self.index_path, 'w').write('')
+            # TODO: not working
+            # self.index.init()
         else:
             msg = 'init() failed. It looks like you already ' + \
                     'have something at %s' % self.repo_path

@@ -4,6 +4,7 @@ import tempfile
 import shutil
 
 import datapkg.util
+import datapkg.repository
 
 class TestCLI:
 
@@ -31,6 +32,7 @@ class TestCLI:
 
     def test_walkthrough(self):
         # from beginning to end ...
+        pkg_name = 'mytestpkg'
 
         # init
         cmd = self.cmd_base + 'init'
@@ -39,15 +41,21 @@ class TestCLI:
         assert os.path.exists(self.repo_path)
 
         # create 
-        name = 'mytest'
-        os.chdir(self.tmpdir)
-        cmd = 'datapkg create ' + name
+        pkg_path = os.path.join(self.tmpdir, pkg_name)
+        cmd = self.cmd_base + 'create %s' % pkg_path
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
-        dest = os.path.join(self.tmpdir, name)
-        assert os.path.exists(dest)
+        assert os.path.exists(pkg_path)
 
-        # install
-        # TODO
+        # register + install
+        cmd = self.cmd_base + 'register %s' % pkg_path 
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
 
+        # repo = datapkg.repository.Repository(self.repo_path)
+        # pkgnames = [ pkg.name for pkg in repo.index.list_packages() ]
+        # assert pkg_name in pkgnames
 
+        # cmd = self.cmd_base + 'install %s' % pkg_path 
+        # status, output = datapkg.util.getstatusoutput(cmd)
+        # assert not status, output

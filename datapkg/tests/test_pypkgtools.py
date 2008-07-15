@@ -19,8 +19,11 @@ class TestPyPkgTools(TestCase):
         self.pkg.create_file_structure(self.base_path)
 
     def test_load_metadata_from_source(self):
-        dist = self.pypkgtools.load_metadata(self.pkg_path)
-        assert dist
+        meta = self.pypkgtools.load_metadata(self.pkg_path)
+        assert meta
+        assert meta.name == self.pkg_name
+        # note that get_* will return something different from direct access
+        assert meta.download_url == None, meta.download_url
 
     def test_parse_pkg_info(self):
         pkg_info_path = os.path.join(self.pkg_path, self.pkg_name + '.egg-info',

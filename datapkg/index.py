@@ -11,6 +11,8 @@ class Index(object):
         Session.configure(bind=self.engine)
 
     def init(self):
+        print self.dburi
+        print self.engine
         metadata.create_all(bind=self.engine)
 
     def list_packages(self):
