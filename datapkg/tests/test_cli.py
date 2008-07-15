@@ -52,10 +52,17 @@ class TestCLI:
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
 
-        # repo = datapkg.repository.Repository(self.repo_path)
-        # pkgnames = [ pkg.name for pkg in repo.index.list_packages() ]
-        # assert pkg_name in pkgnames
+        repo = datapkg.repository.Repository(self.repo_path)
+        pkgnames = [ pkg.name for pkg in repo.index.list_packages() ]
+        assert pkg_name in pkgnames
 
-        # cmd = self.cmd_base + 'install %s' % pkg_path 
-        # status, output = datapkg.util.getstatusoutput(cmd)
-        # assert not status, output
+        cmd = self.cmd_base + 'install %s' % pkg_path 
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        # dest path with be pkg_name-version-*
+        dirs = os.listdir(repo.installed_path)
+        filtered = filter(lambda x: x.startswith(pkg_name), dirs)
+        assert len(filtered) > 0, dirs
+
+
+        # cmd = self.cmd_base + 'inspect %s' % pkg_name

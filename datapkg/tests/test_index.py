@@ -16,6 +16,7 @@ class TestIndex:
 
     def test_db_ok(self):
         assert self.index.dburi is not None
+        assert os.path.exists(self.tmpfile)
 
     def test_list(self):
         pkgs = self.index.list_packages()

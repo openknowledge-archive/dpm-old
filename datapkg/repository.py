@@ -16,19 +16,22 @@ class Repository(object):
             repo_path = self.default_path()
         self.repo_path = os.path.abspath(os.path.expanduser(repo_path))
         self.config_path = os.path.join(self.repo_path, 'config.ini')
-        self.index_path = os.path.join(self.repo_path, 'index.db')
-        self.index_dburi = 'sqlite://%s' % self.index_path
         self.installed_path = os.path.join(self.repo_path, 'installed')
+        self.index_path = os.path.join(self.repo_path, 'index.db')
+        self.index_dburi = 'sqlite:///%s' % self.index_path
         self.index = datapkg.index.Index(self.index_dburi)
+
+    def _make_default_config(self, path):
+        cfg = ConfigParser.SafeConfigParser()
+        cfg.set('DEFAULT', 'version', datapkg.__version__)
+        cfg.write(file(path, 'w'))
 
     def init(self):
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
-            cfg = ConfigParser.SafeConfigParser()
-            cfg.set('DEFAULT', 'version', datapkg.__version__)
-            cfg.write(file(self.config_path, 'w'))
-            # TODO: not working
-            # self.index.init()
+            self._make_default_config(self.config_path)
+            self.index.init()
+            os.makedirs(self.installed_path)
         else:
             msg = 'init() failed. It looks like you already ' + \
                     'have something at %s' % self.repo_path

@@ -19,12 +19,12 @@ class TestRepository(TestCase):
         assert config_path == self.repo.config_path
 
     def test_index(self):
-        assert self.repo.index_dburi == 'sqlite://%s' % self.repo.index_path
+        assert self.repo.index_dburi == 'sqlite:///%s' % self.repo.index_path
         assert self.repo.index is not None
 
     def test_init(self):
         self.repo.init()
         assert os.path.exists(self.repo.config_path)
-        # TODO: get index working
-        # assert os.path.exists(self.repo.index_path)
+        assert os.path.exists(self.repo.index_path)
+        assert os.path.exists(self.repo.installed_path)
 

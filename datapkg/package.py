@@ -194,6 +194,7 @@ class Package(object):
         tools = datapkg.pypkgtools.PyPkgTools()
         metadata = tools.load_metadata(path)
         pkg = Package(metadata.name, metadata=metadata)
+        # TODO: set data path
         return pkg
 
 

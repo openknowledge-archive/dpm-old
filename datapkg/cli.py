@@ -245,26 +245,31 @@ last portion of path. If path simply a name then create in the current
 directory.'''
         print usage
 
+    def _register(self, path):
+        import datapkg.package
+        import datapkg.repository
+        pkg = datapkg.package.Package.from_path(path)
+        repo = datapkg.repository.Repository(self.repository_path)
+        repo.index.register(pkg)
+        return (repo, pkg)
+
     def do_register(self, line):
         path = line.strip()
+        self._register(path)
 
     def do_install(self, line):
         pkg_path = line.strip()
-        import datapkg
-        if not path:
-            path = '.'
-        # get repository install_dir
-        repo = datapkg.repository.Repository()
+        # TODO: check whether it is registered already
+        # TODO: option of installing an existing registered package
+        repo, pkg = self._register(pkg_path)
         install_dir = repo.installed_path
-        pkg = datapkg.package.Package()
         pkg.install(install_dir, pkg_path)
     
     def help_install(self, line=None):
         usage = \
-'''datapkg install [path]
+'''datapkg install {path}
 
-Install a package located at path on disk. If path not provided default to
-current directory.
+Install a package located at path on disk.
 '''
         print usage
 
