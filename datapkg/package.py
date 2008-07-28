@@ -182,8 +182,15 @@ class Package(object):
         self.easy_install.finalize_options()
         install_needed = True
         deps = False
-        self.easy_install.install_item(None, pkg_path, tmpdir,
-            deps, install_needed)
+        # taken from easy_install.install_item
+        spec = None
+        dists = self.easy_install.install_eggs(spec, pkg_path, tmpdir)
+        for dist in dists:
+            # better have only one dist!
+            self.installed_path = dist.location
+            self.easy_install.process_distribution(spec, dist, deps)
+        # self.easy_install.install_item(None, pkg_path, tmpdir,
+        #    deps, install_needed)
         # except setuptools.archive_util.UnrecognizedFormat:
         #    raise 'You have not provided a recognized file format.'
     
@@ -196,6 +203,12 @@ class Package(object):
         pkg = Package(metadata.name, metadata=metadata)
         # TODO: set data path
         return pkg
+
+    def stream(self, path):
+        import sys
+        sys.path.insert(0, self.installed_path)
+        import pkg_resources
+        return pkg_resources.resource_stream(self.name, path)
 
 
 import distutils.dist

@@ -7,7 +7,7 @@ import datapkg.package
 from datapkg.tests.base import TestCase
 
 class TestPackageMaker(TestCase):
-    __test__ = False
+    # __test__ = False
 
     maker = datapkg.package.PackageMaker()
 
@@ -20,28 +20,23 @@ class TestPackageMaker(TestCase):
         assert oname == name
 
     def test_create_on_disk(self):
-        self.tmp = '/tmp/datapkg-package-TestPackageMaker'
-        if os.path.exists(self.tmp):
-            shutil.rmtree(self.tmp)
-        os.makedirs(self.tmp)
+        self.make_tmpdir()
         self.pkg_name = 'mytestpkg2'
-        path = os.path.join(self.tmp, self.pkg_name)
+        path = os.path.join(self.tmpdir, self.pkg_name)
         pkg = self.maker.create_on_disk(path)
         assert os.path.exists(path)
 
 
 class TestPackage(TestCase):
-    __test__ = False
+    # __test__ = False
 
     def setUp(self):
-        self.tmp = '/tmp/datapkg-abc'
-        if os.path.exists(self.tmp):
-            shutil.rmtree(self.tmp)
+        self.make_tmpdir()
+        self.tmp = self.tmpdir
         self.install_dir = os.path.join(self.tmp, 'installed')
         os.makedirs(self.install_dir)
         self.pkg_name = 'mytestpkg2'
         self.pkg = datapkg.package.Package(self.pkg_name, version='1.0')
-        assert self.pkg.name == self.pkg_name
 
     def test_package_name(self):
         name1 = 'Abc3'
@@ -72,7 +67,7 @@ class TestPackage(TestCase):
         manifest = os.path.join(dest, 'MANIFEST.in')
         assert os.path.exists(manifest)
 
-    def test_install(self):
+    def _mock_pkg(self):
         create_dir = os.path.join(self.tmp, 'install-test')
         self.pkg.create_file_structure(create_dir)
         pkg_source_path = os.path.join(create_dir, self.pkg.name)
@@ -81,6 +76,10 @@ class TestPackage(TestCase):
         fo = open(text_fp, 'w')
         fo.write('testing')
         fo.close()
+        return pkg_source_path
+
+    def test_install(self):
+        pkg_source_path = self._mock_pkg()
 
         self.pkg.install(self.install_dir, pkg_source_path)
             
@@ -97,8 +96,23 @@ class TestPackage(TestCase):
         assert os.path.isdir(installed_pkg_path)
         assert os.path.exists(installed_text_path)
 
+        self._test_stream()
+
+    def _test_stream(self):
+        # running this after test_install is not working :(
+        # not clear why so run from test_install for time being
+
+        # pkg_source_path = self._mock_pkg()
+        # self.pkg.install(self.install_dir, pkg_source_path)
+
+        # fo = self.pkg.stream('abc.txt', install_dir=self.install_dir)
+        fo = self.pkg.stream('abc.txt')
+        out = fo.read()
+        assert out == 'testing'
+
 
 class TestPackageFromPath(TestCase):
+    __test__ = False
 
     def setUp(self):
         self.make_tmpdir()

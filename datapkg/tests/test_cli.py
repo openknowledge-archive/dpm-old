@@ -64,5 +64,7 @@ class TestCLI:
         filtered = filter(lambda x: x.startswith(pkg_name), dirs)
         assert len(filtered) > 0, dirs
 
-
         # cmd = self.cmd_base + 'inspect %s' % pkg_name
+        # status, output = datapkg.util.getstatusoutput(cmd)
+        # assert not status, output
+
