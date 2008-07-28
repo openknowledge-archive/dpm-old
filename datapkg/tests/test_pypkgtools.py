@@ -42,3 +42,25 @@ class TestPyPkgTools(TestCase):
         pkg_name = self.pypkgtools.read_pkg_name(self.pkg_path)
         assert pkg_name == self.pkg_name, pkg_name
 
+from datapkg.pypkgtools import DistributionOnDisk
+class TestDistributionOnDisk(TestCase):
+
+    def setUp(self):
+        self.make_tmpdir()
+        import datapkg.package
+        self.pkgname = 'abc'
+        self.srcdir = os.path.join(self.tmpdir, self.pkgname)
+        self.pkg = datapkg.package.PackageMaker.create_on_disk(self.srcdir)
+        self.pkg.install(self.tmpdir, self.srcdir)
+        self.pkg_path = self.pkg.installed_path
+
+    def test_metadata(self):
+        dist = DistributionOnDisk(self.pkg_path)
+        assert dist.metadata.name == self.pkgname
+
+    # encountering that weird error on second run of setUp when installing an
+    # egg (even though completely torn down)
+    def _test_listdir(self):
+        dist = DistributionOnDisk(self.pkg_path)
+        out = dist.listdir('.')
+        
