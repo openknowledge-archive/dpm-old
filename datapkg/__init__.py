@@ -32,13 +32,11 @@ Install a package directly from a url::
 
     $ datapkg install ${url}
 
-[NOT YET OPERATIONAL]
+[ALMOST OPERATIONAL]
 
 Update the index::
 
     $ datapkg update
-
-[NOT YET OPERATIONAL]
 
 Search for a package::
 
@@ -64,7 +62,7 @@ Search for a package::
        $ cd {my-new-package}
        $ cp {lots-of-my-data-files} .
 
-[NOT YET OPERATIONAL]
+[ALMOST OPERATIONAL]
 
 3. Register your package with registry (such as CKAN)::
 

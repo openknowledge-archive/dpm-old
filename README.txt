@@ -1,7 +1,10 @@
 ## Introduction
 
-For a description of the project, as well as other project metadata, please see
-setup.py
+For a description of the project, as well as other project metadata, please either run::
+
+  $ datapkg info
+
+Or read the main package docstring.
 
 
 ## License
@@ -38,7 +41,4 @@ SOFTWARE.
 
 3. Install datapkg: $ easy_install datapkg
 
-
-## Usage
-
-paster create --template=datapkg ${your-new-distribution-name}
+4. Run: $ datapkg info
