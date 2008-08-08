@@ -6,11 +6,9 @@ import re
 
 import os
 import shutil
-import setuptools.package_index as pi
-import setuptools.command.easy_install
-import setuptools.archive_util
 
 import datapkg.util
+import datapkg.pypkgtools
 
 
 class PackageMaker(object):
@@ -54,11 +52,6 @@ class Package(object):
             setattr(self, k, v)
         # self.metadata = Metadata()
 
-        # setuptools stuff
-        self.pi = pi.PackageIndex('http://random.url/')
-        import setuptools.dist
-        tdist = setuptools.dist.Distribution()
-        self.easy_install = setuptools.command.easy_install.easy_install(tdist)
 
     def _normalize_name(self, name):
         new_name = name.lower()
@@ -171,28 +164,8 @@ class Package(object):
 
     def install_python_package(self, install_dir, pkg_path, tmpdir,
             zip_safe=False):
-        # emulate
-        # cmd = 'easy_install --multi-version --install-dir %s %s' % (install_dir, setup_base)
-        # os.system(cmd)
-        self.easy_install.install_dir = install_dir
-        self.easy_install.multi_version = True
-        self.easy_install.zip_ok = zip_safe
-        # hack to make finalize_options happy
-        self.easy_install.args = True
-        self.easy_install.finalize_options()
-        install_needed = True
-        deps = False
-        # taken from easy_install.install_item
-        spec = None
-        dists = self.easy_install.install_eggs(spec, pkg_path, tmpdir)
-        for dist in dists:
-            # better have only one dist!
-            self.installed_path = dist.location
-            self.easy_install.process_distribution(spec, dist, deps)
-        # self.easy_install.install_item(None, pkg_path, tmpdir,
-        #    deps, install_needed)
-        # except setuptools.archive_util.UnrecognizedFormat:
-        #    raise 'You have not provided a recognized file format.'
+        pydist = datapkg.pypkgtools.load_distribution(pkg_path)
+        self.installed_path = pydist.install(install_dir, tmpdir, zip_safe)
     
     @classmethod
     def from_path(self, path):

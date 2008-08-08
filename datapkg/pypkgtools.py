@@ -20,11 +20,13 @@ functionality to its associated provider/metadata object. Furthermore, a
 metadata object is not actually metadata itself but a pointer to a collection
 of metadata directories and files.
 '''
-import setuptools
-import setuptools.dist
 import zipimport, os
 import StringIO
 
+import setuptools
+import setuptools.dist
+import setuptools.package_index as pi
+import setuptools.command.easy_install
 
 def load_distribution(dist_path):
     built_egg_info = os.path.join(dist_path, 'EGG-INFO')
@@ -89,6 +91,42 @@ class DistributionOnDiskBase(object):
             setattr(metadata, field, value)
         return metadata
 
+    # could make this a class method
+    def install(self, install_dir, tmpdir, zip_safe=False):
+        '''Install a python distribution at {pkg_path} to {install_dir} using
+        easy_install and return the path to which it was installed.
+
+        Can be run from Base class (i.e. does not require that this is a 'real'
+        distribution).
+
+        In essence emulates::
+
+            easy_install --multi-version --install-dir install_dir dist_path
+        '''
+        pkg_path = self.dist_path
+
+        # setuptools stuff
+        self.pi = pi.PackageIndex('http://random.url/')
+        import setuptools.dist
+        tdist = setuptools.dist.Distribution()
+        self.easy_install = setuptools.command.easy_install.easy_install(tdist)
+
+        self.easy_install.install_dir = install_dir
+        self.easy_install.multi_version = True
+        self.easy_install.zip_ok = zip_safe
+        # hack to make finalize_options happy
+        self.easy_install.args = True
+        self.easy_install.finalize_options()
+        install_needed = True
+        deps = False
+        # taken from easy_install.install_item
+        spec = None
+        dists = self.easy_install.install_eggs(spec, pkg_path, tmpdir)
+        for dist in dists:
+            # better have only one dist!
+            installed_path = dist.location
+            self.easy_install.process_distribution(spec, dist, deps)
+            return installed_path
 
 class DistributionOnDiskRawSource(DistributionOnDiskBase):
 

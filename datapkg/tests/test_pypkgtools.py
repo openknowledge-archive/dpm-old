@@ -25,6 +25,8 @@ class TestDistributionOnDisk(TestCase):
         f.close()
         self.rawsrcdir = os.path.join(self.tmpdir, 'rawsrc')
         shutil.copytree(self.srcdir, self.rawsrcdir)
+        # behind the scenes this is actually using distribution which could
+        # create some circularity
         self.pkg.install(self.tmpdir, self.srcdir)
         self.installed_pkg_path = self.pkg.installed_path
 
