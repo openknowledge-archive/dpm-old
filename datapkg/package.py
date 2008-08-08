@@ -198,9 +198,8 @@ class Package(object):
     def from_path(self, path):
         '''Load a L{Package} object from a path to a package distribution.'''
         import datapkg.pypkgtools
-        tools = datapkg.pypkgtools.PyPkgTools()
-        metadata = tools.load_metadata(path)
-        pkg = Package(metadata.name, metadata=metadata)
+        pydist = datapkg.pypkgtools.load_distribution(path)
+        pkg = Package(pydist.metadata.name, metadata=pydist.metadata)
         # TODO: set data path
         return pkg
 
