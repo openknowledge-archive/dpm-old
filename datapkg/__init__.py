@@ -8,6 +8,24 @@ datapkg has two main distinct uses:
 
 NB: in what follows items prefixed with $ should be run on the command line.
 
+
+Basic Concepts
+==============
+
+Before we begin it is useful to understand some basic concepts:
+
+    1. Package -- metadata plus some set of resources (code, data etc)
+    2. Distribution -- a Package serialized to structure on disk or at a url
+
+For managing packages datapkg uses:
+
+    1. Index: a list of package metadata (but not package resources)
+    2. Repository: an index plus a place to store package resources plus other
+       miscellaneous facilities (for example a cache, configuration files etc)
+
+When you start off, the first thing you will do is create a local repository.
+
+
 1. Obtaining Material
 =====================
 
@@ -25,27 +43,67 @@ files including a main configuration file (config.ini).
 
     $ vi .datapkg/config.ini
 
-1.2 Obtain and Install Material
--------------------------------
 
-Install a package directly from a url::
+1.2 Install Material
+--------------------
 
-    $ datapkg install ${url}
+Suppose you have downloaded an existing datapkg distribution to your local
+filesystem at {path}. You can get info about it by doing:
 
-[ALMOST OPERATIONAL]
+    $ datapkg info {path}
 
-Update the index::
+You can register (this will not install it!) the package in your local index by
+doing::
 
-    $ datapkg update
+    $ datapkg register {path}
 
-Search for a package::
+Once you have registered a package with name {name} you can replace any {path}
+with {name} in most actions, e.g. you can now do::
 
-    $ datapkg search *
+    $ datapkg info {name}
 
-1.3 Access This Material
-------------------------
+You can install a package in your local repository either from a distribution
+or a registered package by doing::
+
+    $ datapkg install {path-or-name}
+
+[NOT YET OPERATIONAL] You can also do this with non-datapkg material Install a package directly from a url::
+
+    $ datapkg install {url}
+
+TODO: support for replacing path at any point with a url
+
+
+1.3 Using Material
+------------------
+
+Whether you just have a distribution on disk or have installed a package you
+can access this material from the command line by using the `dump` command::
+
+    $ datapkg dump {path-or-name} {path-in-package}
+
+To access the package from python code do:
+
+    import datapkg
+    datapkg.make_available('{name-or-path}')
+
+
+1.4 Find Material
+-----------------
+
+Search for a package on CKAN::
+
+    $ datapkg ckanlist
+    $ datapkg ckantags # list tags
+    $ datapkg ckansearch [NOT YET OPERATIONAL]
+
+You can find out about a package on CKAN by doing::
+
+    $ datapkg ckanshow ${name}
 
 [NOT YET OPERATIONAL]
+
+Pull CKAN index in your local index
 
 
 2. Making Your Material Available to Others
@@ -62,23 +120,14 @@ Search for a package::
        $ cd {my-new-package}
        $ cp {lots-of-my-data-files} .
 
-[ALMOST OPERATIONAL]
 
-3. Register your package with registry (such as CKAN)::
+3. Register your package -- {path} is path to package distribution on disk::
 
-       $ datapkg register
+    $ datapkg register {path} # locally
+    $ datapkg ckanregister {path} # on CKAN
 
+You can update an existing package on CKAN by doing::
 
-2. CKAN Commands
-================
-
-Todo: Integrate CKAN commands into above narrative.
-
-    $ datapkg ckanlist
-    $ datapkg ckanregister ${path}
-    $ datapkg ckansearch *
-    $ datapkg ckanshow  ${name}
-    $ datapkg ckantags
     $ datapkg ckanupdate ${path}
 
 
@@ -86,7 +135,7 @@ Todo: Integrate CKAN commands into above narrative.
 =================
 
 The easiest thing (which also guarantees up-to-date-ness) is to look through
-the unit tests in ./tests/
+the unit tests in ./datapkg/tests/
 '''
 __version__ = '0.1dev'
 __description__ = 'Data packaging system and utilities.'

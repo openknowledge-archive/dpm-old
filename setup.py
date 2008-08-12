@@ -10,9 +10,13 @@ setup(
     include_package_data=True,
     install_requires=[
         'setuptools>=0.6c',
-        'PasteDeploy>=1.0', 'PasteScript>=1.0',
+        'PasteDeploy>=1.0',
+        'PasteScript>=1.0',
         'SQLAlchemy>=0.4',
     ],
+    extra_requires={
+        'ckan' : ['ckanclient>=0.1'],
+        }
     entry_points='''
     [paste.paster_create_template]
     datapkg=datapkg:DataPkgTemplate
