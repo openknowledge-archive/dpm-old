@@ -57,6 +57,7 @@ class TestPackage(TestCase):
 
     def test_package_attr(self):
         assert self.pkg.name == self.pkg_name
+        assert self.pkg.metadata.name == self.pkg.name
 
     def test_create_file_structure(self):
         create_dir = os.path.join(self.tmp, 'create-test')
@@ -127,7 +128,7 @@ class TestPackageFromPath(TestCase):
         assert pkg.metadata.name == self.pkg_name
 
 
-class TestPackageFromDisk:
+class TestPackageFromUrlWhenNotAPythonDistribution:
     __test__ = False
 
     def setUp(self):

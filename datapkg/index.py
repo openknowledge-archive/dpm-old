@@ -9,18 +9,26 @@ class Index(object):
         self.dburi = dburi
         self.engine = create_engine(self.dburi)
         Session.configure(bind=self.engine)
+        self.session = Session()
 
     def init(self):
-        print self.dburi
-        print self.engine
         metadata.create_all(bind=self.engine)
 
     def list_packages(self):
-        session = Session()
-        return session.query(Package).all()
+        return self.session.query(Package).all()
 
     def register(self, pkg):
-        session = Session()
-        session.merge(pkg)
-        session.commit()
+        self.session.save(pkg)
+        self.session.commit()
+
+    def has_package(self, pkg_name):
+        num = self.session.query(Package).filter_by(name=pkg_name).count()
+        return num > 0
+
+    def get_package(self, pkg_name):
+        pkg = self.session.query(Package).filter_by(name=pkg_name).first()
+        # self.session.expunge(pkg)
+        # self.session.close()
+        self.session.update(pkg)
+        return pkg
 

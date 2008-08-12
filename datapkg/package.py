@@ -1,57 +1,32 @@
 import os
+import shutil
 from StringIO import StringIO
 import urllib
-from zipfile import ZipFile
 import re
-
-import os
-import shutil
+import distutils.dist
 
 import datapkg.util
 import datapkg.pypkgtools
 
-
-class PackageMaker(object):
-    '''Helper class for making Packages.
-    '''
-
-    def make_from_python_distribution():
-        pass
-
-    def make_from_url():
-        pass
-
-    @classmethod
-    def info_from_path(self, path):
-        # will remove any trailing slash
-        path = os.path.normpath(path)
-        dir = os.path.dirname(path)
-        name = os.path.basename(path)
-        return dir, name
-
-    @classmethod
-    def create_on_disk(self, path):
-        dir, name = self.info_from_path(path)
-        pkg = Package(name)
-        pkg.create_file_structure(dir)
-        return pkg
-
-
 class Package(object):
-    def __init__(self, name=None, **kwargs):
+
+    def __init__(self, name=None, metadata=None, **kwargs):
         if name:
             self.name = self._normalize_name(name)
         else:
             self.name = None
-        self.metadata = None
+        self.init_on_load(metadata, **kwargs)
+
+    def init_on_load(self, metadata=None, **kwargs):
+        if metadata:
+            self.metadata = metadata
+        else:
+            self.metadata = distutils.dist.DistributionMetadata()
+            self.metadata.name = self.name
         # TODO: most of these attributes should run off metadata
-        self.version = '0.0'
-        self.installed = False
         self.download_url = None
         for k,v in kwargs.items():
             setattr(self, k, v)
-        # self.metadata = Metadata()
-
 
     def _normalize_name(self, name):
         new_name = name.lower()
@@ -172,22 +147,15 @@ class Package(object):
         '''Load a L{Package} object from a path to a package distribution.'''
         import datapkg.pypkgtools
         pydist = datapkg.pypkgtools.load_distribution(path)
-        pkg = Package(pydist.metadata.name, metadata=pydist.metadata)
-        # TODO: set data path
+        pkg = Package(pydist.metadata.name, installed_path=path, metadata=pydist.metadata)
         return pkg
 
     def stream(self, path):
+        # TODO: should move to using underlying pydist here ...
         import sys
         sys.path.insert(0, self.installed_path)
         import pkg_resources
         return pkg_resources.resource_stream(self.name, path)
-
-
-import distutils.dist
-class PackageMetadata(distutils.dist.DistributionMetadata):
-    # TODO: use this (perhaps from pypkgtools?)
-    # TODO: convert to form for json, to form for db etc
-    pass
 
 
 # SQLAlchemy stuff
@@ -200,8 +168,50 @@ metadata = MetaData()
 package_table = Table('package', metadata,
     Column('id', types.Integer, primary_key=True),
     Column('name', types.Unicode(255)),
+    Column('installed_path', types.UnicodeText()),
 )
 
+
+from sqlalchemy.orm import MapperExtension, EXT_STOP
+class ReconstituteExtension(MapperExtension):
+    def populate_instance(self, mapper, selectcontext, row, instance, **flags):
+        # in v0.5 we can change to use on_reconstitute see
+        # http://www.sqlalchemy.org/docs/05/mappers.html#advdatamapping_mapper_onreconstitute
+
+        # here we follow
+        # http://www.sqlalchemy.org/docs/04/sqlalchemy_orm_mapper.html#docstrings_sqlalchemy.orm.mapper_Mapper
+        mapper.populate_instance(selectcontext, instance, row, **flags)
+        instance.init_on_load()
+        return EXT_STOP
+
 from sqlalchemy.orm import mapper
-mapper(Package, package_table)
+mapper(Package, package_table, extension=ReconstituteExtension())
+
+
+
+class PackageMaker(object):
+    '''Helper class for making Packages.
+    '''
+
+    def make_from_python_distribution():
+        pass
+
+    def make_from_url():
+        pass
+
+    @classmethod
+    def info_from_path(self, path):
+        # will remove any trailing slash
+        path = os.path.normpath(path)
+        dir = os.path.dirname(path)
+        name = os.path.basename(path)
+        return dir, name
+
+    @classmethod
+    def create_on_disk(self, path):
+        dir, name = self.info_from_path(path)
+        pkg = Package(name)
+        pkg.create_file_structure(dir)
+        return pkg
+
 

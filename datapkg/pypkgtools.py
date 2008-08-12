@@ -45,18 +45,21 @@ def load_distribution(dist_path):
     msg = 'File/Directory at %s does not look like a Distribution' % dist_path
     raise ValueError(msg)
 
+
 class DistributionOnDiskBase(object):
     '''Wrap a python distribution on disk.
 
-    To get at basic metadata (i.e. what is found in PKG-INFO) call .metadata.
+    @attrib metadata: distribution metadata (i.e. contents of PKG-INFO).
+        Returned in the form of a distutils.dist.Distribution. Main metadata
+        attributes are then accessible directly via property calls.
 
-    # 4 cases:
+    # 4 possible cases:
     # A.1: built distribution zipped
     # A.2: built distbn unzipped
     # B.1: a development/unbuilt distribution with a .egg-info directory
     # B.2: a raw distribution (no egg, nothing more than a setup.py ...)
 
-    These are handled by separate child classes
+    These are handled by separate child classes.
     '''
     def __init__(self, dist_path):
         self.dist_path = dist_path
@@ -154,8 +157,6 @@ class DistributionOnDiskEgg(DistributionOnDiskBase):
     '''Wrap an EGG distribution on disk.
 
     In essence this is a wrapper around pkg_resources.Distribution object.
-
-    To get at basic metadata (i.e. what is found in PKG-INFO) call .metadata.
     '''
 
     def _init(self):

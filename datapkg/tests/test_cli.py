@@ -32,7 +32,7 @@ class TestCLI:
 
     def test_walkthrough(self):
         # from beginning to end ...
-        pkg_name = 'mytestpkg'
+        pkg_name = u'mytestpkg'
 
         # init
         cmd = self.cmd_base + 'init'
@@ -46,8 +46,12 @@ class TestCLI:
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert os.path.exists(pkg_path)
+        fp = os.path.join(pkg_path, pkg_name, 'abc.txt')
+        fo = open(fp, 'w')
+        fo.write('Ideas are cheap, implementation is costly.')
+        fo.close()
 
-        # register + install
+        # register
         cmd = self.cmd_base + 'register %s' % pkg_path 
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
@@ -56,6 +60,7 @@ class TestCLI:
         pkgnames = [ pkg.name for pkg in repo.index.list_packages() ]
         assert pkg_name in pkgnames
 
+        # install
         cmd = self.cmd_base + 'install %s' % pkg_path 
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
@@ -64,7 +69,22 @@ class TestCLI:
         filtered = filter(lambda x: x.startswith(pkg_name), dirs)
         assert len(filtered) > 0, dirs
 
+        # info
+        # A: from pkg_name
+        cmd = self.cmd_base + 'info %s' % pkg_name
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        assert pkg_name in output, output
+
+        # TODO B: from disk
+
+        # inspect - not yet implemented
         # cmd = self.cmd_base + 'inspect %s' % pkg_name
         # status, output = datapkg.util.getstatusoutput(cmd)
         # assert not status, output
+
+        offset = 'abc.txt'
+        cmd = self.cmd_base + 'dump %s %s' % (pkg_name, offset)
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
 
