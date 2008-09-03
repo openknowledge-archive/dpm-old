@@ -14,8 +14,9 @@ setup(
         'PasteScript>=1.0',
         'SQLAlchemy>=0.4',
     ],
-    extra_requires={
-        'ckan' : ['ckanclient>=0.1'],
+    install_requires={
+        # make ckan support obligatory for time being
+        'ckanclient>=0.1',
         }
     entry_points='''
     [paste.paster_create_template]

@@ -2,7 +2,7 @@
 
 For a description of the project, as well as other project metadata, please either run::
 
-  $ datapkg info
+  $ datapkg man
 
 Or read the main package docstring.
 
@@ -41,4 +41,4 @@ SOFTWARE.
 
 3. Install datapkg: $ easy_install datapkg
 
-4. Run: $ datapkg info
+4. Run: $ datapkg man
