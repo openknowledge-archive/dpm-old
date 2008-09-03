@@ -210,8 +210,11 @@ ckanupdate command to update the register when the package metadata changes.
 
     def do_init(self, line=None):
         import datapkg.repository
-        repo = datapkg.repository.Repository(self.repository_path)
-        repo.init()
+        try:
+            repo = datapkg.repository.Repository(self.repository_path)
+            repo.init()
+        except Exception, inst:
+            print inst
         msg = 'Repository successfully initialized at %s' % self.repository_path
         self._print(msg)
     
@@ -260,6 +263,7 @@ directory.'''
         return (repo, pkg)
 
     def _get_package(self, path_or_name):
+        path_or_name = unicode(path_or_name)
         import datapkg.package
         # this is crude
         is_path = os.path.exists(path_or_name)
@@ -303,7 +307,7 @@ Install a package located at path on disk.
         pkg_locator = line.strip()
         pkg = self._get_package(pkg_locator)
         if pkg is None:
-            print 'No package was found at: %s' % pkg_locator
+            print 'No package was found for: "%s"' % pkg_locator
             return 1
         from StringIO import StringIO
         out = StringIO()

@@ -27,8 +27,8 @@ class Index(object):
 
     def get_package(self, pkg_name):
         pkg = self.session.query(Package).filter_by(name=pkg_name).first()
-        # self.session.expunge(pkg)
-        # self.session.close()
-        self.session.update(pkg)
+        # no package may exist with that name
+        if pkg:
+            self.session.update(pkg)
         return pkg
 
