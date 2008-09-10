@@ -5,6 +5,7 @@ setup(
     version=${repr(version)|empty},
     license="MIT",
     #description="",
+    #long_description="",
     #author="",
     #author_email="",
     #url="",

@@ -3,7 +3,7 @@ data 'packages'.
 
 datapkg has two main distinct uses:
 
-    1. Find, obtaining and accessing material made available *by* others.
+    1. Finding, obtaining and accessing material made available *by* others.
     2. Assisting you to make material available *to* others.
 
 NB: in what follows items prefixed with $ should be run on the command line.
@@ -12,16 +12,16 @@ NB: in what follows items prefixed with $ should be run on the command line.
 Basic Concepts
 ==============
 
-Before we begin it is useful to understand some basic concepts:
+Before we begin it is useful to understand some basic datapkg concepts:
 
-    1. Package -- metadata plus some set of resources (code, data etc)
-    2. Distribution -- a Package serialized to structure on disk or at a url
+    1. A Package -- metadata plus some set of resources (code, data etc)
+    2. A Distribution -- a Package serialized to structure on disk or at a url
 
 For managing packages datapkg uses:
 
-    1. Index: a list of package metadata (but not package resources)
-    2. Repository: an index plus a place to store package resources plus other
-       miscellaneous facilities (for example a cache, configuration files etc)
+    1. An Index: a list of package metadata (but not package resources)
+    2. Repository: an index plus a place to store package resources (as well as
+       other miscellaneous facilities such as caches, configuration files etc)
 
 When you start off, the first thing you will do is create a local repository.
 
@@ -39,6 +39,10 @@ First set up your local repository::
 This will create a .datapkg directory in your home directory along with various
 files including a main configuration file (config.ini).
 
+NB: you can choose any location you like for your repository by passing the
+--repository option to the init command. If you do so you will need to pass
+this option to all other commands that require use of the repository.
+
 [Optional] Edit your configuration file::
 
     $ vi .datapkg/config.ini
@@ -48,7 +52,8 @@ files including a main configuration file (config.ini).
 --------------------
 
 Suppose you have downloaded an existing datapkg distribution to your local
-filesystem at {path}. You can get info about it by doing:
+filesystem at {path}. (If you don't have one available you can download a demo
+distribution from: http://knowledgeforge.net/ckan/pkgdemo.egg). Then you can get info about it by doing:
 
     $ datapkg info {path}
 
@@ -67,7 +72,8 @@ or a registered package by doing::
 
     $ datapkg install {path-or-name}
 
-[NOT YET OPERATIONAL] You can also do this with non-datapkg material Install a package directly from a url::
+[NOT YET OPERATIONAL] You can also do this with non-datapkg material Install a
+package directly from a url::
 
     $ datapkg install {url}
 

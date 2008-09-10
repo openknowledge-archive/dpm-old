@@ -61,7 +61,7 @@ For more information about datapkg and how to use it run the `man` command.
         import datapkg 
         info = datapkg.__doc__
         print
-        print '                   ## DataPkg Tutorial ##'
+        print '                   ## DataPkg Manual ##'
         print '\n' + info
 
     def help_man(self, line=None):
@@ -333,6 +333,14 @@ Get information about a package.
         import sys
         sys.stdout.write(stream.read()) 
 
+    def help_dump(self, line=None):
+        usage = \
+'''datapkg dump {path-or-pkg-name} {path-of-resource-with-pkg}
+
+Dump contents of specified resource in specified package to stdout.
+'''
+        print usage
+
     # def do_inspect(self, line):
         # pkg_locator = line.strip()
         # pkg = self._get_package(pkg_locator)
@@ -345,7 +353,12 @@ def main():
     usage = \
 '''%prog [options] <command>
 
-Run `datapkg about` or `datapkg help` for more details on using datapkg.
+For instructions on using datapkg see the manual by running:
+
+    $ datapkg man
+
+About information (including license details) is available via `datapkg about`
+while a full list of commands is provided by `datapkg help`.
 '''
     parser = optparse.OptionParser(usage)
     parser.add_option('-v', '--verbose', dest='verbose', help='Be verbose',
