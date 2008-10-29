@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from datapkg.package import Package, metadata
+from datapkg.package import Package, dbmetadata
 Session = sessionmaker()
 
 class Index(object):
@@ -12,7 +12,7 @@ class Index(object):
         self.session = Session()
 
     def init(self):
-        metadata.create_all(bind=self.engine)
+        dbmetadata.create_all(bind=self.engine)
 
     def list_packages(self):
         return self.session.query(Package).all()

@@ -117,6 +117,10 @@ class DistributionOnDiskBase(object):
         self.easy_install.install_dir = install_dir
         self.easy_install.multi_version = True
         self.easy_install.zip_ok = zip_safe
+        # Suppress easy_install.installation_report() messages
+        # (o/w receive confusing report at end of install about multi-version
+        # etc)
+        self.easy_install.no_report = True
         # hack to make finalize_options happy
         self.easy_install.args = True
         self.easy_install.finalize_options()

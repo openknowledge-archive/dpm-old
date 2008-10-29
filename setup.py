@@ -13,11 +13,11 @@ setup(
         'PasteDeploy>=1.0',
         'PasteScript>=1.0',
         'SQLAlchemy>=0.4',
-    ],
-    install_requires={
         # make ckan support obligatory for time being
         'ckanclient>=0.1',
-        }
+    ],
+    extra_requires={
+    },
     entry_points='''
     [paste.paster_create_template]
     datapkg=datapkg:DataPkgTemplate

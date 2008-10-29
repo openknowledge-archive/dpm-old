@@ -34,7 +34,7 @@ class Package(object):
         if not re.match(regex, new_name):
             msg = 'Invalid package name: %s' % name
             raise ValueError(msg)
-        return new_name
+        return unicode(new_name)
 
     def create_file_structure(self, base_path=''):
         '''Create a skeleton data package on disk.
@@ -48,7 +48,6 @@ class Package(object):
         # TODO: catch stdout and only print if error
         import commands
         # os.system(cmd)
-        print cmd
         status, output = datapkg.util.getstatusoutput(cmd)
         if status:
             print output
@@ -147,7 +146,7 @@ class Package(object):
         '''Load a L{Package} object from a path to a package distribution.'''
         import datapkg.pypkgtools
         pydist = datapkg.pypkgtools.load_distribution(path)
-        pkg = Package(pydist.metadata.name, installed_path=path, metadata=pydist.metadata)
+        pkg = Package(pydist.metadata.name, installed_path=unicode(path), metadata=pydist.metadata)
         return pkg
 
     def stream(self, path):
@@ -163,9 +162,9 @@ from sqlalchemy import Column, MetaData, Table, types, ForeignKey
 from sqlalchemy import orm
 
 # Instantiate meta data manager.
-metadata = MetaData()
+dbmetadata = MetaData()
 
-package_table = Table('package', metadata,
+package_table = Table('package', dbmetadata,
     Column('id', types.Integer, primary_key=True),
     Column('name', types.Unicode(255)),
     Column('installed_path', types.UnicodeText()),

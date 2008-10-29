@@ -15,7 +15,7 @@ Basic Concepts
 Before we begin it is useful to understand some basic datapkg concepts:
 
     1. A Package -- metadata plus some set of resources (code, data etc)
-    2. A Distribution -- a Package serialized to structure on disk or at a url
+    2. A Distribution -- a Package serialized to a structure on disk or at a url
 
 For managing packages datapkg uses:
 
@@ -53,7 +53,8 @@ this option to all other commands that require use of the repository.
 
 Suppose you have downloaded an existing datapkg distribution to your local
 filesystem at {path}. (If you don't have one available you can download a demo
-distribution from: http://knowledgeforge.net/ckan/pkgdemo.egg). Then you can get info about it by doing:
+distribution from: http://knowledgeforge.net/ckan/pkgdemo.egg). Then you can
+get info about it by doing:
 
     $ datapkg info {path}
 
@@ -72,6 +73,9 @@ or a registered package by doing::
 
     $ datapkg install {path-or-name}
 
+NB: to install from a registered package the package will need to have a
+download_url associated.
+
 [NOT YET OPERATIONAL] You can also do this with non-datapkg material Install a
 package directly from a url::
 
@@ -87,6 +91,14 @@ Whether you just have a distribution on disk or have installed a package you
 can access this material from the command line by using the `dump` command::
 
     $ datapkg dump {path-or-name} {path-in-package}
+
+For example, if you have installed the pkgdemo package from earlier you could
+do:
+
+    $ datapkg dump pkgdemo windhover.txt
+
+Which should result in Gerald Manley Hopkin's "The Windhover" being printed
+out (as this is the contents of windhover.txt).
 
 To access the package from python code do:
 
@@ -115,21 +127,52 @@ Pull CKAN index in your local index
 2. Making Your Material Available to Others
 ===========================================
 
-1. Create a skeletal package::
+2.1 Creating a package (distribution)
+-------------------------------------
 
-       $ datapkg create {my-new-package}
+First a skeletal distribution on disk::
 
-   See the help for the create command for more details.
+    $ datapkg create {pkg-name-or-path}
 
-2. Add material to this package::
+Take a look inside your newly created distribution directory. There should
+be 3 files/directories:
 
-       $ cd {my-new-package}
-       $ cp {lots-of-my-data-files} .
+  1. MANIFEST.in: this specifies what files/directories within the distribution
+  directory should actually be included in the package.
+  2. *.egg-info: this directory you can safely ignore (though don't delete it)
+  3. setup.py: this files holds metadata about your package.
+
+Generally the only file you should have to alter is setup.py. Open this up in
+your favourite editor and then modify the various attributes to be as you would
+like them.
+
+Having sorted out the metadata you will actually want to add some material to
+your package. You do this by simply copying material into the distribution
+directory, e.g.::
+
+    $ cd {my-new-package}
+    $ cp {lots-of-my-data-files} .
 
 
-3. Register your package -- {path} is path to package distribution on disk::
+2. Register your package
+------------------------
 
-    $ datapkg register {path} # locally
+Now you have created a package you will want to make it available.
+
+You can either do this by registering it on a public registry such as CKAN or,
+more simply, you can just upload it somewhere and point people to that
+location.
+
+The first step in either process is building/compiling the distribution into a
+standard form. This is most easily done by installing the package in your local
+repository:
+
+    $ datapkg install {path-to-distribution}
+
+[NOT YET FULLY IMPLEMENTED]
+
+Once that is done you register the package on CKAN by doing::
+
     $ datapkg ckanregister {path} # on CKAN
 
 You can update an existing package on CKAN by doing::
