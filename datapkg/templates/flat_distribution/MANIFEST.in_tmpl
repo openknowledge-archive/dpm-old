@@ -1,0 +1,4 @@
+# Follows python MANIFEST.in syntax. See datapkg man for more details
+recursive-include * *.txt *.csv *.js *.dat
+include *.txt *.csv *.js *.dat
+

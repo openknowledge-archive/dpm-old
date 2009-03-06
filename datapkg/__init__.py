@@ -139,6 +139,8 @@ be 3 files/directories:
 
   1. MANIFEST.in: this specifies what files/directories within the distribution
   directory should actually be included in the package.
+    * For instructions on using the MANIFEST.in to specify what files to
+      include see <http://docs.python.org/distutils/commandref.html#sdist-cmd>
   2. *.egg-info: this directory you can safely ignore (though don't delete it)
   3. setup.py: this files holds metadata about your package.
 
@@ -323,6 +325,10 @@ class DataPkgTemplate(Template):
     _template_dir = 'templates/default_distribution'
     summary = 'DataPkg default distribution template'
 
+class DataPkgTemplate(Template):
+    _template_dir = 'templates/flat_distribution'
+    summary = 'DataPkg "flat" template'
+
 def install(name):
     from manager import PackageManager
     mgr = PackageManager()
@@ -335,3 +341,6 @@ def upload(path='.'):
         raise Exception(msg)
     # TODO: implement the rest of this
     
+
+class DatapkgException(Exception):
+    pass

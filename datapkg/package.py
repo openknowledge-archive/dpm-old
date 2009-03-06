@@ -7,6 +7,7 @@ import distutils.dist
 
 import datapkg.util
 import datapkg.pypkgtools
+from datapkg import DatapkgException
 
 class Package(object):
 
@@ -36,11 +37,11 @@ class Package(object):
             raise ValueError(msg)
         return unicode(new_name)
 
-    def create_file_structure(self, base_path=''):
+    def create_file_structure(self, base_path='', template='default'):
         '''Create a skeleton data package on disk.
         '''
         # TODO: import PasteScript direct and use
-        cmd = 'paster create --template=datapkg '
+        cmd = 'paster create --template=datapkg-%s ' % template
         if base_path:
             cmd += '--output-dir %s ' % base_path
         cmd += self.name
@@ -50,7 +51,8 @@ class Package(object):
         # os.system(cmd)
         status, output = datapkg.util.getstatusoutput(cmd)
         if status:
-            print output
+            msg = 'Error on attempt to create file structure:\n\n%s' % output
+            raise DatapkgException(msg)
         return dist_path
 
     def download(self, tmpdir):
@@ -207,10 +209,10 @@ class PackageMaker(object):
         return dir, name
 
     @classmethod
-    def create_on_disk(self, path):
+    def create_on_disk(self, path, template='default'):
         dir, name = self.info_from_path(path)
         pkg = Package(name)
-        pkg.create_file_structure(dir)
+        pkg.create_file_structure(dir, template)
         return pkg
 
 

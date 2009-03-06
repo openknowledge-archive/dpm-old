@@ -38,6 +38,13 @@ parser.add_option(
     dest='repository',
     help='Path to repository (if non-default)',
     default=None)
+# TODO: this should be made specific to CreateCommand
+parser.add_option(
+    '-t', '--template',
+    dest='template',
+    action='store',
+    default='default',
+    help='Specify a template to use when creating on disk (default or flat)')
 
 _commands = {}
 
@@ -347,11 +354,19 @@ Create a skeleton data package at path. Package Name will be taken from
 last portion of path. If path simply a name then create in the current
 directory.'''
 
+#     def __init__(self):
+#         super(CreateCommand, self).__init__()
+#         self.parser.add_option(
+#             '-t', '--template',
+#             dest='template',
+#             action='store',
+#             default='default',
+#             help='Specify template to use (default or flat)')
+ 
     def run(self, options, args):
         path = args[0]
         import datapkg.package
-        template = self.options
-        print template
+        template = options.template 
         msg = 'Creating new datapkg: %s' %  path
         self._print(msg)
         datapkg.package.PackageMaker.create_on_disk(path)

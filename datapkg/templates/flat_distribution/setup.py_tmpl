@@ -1,0 +1,20 @@
+from setuptools import setup, find_packages
+
+setup(
+    name=${repr(project)|empty},
+    version=${repr(version)|empty},
+    license="MIT",
+    #description="",
+    #long_description="",
+    #author="",
+    #author_email="",
+    #url="",
+
+    # information about what to include
+    packages=find_packages(),
+    package_dir={${repr(project)|empty}: ''},
+    include_package_data=True,
+    # package_data={},
+    # do not install in zipped format
+    zip_safe=False,
+)

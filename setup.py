@@ -20,7 +20,8 @@ setup(
     },
     entry_points='''
     [paste.paster_create_template]
-    datapkg=datapkg:DataPkgTemplate
+    datapkg-default=datapkg:DataPkgTemplate
+    datapkg-flat=datapkg:DataPkgFlatTemplate
     
     [console_scripts]
     datapkg=datapkg.cli:main
