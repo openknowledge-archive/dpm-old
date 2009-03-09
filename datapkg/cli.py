@@ -39,10 +39,11 @@ parser.add_option(
     help='Path to repository (if non-default)',
     default=None)
 # TODO: this should be made specific to CreateCommand
+# problem is how to have general parser and specific parser ...
+# http://osdir.com/ml/python.optik.user/2008-02/msg00001.html
 parser.add_option(
     '-t', '--template',
     dest='template',
-    action='store',
     default='default',
     help='Specify a template to use when creating on disk (default or flat)')
 
@@ -99,10 +100,11 @@ class Command(object):
             return repo.index.get_package(path_or_name)
 
     def main(self, complete_args, args, initial_options):
-        options, args = self.parser.parse_args(args)
+        options = initial_options
+        discarded_options, args = self.parser.parse_args(args)
+        # self.merge_options(initial_options, options)
         self.repository_path = options.repository
         self.verbose = options.verbose
-        self.merge_options(initial_options, options)
 
         # TODO: fix up logger
         level = 1 # Notify
@@ -216,25 +218,25 @@ class CkanCommand(Command):
     name = 'ckan'
     usage = '''%prog {action}
 
-ckantags: Prints all the tags in use on the CKAN service.
+tags: Prints all the tags in use on the CKAN service.
 
-ckanlist: Prints the names of all the packages registered on the CKAN service.
+list: Prints the names of all the packages registered on the CKAN service.
 
-ckanshow name: Prints the registered details of the named package on the CKAN service.
+show {name}: Prints the registered details of the named package on the CKAN service.
 
-ckanregister [path] [api-key]
+register [path] [api-key]
 
-Register a package located at path on disk with the CKAN service. If path 
-not provided, it defaults to current directory. If a valid api-key is not
-provided, changes to the CKAN register will not be allowed. Please use the
-ckanupdate command to update the register when the package metadata changes.
+  Register a package located at path on disk with the CKAN service. If path 
+  not provided, it defaults to current directory. If a valid api-key is not
+  provided, changes to the CKAN register will not be allowed. Please use the
+  update command to update the register when the package metadata changes.
 
-ckanupdate [path] [api-key]
+update [path] [api-key]
 
-Update a package located at path on disk with the CKAN service. If path 
-not provided, it defaults to current directory. If a valid api-key is not
-provided, changes to the CKAN register will not be allowed. Please use the
-ckanupdate command to update the register when the package metadata changes.
+  Update a package located at path on disk with the CKAN service. If path 
+  not provided, it defaults to current directory. If a valid api-key is not
+  provided, changes to the CKAN register will not be allowed. Please use the
+  ckanupdate command to update the register when the package metadata changes.
 '''
     summary = 'Interact with CKAN'
 
@@ -243,15 +245,16 @@ ckanupdate command to update the register when the package metadata changes.
             action = args[0]
             if len(args) >= 2:
                 self.pkgname = args[1]
-            # if options.has_option('base_location'):
-            #    self.base_location = args[1]
-            self.base_location = None
-            method = getattr(self, 'do_' + action)
-            method()
+            # TODO: remove base_location and replace with repository
+            if self.repository_path: # TODO: ? startswith http
+                self.base_location = self.repository_path
+            method = getattr(self, action)
+            theirargs = args[1:]
+            method(theirargs, options)
         else:
             print 'You must supply an action'
 
-    def do_ckantags(self, line=''):
+    def tags(self, args, options):
         import datapkg
         msg = 'Listing all tags registered on CKAN... %s' % self.base_location
         self._print(msg)
@@ -259,7 +262,7 @@ ckanupdate command to update the register when the package metadata changes.
             base_location=self.base_location,
         )
 
-    def do_ckanlist(self, line=''):
+    def list(self, args, options):
         import datapkg
         msg = 'Listing packages registered on CKAN... %s' % self.base_location
         self._print(msg)
@@ -267,10 +270,8 @@ ckanupdate command to update the register when the package metadata changes.
             base_location=self.base_location,
         )
 
-    def do_ckanshow(self, line):
-        args = line.strip().split(' ')
+    def show(self, args, options):
         pkg_name = args[0]
-        import datapkg
         msg = 'Showing details for \'%s\' package registered on CKAN... %s' % (pkg_name, self.base_location)
         self._print(msg)
         datapkg.ckanshow(
@@ -278,8 +279,7 @@ ckanupdate command to update the register when the package metadata changes.
             base_location=self.base_location,
         )
 
-    def do_ckanregister(self, line):
-        args = line.strip().split(' ')
+    def register(self, args, options):
         path = args[0]
         if len(args) > 1:
             api_key = args[1]
@@ -289,7 +289,6 @@ ckanupdate command to update the register when the package metadata changes.
             base_location = args[2]
         else:
             base_location = None
-        import datapkg
         msg = 'Registering with CKAN the datapkg on path: %s' %  path
         self._print(msg)
         datapkg.ckanregister(
@@ -298,8 +297,7 @@ ckanupdate command to update the register when the package metadata changes.
             api_key=api_key,
         )
 
-    def do_ckanupdate(self, line):
-        args = line.strip().split(' ')
+    def update(self, args, options):
         path = args[0]
         if len(args) > 1:
             api_key = args[1]
@@ -309,7 +307,6 @@ ckanupdate command to update the register when the package metadata changes.
             base_location = args[2]
         else:
             base_location = None
-        import datapkg
         msg = 'Updating datapkg on CKAN: %s' %  path
         self._print(msg)
         datapkg.ckanupdate(
@@ -401,7 +398,6 @@ Install a package located at path on disk.
 
     def run(self, options, args):
         pkg_path = args[0]
-        pkg_path = line.strip()
         # TODO: check whether it is registered already
         # TODO: option of installing an existing registered package
         repo, pkg = self._register(pkg_path)

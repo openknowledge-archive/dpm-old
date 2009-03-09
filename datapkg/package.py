@@ -41,7 +41,8 @@ class Package(object):
         '''Create a skeleton data package on disk.
         '''
         # TODO: import PasteScript direct and use
-        cmd = 'paster create --template=datapkg-%s ' % template
+        # use no-interactive to avoid querying on vars
+        cmd = 'paster create --no-interactive --template=datapkg-%s ' % template
         if base_path:
             cmd += '--output-dir %s ' % base_path
         cmd += self.name

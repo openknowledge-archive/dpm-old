@@ -16,12 +16,10 @@ setup(
         # make ckan support obligatory for time being
         'ckanclient>=0.1',
     ],
-    extra_requires={
-    },
     entry_points='''
     [paste.paster_create_template]
-    datapkg-default=datapkg:DataPkgTemplate
-    datapkg-flat=datapkg:DataPkgFlatTemplate
+    datapkg-default=datapkg.templates:DataPkgTemplate
+    datapkg-flat=datapkg.templates:DataPkgFlatTemplate
     
     [console_scripts]
     datapkg=datapkg.cli:main

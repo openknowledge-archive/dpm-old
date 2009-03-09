@@ -188,7 +188,7 @@ You can update an existing package on CKAN by doing::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.1'
+__version__ = '0.2'
 __description__ = 'Data packaging system and utilities.'
 __description_long__ = __doc__
 __license__ = 'MIT'
@@ -320,26 +320,18 @@ def print_status(ckan):
     else:
         print "System error (%s). Seek help." %  ckan.last_status
 
-from paste.script.templates import Template
-class DataPkgTemplate(Template):
-    _template_dir = 'templates/default_distribution'
-    summary = 'DataPkg default distribution template'
-
-class DataPkgTemplate(Template):
-    _template_dir = 'templates/flat_distribution'
-    summary = 'DataPkg "flat" template'
-
-def install(name):
-    from manager import PackageManager
-    mgr = PackageManager()
-    mgr.install(name)
-
-def upload(path='.'):
-    fns = os.listdir('.')
-    if 'setup.py' not in fns:
-        msg = '%s does not look like a data package (no setup.py ...)' % path
-        raise Exception(msg)
-    # TODO: implement the rest of this
+# TODO: 2009-03-09 Remove this.
+# def install(name):
+#     from manager import PackageManager
+#     mgr = PackageManager()
+#     mgr.install(name)
+# 
+# def upload(path='.'):
+#     fns = os.listdir('.')
+#     if 'setup.py' not in fns:
+#         msg = '%s does not look like a data package (no setup.py ...)' % path
+#         raise Exception(msg)
+#     # TODO: implement the rest of this
     
 
 class DatapkgException(Exception):

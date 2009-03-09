@@ -19,8 +19,13 @@ class TestCLI:
         self.cwd = os.getcwd()
         self.cmd_base = 'datapkg --repository %s ' % self.repo_path
 
+        # from beginning to end ...
+        self.pkg_name = u'mytestpkg'
+        self.pkg_path = os.path.join(self.tmpdir, self.pkg_name)
+
     @classmethod
     def teardown_class(self):
+        # do not teardown directory in order to allow investigation on error
         # reset cwd or problems in other tests
         os.chdir(self.cwd)
 
@@ -30,9 +35,17 @@ class TestCLI:
         exp = 'datapkg version'
         assert exp in output
 
+    def _test_create(self):
+        cmd = self.cmd_base + 'create %s' % self.pkg_path
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        assert os.path.exists(self.pkg_path)
+        fp = os.path.join(self.pkg_path, self.pkg_name, 'abc.txt')
+        fo = open(fp, 'w')
+        fo.write('Ideas are cheap, implementation is costly.')
+        fo.close()
+
     def test_walkthrough(self):
-        # from beginning to end ...
-        pkg_name = u'mytestpkg'
 
         # init
         cmd = self.cmd_base + 'init'
@@ -41,50 +54,64 @@ class TestCLI:
         assert os.path.exists(self.repo_path)
 
         # create 
-        pkg_path = os.path.join(self.tmpdir, pkg_name)
-        cmd = self.cmd_base + 'create %s' % pkg_path
-        status, output = datapkg.util.getstatusoutput(cmd)
-        assert not status, output
-        assert os.path.exists(pkg_path)
-        fp = os.path.join(pkg_path, pkg_name, 'abc.txt')
-        fo = open(fp, 'w')
-        fo.write('Ideas are cheap, implementation is costly.')
-        fo.close()
+        self._test_create()
 
         # register
-        cmd = self.cmd_base + 'register %s' % pkg_path 
+        cmd = self.cmd_base + 'register %s' % self.pkg_path 
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
 
         repo = datapkg.repository.Repository(self.repo_path)
         pkgnames = [ pkg.name for pkg in repo.index.list_packages() ]
-        assert pkg_name in pkgnames
+        assert self.pkg_name in pkgnames
 
         # install
-        cmd = self.cmd_base + 'install %s' % pkg_path 
+        cmd = self.cmd_base + 'install %s' % self.pkg_path 
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
-        # dest path with be pkg_name-version-*
+        # dest path with be self.pkg_name-version-*
         dirs = os.listdir(repo.installed_path)
-        filtered = filter(lambda x: x.startswith(pkg_name), dirs)
+        filtered = filter(lambda x: x.startswith(self.pkg_name), dirs)
         assert len(filtered) > 0, dirs
 
         # info
-        # A: from pkg_name
-        cmd = self.cmd_base + 'info %s' % pkg_name
+        # A: from self.pkg_name
+        cmd = self.cmd_base + 'info %s' % self.pkg_name
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
-        assert pkg_name in output, output
+        assert self.pkg_name in output, output
 
         # TODO B: from disk
 
         # inspect - not yet implemented
-        # cmd = self.cmd_base + 'inspect %s' % pkg_name
+        # cmd = self.cmd_base + 'inspect %s' % self.pkg_name
         # status, output = datapkg.util.getstatusoutput(cmd)
         # assert not status, output
 
+        # dump
         offset = 'abc.txt'
-        cmd = self.cmd_base + 'dump %s %s' % (pkg_name, offset)
+        cmd = self.cmd_base + 'dump %s %s' % (self.pkg_name, offset)
         status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+    
+    # For this need dummy ckan running locally with standard test data
+
+    def test_ckan(self):
+        localckan = 'http://localhost:5000/api/rest'
+        ckanbase = 'datapkg --repository %s ckan ' % localckan
+
+        listcmd = ckanbase + 'list'
+        status, output = datapkg.util.getstatusoutput(listcmd)
+        assert not status, output
+        assert 'annakarenina' in output, output
+
+        # create dummy package if not created already
+        if not os.path.exists(self.pkg_path):
+            self._test_create()
+        
+        apikey = 'tester'
+        registercmd = ckanbase + 'register %s %s' % (self.pkg_path, apikey)
+        listcmd = ckanbase + 'list'
+        status, output = datapkg.util.getstatusoutput(registercmd)
         assert not status, output
 
