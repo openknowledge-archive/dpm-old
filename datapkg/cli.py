@@ -1,3 +1,10 @@
+'''datapkg command line interface.
+
+datapkg ondiskorpath create | dump | info | register | install
+datapkg repo init | list | sync | search
+          index list | sync | search
+datapkg doc about | license | man
+'''
 import sys
 import os
 import optparse
@@ -13,7 +20,9 @@ logging.basicConfig()
 import datapkg
 
 parser = optparse.OptionParser(
-    usage='%prog COMMAND [OPTIONS]',
+    usage='''%prog COMMAND [OPTIONS]
+
+Use "datapkg help" see a list of commands.''',
     version=datapkg.__version__)
 
 parser.add_option(
@@ -38,6 +47,11 @@ parser.add_option(
     dest='repository',
     help='Path to repository (if non-default)',
     default=None)
+parser.add_option(
+    '-k', '--api-key',
+    dest='api_key',
+    default=None,
+    help='API Key for use with repository (where necessary)')
 # TODO: this should be made specific to CreateCommand
 # problem is how to have general parser and specific parser ...
 # http://osdir.com/ml/python.optik.user/2008-02/msg00001.html
@@ -78,7 +92,16 @@ class Command(object):
 
     def _get_repo(self):
         import datapkg.repository
-        repo = datapkg.repository.Repository(self.repository_path)
+        # HACK: fix this up
+        if self.repository_path and 'http://' in self.repository_path:
+            class StubbedRepo(object):
+                pass
+            repo = StubbedRepo()
+            repo.index = datapkg.index.CkanIndex(
+                    rest_api_url=self.repository_path,
+                    api_key=self.options.api_key)
+        else:
+            repo = datapkg.repository.Repository(self.repository_path)
         return repo
 
     def _register(self, path):
@@ -97,12 +120,22 @@ class Command(object):
             return datapkg.package.Package.from_path(path_or_name)
         else:
             repo = self._get_repo()
-            return repo.index.get_package(path_or_name)
+            return repo.index.get(path_or_name)
+
+    def _print_pkg(self, pkg):
+        out = StringIO()
+        pkg.metadata.write_pkg_file(out)
+        out.seek(0)
+        print u'## Package: %s' % pkg.name
+        print
+        print out.read()
 
     def main(self, complete_args, args, initial_options):
         options = initial_options
         discarded_options, args = self.parser.parse_args(args)
+        # From pip but not needed by us I think
         # self.merge_options(initial_options, options)
+        self.options = options
         self.repository_path = options.repository
         self.verbose = options.verbose
 
@@ -129,7 +162,8 @@ class Command(object):
         if exit:
             log_fn = 'datapkg-log.txt'
             text = '\n'.join(complete_log)
-            logger.fatal('Storing complete log in %s' % log_fn)
+            # Not sure we need to tell people ...
+            # logger.fatal('Storing complete log in %s' % log_fn)
             log_fp = open_logfile_append(log_fn)
             log_fp.write(text)
             log_fp.close()
@@ -214,131 +248,97 @@ class ManCommand(Command):
 ManCommand()
 
 
-class CkanCommand(Command):
-    name = 'ckan'
+class ListCommand(Command):
+    name = 'list'
+    summary = 'List registered packages'
+    usage = \
+'''%prog
+
+List registered packages.
+'''
+    def run(self, options, args):
+        repo = self._get_repo()
+        for pkg in repo.index.list():
+            print pkg.name
+
+ListCommand()
+
+
+class InfoCommand(Command):
+    name = 'info'
+    summary = 'Get information about a package'
+    usage = \
+'''%prog {path-or-pkg-name}
+
+Get information about a package.
+'''
+
+    def run(self, options, args):
+        pkg_locator = args[0]
+        pkg = self._get_package(pkg_locator)
+        if pkg is None:
+            print 'No package was found for: "%s"' % pkg_locator
+            return 1
+        self._print_pkg(pkg)
+
+InfoCommand()
+
+
+class DumpCommand(Command):
+    name = 'dump'
+    summary = 'Dump a resource from a package'
+    usage = \
+'''%prog {path-or-pkg-name} {path-of-resource-with-pkg}
+
+Dump contents of specified resource in specified package to stdout.
+'''
+
+    def run(self, options, args):
+        # assuming no spaces in the paths!
+        pkg_locator = args[0]
+        offset = args[1]
+        pkg = self._get_package(pkg_locator)
+        stream = pkg.stream(offset)
+        import sys
+        sys.stdout.write(stream.read()) 
+
+DumpCommand()
+
+
+# def do_inspect(self, line):
+    # pkg_locator = line.strip()
+    # pkg = self._get_package(pkg_locator)
+    # print pkg.distribution.listdir
+
+
+class RepoCommand(Command):
+    name = 'repo'
+    summary = 'Manage a repository'
     usage = '''%prog {action}
 
-tags: Prints all the tags in use on the CKAN service.
+init: Initialize a repository.
 
-list: Prints the names of all the packages registered on the CKAN service.
-
-show {name}: Prints the registered details of the named package on the CKAN service.
-
-register [path] [api-key]
-
-  Register a package located at path on disk with the CKAN service. If path 
-  not provided, it defaults to current directory. If a valid api-key is not
-  provided, changes to the CKAN register will not be allowed. Please use the
-  update command to update the register when the package metadata changes.
-
-update [path] [api-key]
-
-  Update a package located at path on disk with the CKAN service. If path 
-  not provided, it defaults to current directory. If a valid api-key is not
-  provided, changes to the CKAN register will not be allowed. Please use the
-  ckanupdate command to update the register when the package metadata changes.
+    The repository will be created at the location specified via the
+    --repository option or default location if not specified (~/.datapkg).
 '''
-    summary = 'Interact with CKAN'
 
     def run(self, options, args):
         if args:
             action = args[0]
-            if len(args) >= 2:
-                self.pkgname = args[1]
-            # TODO: remove base_location and replace with repository
-            if self.repository_path: # TODO: ? startswith http
-                self.base_location = self.repository_path
             method = getattr(self, action)
             theirargs = args[1:]
             method(theirargs, options)
         else:
             print 'You must supply an action'
-
-    def tags(self, args, options):
-        import datapkg
-        msg = 'Listing all tags registered on CKAN... %s' % self.base_location
-        self._print(msg)
-        datapkg.ckantags(
-            base_location=self.base_location,
-        )
-
-    def list(self, args, options):
-        import datapkg
-        msg = 'Listing packages registered on CKAN... %s' % self.base_location
-        self._print(msg)
-        datapkg.ckanlist(
-            base_location=self.base_location,
-        )
-
-    def show(self, args, options):
-        pkg_name = args[0]
-        msg = 'Showing details for \'%s\' package registered on CKAN... %s' % (pkg_name, self.base_location)
-        self._print(msg)
-        datapkg.ckanshow(
-            pkg_name=pkg_name,
-            base_location=self.base_location,
-        )
-
-    def register(self, args, options):
-        path = args[0]
-        if len(args) > 1:
-            api_key = args[1]
-        else:
-            api_key = None
-        if len(args) > 2:
-            base_location = args[2]
-        else:
-            base_location = None
-        msg = 'Registering with CKAN the datapkg on path: %s' %  path
-        self._print(msg)
-        datapkg.ckanregister(
-            path=path,
-            base_location=self.base_location,
-            api_key=api_key,
-        )
-
-    def update(self, args, options):
-        path = args[0]
-        if len(args) > 1:
-            api_key = args[1]
-        else:
-            api_key = None
-        if len(args) > 2:
-            base_location = args[2]
-        else:
-            base_location = None
-        msg = 'Updating datapkg on CKAN: %s' %  path
-        self._print(msg)
-        datapkg.ckanupdate(
-            path=path,
-            base_location=self.base_location,
-            api_key=api_key,
-        )
-
-CkanCommand()
-
-
-class InitCommand(Command):
-    name = 'init'
-    usage = '''%prog
-
-Initialize a repository.
-
-The repository will be created at the default location (see help for command) unless an alternative location is specified via the --repository option.
-'''
-    summary = 'Initialize a repository'
-
-    def run(self, options, args):
+    
+    def init(self, args, options):
         import datapkg.repository
-        try:
-            repo = datapkg.repository.Repository(self.repository_path)
-            repo.init()
-        except Exception, inst:
-            print inst
+        repo = datapkg.repository.Repository(self.repository_path)
+        repo.init()
         msg = 'Repository successfully initialized at %s' % self.repository_path
         self._print(msg)
     
-InitCommand()
+RepoCommand()
 
 
 class CreateCommand(Command):
@@ -407,59 +407,6 @@ Install a package located at path on disk.
         # This should probably be moved down into package object
 
 InstallCommand()
-
-
-class InfoCommand(Command):
-    name = 'info'
-    summary = 'Get information about a package'
-    usage = \
-'''%prog {path-or-pkg-name}
-
-Get information about a package.
-'''
-
-    def run(self, options, args):
-        pkg_locator = args[0]
-        pkg = self._get_package(pkg_locator)
-        if pkg is None:
-            print 'No package was found for: "%s"' % pkg_locator
-            return 1
-        from StringIO import StringIO
-        out = StringIO()
-        pkg.metadata.write_pkg_file(out)
-        out.seek(0)
-        print u'## Package: %s' % pkg.name
-        print
-        print out.read()
-
-InfoCommand()
-
-
-class DumpCommand(Command):
-    name = 'dump'
-    summary = 'Dump a resource from a package'
-    usage = \
-'''%prog {path-or-pkg-name} {path-of-resource-with-pkg}
-
-Dump contents of specified resource in specified package to stdout.
-'''
-
-    def run(self, options, args):
-        # assuming no spaces in the paths!
-        pkg_locator = args[0]
-        offset = args[1]
-        pkg = self._get_package(pkg_locator)
-        stream = pkg.stream(offset)
-        import sys
-        sys.stdout.write(stream.read()) 
-
-DumpCommand()
-
-
-# def do_inspect(self, line):
-    # pkg_locator = line.strip()
-    # pkg = self._get_package(pkg_locator)
-    # print pkg.distribution.listdir
 
 
 def format_exc(exc_info=None):

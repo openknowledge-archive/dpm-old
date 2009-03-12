@@ -48,7 +48,7 @@ class TestCLI:
     def test_walkthrough(self):
 
         # init
-        cmd = self.cmd_base + 'init'
+        cmd = self.cmd_base + 'repo init'
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert os.path.exists(self.repo_path)
@@ -62,7 +62,7 @@ class TestCLI:
         assert not status, output
 
         repo = datapkg.repository.Repository(self.repo_path)
-        pkgnames = [ pkg.name for pkg in repo.index.list_packages() ]
+        pkgnames = [ pkg.name for pkg in repo.index.list() ]
         assert self.pkg_name in pkgnames
 
         # install
@@ -98,10 +98,19 @@ class TestCLI:
 
     def test_ckan(self):
         localckan = 'http://localhost:5000/api/rest'
-        ckanbase = 'datapkg --repository %s ckan ' % localckan
+        apikey = 'tester'
+        ckanbase = 'datapkg --repository %s ' % localckan
+        ckanbase += '--api-key %s ' % apikey
 
+        # list
         listcmd = ckanbase + 'list'
         status, output = datapkg.util.getstatusoutput(listcmd)
+        assert not status, output
+        assert 'annakarenina' in output, output
+
+        # info
+        cmd = ckanbase + 'info %s' % 'annakarenina'
+        status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert 'annakarenina' in output, output
 
@@ -109,9 +118,14 @@ class TestCLI:
         if not os.path.exists(self.pkg_path):
             self._test_create()
         
-        apikey = 'tester'
-        registercmd = ckanbase + 'register %s %s' % (self.pkg_path, apikey)
-        listcmd = ckanbase + 'list'
+        # register
+        registercmd = ckanbase + 'register %s' % self.pkg_path
         status, output = datapkg.util.getstatusoutput(registercmd)
         assert not status, output
+        # check actually registered
+        listcmd = ckanbase + 'info %s' % self.pkg_name
+        status, output = datapkg.util.getstatusoutput(listcmd)
+        assert not status, output
+        assert self.pkg_name in output, output
+        # TODO: test other info is registered
 
