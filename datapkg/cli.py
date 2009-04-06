@@ -124,11 +124,9 @@ class Command(object):
 
     def _print_pkg(self, pkg):
         out = StringIO()
-        pkg.metadata.write_pkg_file(out)
-        out.seek(0)
         print u'## Package: %s' % pkg.name
         print
-        print out.read()
+        print pkg.metadata.pprint()
 
     def main(self, complete_args, args, initial_options):
         options = initial_options
@@ -366,7 +364,7 @@ directory.'''
         template = options.template 
         msg = 'Creating new datapkg: %s' %  path
         self._print(msg)
-        datapkg.package.PackageMaker.create_on_disk(path)
+        datapkg.package.PackageMaker.create_on_disk(path, template=template)
 
 CreateCommand()
 

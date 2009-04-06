@@ -1,7 +1,45 @@
 '''datapkg is a tool for distributing, discovering and installing knowledge and
 data 'packages'.
 
-datapkg has two main distinct uses:
+Contents:
+    1. Quickstart
+    2. Tutorial
+
+1. Quickstart
++++++++++++++
+
+Create a new data package on disk using standard file layout:
+
+    $ datapkg create MyNewDataPackage
+
+Edit the metadata:
+
+    $ vim MyNewDataPackage/setup.py
+
+Add some data:
+
+    $ cp mydata.csv MyNewDataPackage
+    $ cp mydata.js MyNewDataPackage
+    $ etc ...
+
+Register in your local repository on on CKAN:
+
+    $ datapkg repo init # if repo not already initialized
+    $ datapkg register MyNewDataPackage
+    $ # OR
+    $ datapkg register --repository=http://ckan.net/api/rest/ --api-key=....  MyNewDataPackage
+
+Check it has registered ok:
+
+    $ datapkg info MyNewDataPackage
+    $ # OR
+    $ datapkg info --repository=http://ckan.net/api/rest/ MyNewDataPackage
+
+
+2. Tutorial
++++++++++++
+
+datapkg has two distinct uses:
 
     1. Finding, obtaining and accessing material made available *by* others.
     2. Assisting you to make material available *to* others.

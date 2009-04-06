@@ -4,7 +4,8 @@ import distutils.dist
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from datapkg.package import Package, dbmetadata
+from datapkg.package import Package
+from datapkg.db import dbmetadata
 Session = sessionmaker()
 
 logger = logging.getLogger('datapkg.index')

@@ -6,6 +6,7 @@ import re
 import distutils.dist
 
 import datapkg.util
+import datapkg.metadata
 import datapkg.pypkgtools
 from datapkg import DatapkgException
 
@@ -22,8 +23,8 @@ class Package(object):
         if metadata:
             self.metadata = metadata
         else:
-            self.metadata = distutils.dist.DistributionMetadata()
-            self.metadata.name = self.name
+            self.metadata = datapkg.metadata.Metadata()
+            self.metadata['name'] = self.name
         # TODO: most of these attributes should run off metadata
         self.download_url = None
         for k,v in kwargs.items():
@@ -149,7 +150,10 @@ class Package(object):
         '''Load a L{Package} object from a path to a package distribution.'''
         import datapkg.pypkgtools
         pydist = datapkg.pypkgtools.load_distribution(path)
-        pkg = Package(pydist.metadata.name, installed_path=unicode(path), metadata=pydist.metadata)
+        import datapkg.metadata as M
+        metadata = M.MetadataConverter.from_distutils(pydist.metadata)
+        pkg = Package(pydist.metadata.name, installed_path=unicode(path),
+                metadata=metadata)
         return pkg
 
     def stream(self, path):
@@ -158,37 +162,6 @@ class Package(object):
         sys.path.insert(0, self.installed_path)
         import pkg_resources
         return pkg_resources.resource_stream(self.name, path)
-
-
-# SQLAlchemy stuff
-from sqlalchemy import Column, MetaData, Table, types, ForeignKey
-from sqlalchemy import orm
-
-# Instantiate meta data manager.
-dbmetadata = MetaData()
-
-package_table = Table('package', dbmetadata,
-    Column('id', types.Integer, primary_key=True),
-    Column('name', types.Unicode(255)),
-    Column('installed_path', types.UnicodeText()),
-)
-
-
-from sqlalchemy.orm import MapperExtension, EXT_STOP
-class ReconstituteExtension(MapperExtension):
-    def populate_instance(self, mapper, selectcontext, row, instance, **flags):
-        # in v0.5 we can change to use on_reconstitute see
-        # http://www.sqlalchemy.org/docs/05/mappers.html#advdatamapping_mapper_onreconstitute
-
-        # here we follow
-        # http://www.sqlalchemy.org/docs/04/sqlalchemy_orm_mapper.html#docstrings_sqlalchemy.orm.mapper_Mapper
-        mapper.populate_instance(selectcontext, instance, row, **flags)
-        instance.init_on_load()
-        return EXT_STOP
-
-from sqlalchemy.orm import mapper
-mapper(Package, package_table, extension=ReconstituteExtension())
-
 
 
 class PackageMaker(object):
@@ -216,4 +189,7 @@ class PackageMaker(object):
         pkg.create_file_structure(dir, template)
         return pkg
 
+
+import datapkg.db as db
+db.mapper(Package, db.package_table, extension=db.ReconstituteExtension())
 
