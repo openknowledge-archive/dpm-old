@@ -149,13 +149,11 @@ To access the package from python code do:
 
 Search for a package on CKAN::
 
-    $ datapkg ckanlist
-    $ datapkg ckantags # list tags
-    $ datapkg ckansearch [NOT YET OPERATIONAL]
+    $ datapkg --repository=http://ckan.net/api/rest/ list
 
 You can find out about a package on CKAN by doing::
 
-    $ datapkg ckanshow ${name}
+    $ datapkg --repository=http://ckan.net/api/rest/ info {pkg-name}
 
 [NOT YET OPERATIONAL]
 
@@ -213,11 +211,7 @@ repository:
 
 Once that is done you register the package on CKAN by doing::
 
-    $ datapkg ckanregister {path} # on CKAN
-
-You can update an existing package on CKAN by doing::
-
-    $ datapkg ckanupdate ${path}
+    $ datapkg --repository=http://ckan.net/api/rest/ register {path}
 
 
 3. For Developers

@@ -1,7 +1,7 @@
 # from ez_setup import use_setuptools
 # use_setuptools()
 from setuptools import setup, find_packages
-from datapkg import __version__, __license__, __description__
+from datapkg import __version__, __license__, __description__, __description_long__
 
 setup(
     name='datapkg',
@@ -26,12 +26,13 @@ setup(
     ''',
 
     # metadata
-    author='Appropriate Software Foundation, Open Knowledge Foundation',
+    author='Open Knowledge Foundation, Appropriate Software Foundation',
     author_email='info@okfn.org',
     license=__license__,
     description=__description__,
+    long_description=__description_long__,
     keywords='data packaging component tool',
-    url='http://www.okfn.org/',
+    url='http://www.okfn.org/datapkg',
     classifiers=[
     ],
 )
