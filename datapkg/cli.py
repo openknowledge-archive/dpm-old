@@ -42,16 +42,6 @@ parser.add_option(
     dest='log',
     metavar='FILENAME',
     help='Log file where a complete (maximum verbosity) record will be kept')
-parser.add_option(
-    '-r', '--repository',
-    dest='repository',
-    help='Path to repository (if non-default)',
-    default=None)
-parser.add_option(
-    '-k', '--api-key',
-    dest='api_key',
-    default=None,
-    help='API Key for use with repository (where necessary)')
 # TODO: this should be made specific to CreateCommand
 # problem is how to have general parser and specific parser ...
 # http://osdir.com/ml/python.optik.user/2008-02/msg00001.html
@@ -60,6 +50,27 @@ parser.add_option(
     dest='template',
     default='default',
     help='Specify a template to use when creating on disk (default or flat)')
+parser.add_option(
+    '--ckan',
+    dest='ckan',
+    help='Use CKAN as the repository using info from ~/.datapkg/config.ini file')
+# TODO: put in defaults for repo and config
+import datapkg.config
+parser.add_option(
+    '-c', '--config',
+    dest='config',
+    help='Path to config file (if non-default)',
+    default=datapkg.config.default_config_path)
+parser.add_option(
+    '-r', '--repository',
+    dest='repository',
+    help='Path to repository (if non-default)',
+    default=datapkg.config.default_repo_path)
+parser.add_option(
+    '-k', '--api-key',
+    dest='api_key',
+    default=None,
+    help='CKAN API Key (overrides value in config file)')
 
 _commands = {}
 
@@ -97,11 +108,15 @@ class Command(object):
             class StubbedRepo(object):
                 pass
             repo = StubbedRepo()
+            api_key = self.options.api_key
+            if not api_key:
+                api_key = self.config.get('DEFAULT', 'ckan.api_key')
             repo.index = datapkg.index.CkanIndex(
                     rest_api_url=self.repository_path,
                     api_key=self.options.api_key)
         else:
-            repo = datapkg.repository.Repository(self.repository_path)
+            repo_path = self.config.get('DEFAULT', 'repo.default_path')
+            repo = datapkg.repository.Repository(repo_path)
         return repo
 
     def _register(self, path):
@@ -136,6 +151,9 @@ class Command(object):
         self.options = options
         self.repository_path = options.repository
         self.verbose = options.verbose
+        import datapkg.config
+        # may be None if no config yet
+        self.config = datapkg.config.get_config(options.config)
 
         # TODO: fix up logger
         level = 1 # Notify
@@ -330,10 +348,14 @@ init: Initialize a repository.
             print 'You must supply an action'
     
     def init(self, args, options):
+        import datapkg.config
+        cfg = datapkg.config.make_default_config(options.config,
+                options.repository)
         import datapkg.repository
-        repo = datapkg.repository.Repository(self.repository_path)
+        repo_path = cfg.get('DEFAULT', 'repo.default_path')
+        repo = datapkg.repository.Repository(repo_path)
         repo.init()
-        msg = 'Repository successfully initialized at %s' % self.repository_path
+        msg = 'Repository successfully initialized at %s' % repo_path
         self._print(msg)
     
 RepoCommand()
@@ -375,7 +397,7 @@ class RegisterCommand(Command):
     usage = \
 '''%prog {path}
 
-Register package at path in the in the local index.
+Register package at path in the local index.
 '''
 
     def run(self, options, args):

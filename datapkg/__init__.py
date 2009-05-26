@@ -22,7 +22,7 @@ Add some data:
     $ cp mydata.js MyNewDataPackage
     $ etc ...
 
-Register in your local repository on on CKAN:
+Register in your local repository on CKAN:
 
     $ datapkg repo init # if repo not already initialized
     $ datapkg register MyNewDataPackage

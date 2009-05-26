@@ -12,12 +12,13 @@ class TestCLI:
     def setup_class(self):
         self.tmp_base = tempfile.gettempdir()
         self.tmpdir = os.path.join(self.tmp_base, 'datapkg-test-cli')
+        self.config_path = os.path.join(self.tmpdir, 'config.ini')
         self.repo_path = os.path.join(self.tmpdir, '.datapkg')
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
         os.makedirs(self.tmpdir)
         self.cwd = os.getcwd()
-        self.cmd_base = 'datapkg --repository %s ' % self.repo_path
+        self.cmd_base = 'datapkg --config %s --repository %s ' % (self.config_path, self.repo_path)
 
         # from beginning to end ...
         self.pkg_name = u'mytestpkg'
