@@ -4,6 +4,7 @@ import distutils.dist
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+import datapkg.metadata
 from datapkg.package import Package
 from datapkg.db import dbmetadata
 Session = sessionmaker()
@@ -109,9 +110,13 @@ class CkanIndex(IndexBase):
             raise Exception(self.status_info)
 
     def register(self, pkg):
-        pkg_dict = self.cvt_pkg_metadata(pkg)
+        pkg_dict = pkg.metadata
+        pkg_dict = dict(pkg_dict)
+        pkg_dict['tags'] = []
         self.ckan.package_register_post(pkg_dict)
         self.print_status()
+        if self.ckan.last_status != 200:
+            raise Exception(self.status_info)
 
     def update(self, pkg):
         pkg_dict = self.cvt_pkg_metadata(pkg)
@@ -120,42 +125,9 @@ class CkanIndex(IndexBase):
 
     def cvt_to_pkg(self, ckan_pkg_dict):
         name = ckan_pkg_dict.get('name', None)
-        metadata = distutils.dist.DistributionMetadata()
-        for key, value in ckan_pkg_dict.items():
-            setkey = key
-            tval = value
-            if key == 'tags':
-                setkey = 'keywords'
-            elif key == 'title':
-                setkey = 'description'
-            elif key == 'notes':
-                setkey = 'long_description'
-            setattr(metadata, setkey, tval)
+        metadata = datapkg.metadata.Metadata(ckan_pkg_dict)
         pkg = Package(name=name, metadata=metadata)
         return pkg
-
-    def cvt_pkg_metadata(self, pkg):
-        data = pkg.metadata
-        name = pkg.name
-        title = data.get_description()
-        if title == 'UNKNOWN': title = ''
-        url = data.get_url()
-        if url == 'UNKNOWN': url = ''
-        notes = data.get_long_description()
-        if notes == 'UNKNOWN': notes = ''
-        download_url = data.get_download_url()
-        if download_url == 'UNKNOWN': download_url = ''
-        tags = " ".join(data.get_keywords()).split(' ')
-        pkg_metadata = {
-            'name': name,
-            'title': title,
-            'url': url,
-            'download_url': download_url,
-            'notes': notes,
-            'tags': tags,
-        }
-        #self._print("datapkg: Loaded package metadata: %s" % pkg_metadata)
-        return pkg_metadata
 
     def print_status(self):
         if self.ckan.last_status == None:
