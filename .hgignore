@@ -1,0 +1,5 @@
+syntax: glob
+*.pyc
+datapkg.egg-info/*
+sandbox/*
+TODO.txt
