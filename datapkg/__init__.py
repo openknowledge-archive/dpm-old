@@ -220,7 +220,7 @@ Once that is done you register the package on CKAN by doing::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.2'
+__version__ = '0.3a'
 __description__ = 'Data packaging system and utilities.'
 __description_long__ = __doc__
 __license__ = 'MIT'
