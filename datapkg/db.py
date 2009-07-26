@@ -1,6 +1,9 @@
 # SQLAlchemy stuff
 from sqlalchemy import Column, MetaData, Table, types, ForeignKey
 from sqlalchemy import orm
+# from sqlalchemy import __version__ as _sqla_version
+# import pkg_resources
+# _sqla_version = pkg_resources.parse_version(_sqla_version)
 
 
 import simplejson
@@ -10,7 +13,6 @@ class JsonType(types.TypeDecorator):
     impl = types.UnicodeText
 
     def process_bind_param(self, value, engine):
-        # None or {}
         if not value:
             return None
         else:
@@ -45,15 +47,26 @@ package_table = Table('package', dbmetadata,
 
 from sqlalchemy.orm import MapperExtension, EXT_STOP
 class ReconstituteExtension(MapperExtension):
+    # v0.4
     def populate_instance(self, mapper, selectcontext, row, instance, **flags):
         # in v0.5 we can change to use on_reconstitute see
-        # http://www.sqlalchemy.org/docs/05/mappers.html#advdatamapping_mapper_onreconstitute
+        # http://www.sqlalchemy.org/docs/05/mappers.html#constructors-and-object-initialization
 
         # here we follow
         # http://www.sqlalchemy.org/docs/04/sqlalchemy_orm_mapper.html#docstrings_sqlalchemy.orm.mapper_Mapper
-        mapper.populate_instance(selectcontext, instance, row, **flags)
+        try: # v0.5 will raise exception
+            mapper.populate_instance(selectcontext, instance, row, **flags)
+            instance.init_on_load()
+            return EXT_STOP
+        except:
+            pass
+
+    # v0.5
+    def reconstruct_instance(self, mapper, instance):
         instance.init_on_load()
-        return EXT_STOP
 
 from sqlalchemy.orm import mapper
+
+from datapkg.package import Package
+mapper(Package, package_table, extension=ReconstituteExtension())
 

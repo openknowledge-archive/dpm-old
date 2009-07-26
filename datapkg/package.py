@@ -189,7 +189,3 @@ class PackageMaker(object):
         pkg.create_file_structure(dir, template)
         return pkg
 
-
-import datapkg.db as db
-db.mapper(Package, db.package_table, extension=db.ReconstituteExtension())
-

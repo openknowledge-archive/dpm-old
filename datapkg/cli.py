@@ -121,8 +121,8 @@ class Command(object):
 
     def _register(self, path):
         import datapkg.package
-        pkg = datapkg.package.Package.from_path(path)
         repo = self._get_repo()
+        pkg = datapkg.package.Package.from_path(path)
         repo.index.register(pkg)
         return (repo, pkg)
 
