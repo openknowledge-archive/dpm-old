@@ -16,7 +16,7 @@ class TestDistributionOnDisk(TestCase):
         import datapkg.package
         self.pkgname = 'abc'
         self.srcdir = os.path.join(self.tmpdir, self.pkgname)
-        self.pkg = datapkg.package.PackageMaker.create_on_disk(self.srcdir)
+        self.pkg = Package.create_on_disk(self.srcdir)
         self.offset = os.path.join(self.pkgname, 'info.txt')
         pkg_pkg_path = os.path.join(self.srcdir, self.offset)
         f = open(pkg_pkg_path, 'w')

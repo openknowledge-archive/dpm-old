@@ -34,7 +34,7 @@ def load_distribution(dist_path):
     if not os.path.isdir(dist_path): # A.1
         return DistributionOnDiskEgg(dist_path)
     elif os.path.exists(built_egg_info): # A.2
-        return DistributionOnDiskUnpacked(dist_path)
+        return DistributionOnDiskEggUnpacked(dist_path)
     else:
         egginfos = filter(lambda x: x.endswith('.egg-info'),
             os.listdir(dist_path))

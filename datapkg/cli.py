@@ -382,11 +382,11 @@ directory.'''
  
     def run(self, options, args):
         path = args[0]
-        import datapkg.package
+        import datapkg.distribution
         template = options.template 
         msg = 'Creating new datapkg: %s' %  path
         self._print(msg)
-        datapkg.package.PackageMaker.create_on_disk(path, template=template)
+        datapkg.package.Package.create_on_disk(path, template=template)
 
 CreateCommand()
 

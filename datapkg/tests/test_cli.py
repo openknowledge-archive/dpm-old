@@ -91,13 +91,12 @@ class TestCLI:
 
         # dump
         offset = 'abc.txt'
-        cmd = self.cmd_base + 'dump %s %s' % (self.pkg_name, offset)
+        cmd = self.cmd_base + 'dump %s %s' % (self.pkg_path, offset)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
     
     # For this need dummy ckan running locally with standard test data
-
-    def test_ckan(self):
+    def _test_ckan(self):
         localckan = 'http://localhost:5000/api/rest'
         apikey = 'tester'
         ckanbase = 'datapkg --repository %s ' % localckan
