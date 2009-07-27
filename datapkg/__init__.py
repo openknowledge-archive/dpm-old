@@ -8,28 +8,28 @@ Contents:
 1. Quickstart
 +++++++++++++
 
-Create a new data package on disk using standard file layout:
+Create a new data package on disk using standard file layout::
 
     $ datapkg create MyNewDataPackage
 
-Edit the metadata:
+Edit the metadata::
 
     $ vim MyNewDataPackage/setup.py
 
-Add some data:
+Add some data::
 
     $ cp mydata.csv MyNewDataPackage
     $ cp mydata.js MyNewDataPackage
     $ etc ...
 
-Register in your local repository on CKAN:
+Register in your local repository on CKAN::
 
     $ datapkg repo init # if repo not already initialized
     $ datapkg register MyNewDataPackage
     $ # OR
     $ datapkg register --repository=http://ckan.net/api/rest/ --api-key=....  MyNewDataPackage
 
-Check it has registered ok:
+Check it has registered ok::
 
     $ datapkg info MyNewDataPackage
     $ # OR
@@ -131,17 +131,17 @@ can access this material from the command line by using the `dump` command::
     $ datapkg dump {path-or-name} {path-in-package}
 
 For example, if you have installed the pkgdemo package from earlier you could
-do:
+do::
 
     $ datapkg dump pkgdemo windhover.txt
 
 Which should result in Gerald Manley Hopkin's "The Windhover" being printed
 out (as this is the contents of windhover.txt).
 
-To access the package from python code do:
+To access the package from python code do::
 
-    import datapkg
-    datapkg.make_available('{name-or-path}')
+    >>> import datapkg
+    >>> datapkg.make_available('{name-or-path}')
 
 
 1.4 Find Material
@@ -174,10 +174,12 @@ Take a look inside your newly created distribution directory. There should
 be 3 files/directories:
 
   1. MANIFEST.in: this specifies what files/directories within the distribution
-  directory should actually be included in the package.
-    * For instructions on using the MANIFEST.in to specify what files to
-      include see <http://docs.python.org/distutils/commandref.html#sdist-cmd>
-  2. *.egg-info: this directory you can safely ignore (though don't delete it)
+     directory should actually be included in the package.
+
+     * For instructions on using the MANIFEST.in to specify what files to
+       include see http://docs.python.org/distutils/commandref.html#sdist-cmd
+
+  2. .egg-info: this directory you can safely ignore (though don't delete it)
   3. setup.py: this files holds metadata about your package.
 
 Generally the only file you should have to alter is setup.py. Open this up in

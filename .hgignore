@@ -3,3 +3,4 @@ syntax: glob
 datapkg.egg-info/*
 sandbox/*
 TODO.txt
+build/*

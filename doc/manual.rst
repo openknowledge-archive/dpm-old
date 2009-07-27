@@ -1,0 +1,5 @@
+Datapkg Manual
+==============
+
+.. automodule:: datapkg
+
