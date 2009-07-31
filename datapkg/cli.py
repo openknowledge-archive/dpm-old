@@ -141,7 +141,7 @@ class Command(object):
         out = StringIO()
         print u'## Package: %s' % pkg.name
         print
-        print pkg.metadata.pprint()
+        print str(pkg)
 
     def main(self, complete_args, args, initial_options):
         options = initial_options

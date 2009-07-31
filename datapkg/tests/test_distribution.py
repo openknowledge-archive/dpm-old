@@ -11,7 +11,7 @@ class TestPythonDistribution(TestCase):
         self.install_dir = os.path.join(self.tmp, 'installed')
         os.makedirs(self.install_dir)
         self.pkg_name = 'mytestpkg2'
-        self.pkg = Package(self.pkg_name, version='1.0')
+        self.pkg = Package(name=self.pkg_name, version='1.0')
 
     def test_write(self):
         create_dir = os.path.join(self.tmp, 'create-test')
@@ -76,7 +76,7 @@ class TestPythonDistributionFromPath(TestCase):
     def setUp(self):
         self.make_tmpdir()
         self.pkg_name = 'abc'
-        self.pkg = Package(self.pkg_name,
+        self.pkg = Package(name=self.pkg_name,
                 version='1.0',
                 installed_path=os.path.join(self.tmpdir, self.pkg_name),
                 )
@@ -87,5 +87,4 @@ class TestPythonDistributionFromPath(TestCase):
         dist = PythonDistribution.from_path(self.dist_path)
         pkg = dist.package
         assert pkg.name == self.pkg_name
-        assert pkg.metadata.name == self.pkg_name
 

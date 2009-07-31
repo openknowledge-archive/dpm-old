@@ -1,35 +1,3 @@
-import simplejson
-
-class Metadata(dict):
-    keys = [
-       'name', 
-       'title',
-       'license',
-       'url',
-       'download_url',
-       'notes',
-       'tags',
-       ]
-
-    def __setattr__(self, name, value):
-        if name in self.keys:
-            self[name] = value
-        else:
-            super(Metadata, self).__setattr__(name)
-
-    def __getattr__(self, name):
-        if name in self.keys:
-            return self[name]
-        else:
-            return super(Metadata, self).__getattribute__(name)
-    
-    def pprint(self):
-        return simplejson.dumps(self, indent=2)
-
-    def __str__(self):
-        return simplejson.dumps(self)
-
-
 class MetadataConverter(object):
 
     @classmethod
@@ -52,7 +20,7 @@ class MetadataConverter(object):
             'notes': notes,
             'tags': tags,
         }
-        return Metadata(pkg_metadata)
+        return pkg_metadata
 
     @classmethod
     def to_distutils(self, metadata):

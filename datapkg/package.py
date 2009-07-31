@@ -10,41 +10,66 @@ import datapkg.metadata
 import datapkg.pypkgtools
 from datapkg import DatapkgException
 
+def normalize_name(name):
+    new_name = name.lower()
+    regex = r'^[\w-]+$'
+    if not re.match(regex, new_name):
+        msg = 'Invalid package name: %s' % name
+        raise ValueError(msg)
+    return unicode(new_name)
+
+
+## TODO: do we want to normalize name?
 class Package(object):
+    '''A knowledge (data or content) 'package'.
 
-    def __init__(self, name=None, metadata=None, **kwargs):
-        if name:
-            self.name = self._normalize_name(name)
-        else:
-            self.name = None
-        self.init_on_load(metadata, **kwargs)
+    It combines metadata with a manifest listing the material contained in this
+    package.
 
-    # separated out from __init__ for the benefit of sqlalchemy
-    def init_on_load(self, metadata=None, **kwargs):
-        if metadata:
-            self.metadata = metadata
-        else:
-            self.metadata = datapkg.metadata.Metadata()
-            self.metadata['name'] = self.name
+    If it has an associated distribution then this material will be directly
+    accessible. 
+    '''
+    metadata_keys = [
+       'name', 
+       'title',
+       'license',
+       'url',
+       'download_url',
+       'notes',
+       'tags',
+       ]
+    def __init__(self, **kwargs):
+        self.init_on_load(**kwargs)
+
+    # TODO: deprecate usage of name
+    def init_on_load(self, **kwargs):
+        '''Additional __init__ method.
+        
+        Separated out from __init__ for the benefit of sqlalchemy
+        '''
         # path to distribution on disk associated to package (if any)
         self.installed_path = None
         # TODO: most of these attributes should run off metadata
         self.download_url = None
         for k,v in kwargs.items():
             setattr(self, k, v)
+        for k in self.metadata_keys:
+            if not hasattr(self, k):
+                setattr(self, k, None)
+
+    def _get_metadata(self):
+        return dict([ (k,getattr(self,k)) for k in self.metadata_keys ])
+    
+    metadata = property(_get_metadata)
+
+    def update_metadata(self, metadata):
+        for k,v in metadata.items():
+            setattr(self, k, v)
 
     def _path_set(self, v):
         self.installed_path = v
     # TODO: rename installed path to path
     path = property(lambda: self.installed_path, _path_set)
-
-    def _normalize_name(self, name):
-        new_name = name.lower()
-        regex = r'^[\w-]+$'
-        if not re.match(regex, new_name):
-            msg = 'Invalid package name: %s' % name
-            raise ValueError(msg)
-        return unicode(new_name)
 
     def download(self, tmpdir):
         filepath = self.pi.download(self.download_url, tmpdir)
@@ -123,7 +148,7 @@ class Package(object):
         args, kwargs as appropriate for write method on default distribution
         '''
         dir, name = self.info_from_path(path)
-        pkg = Package(name)
+        pkg = Package(name=name)
         pkg.installed_path = path
         pkg.dist.write(*args, **kwargs)
         return pkg
@@ -136,4 +161,9 @@ class Package(object):
         dist = klass.from_path(path)
         return dist.package
 
-    
+    def __str__(self):
+        repr = 'Package'
+        for key in self.metadata_keys:
+            repr += ' %s: %s' % (key, getattr(self,key))
+        return repr
+

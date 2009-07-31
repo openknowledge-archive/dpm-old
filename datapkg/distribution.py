@@ -14,11 +14,24 @@ class DistributionBase(object):
     def __init__(self, package=None):
         self.package = package
 
-#     def make_from_python_distribution():
-#         pass
-# 
-#     def make_from_url():
-#         pass
+    def write(self, template='default'):
+        '''Write this distribution to disk at self.package.installed_path.
+        '''
+        raise NotImplementedError
+
+    @classmethod
+    def from_path(self, path):
+        '''Load a L{Package} object from a path to a package distribution.
+        
+        @return: the package object.
+        '''
+        raise NotImplementedError
+
+    def stream(self, path):
+        '''Return a fileobj stream for material at `path`.
+        '''
+        raise NotImplementedError
+
 
 
 class PythonDistribution(DistributionBase):
@@ -49,8 +62,9 @@ class PythonDistribution(DistributionBase):
         pydist = datapkg.pypkgtools.load_distribution(path)
         import datapkg.metadata as M
         metadata = M.MetadataConverter.from_distutils(pydist.metadata)
-        pkg = Package(pydist.metadata.name, installed_path=unicode(path),
-                metadata=metadata)
+        pkg = Package(name=pydist.metadata.name, installed_path=unicode(path))
+        for k,v in metadata.items():
+            setattr(pkg, k, v)
         dist = self(pkg)
         return dist
 

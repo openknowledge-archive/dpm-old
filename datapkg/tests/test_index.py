@@ -12,17 +12,16 @@ class TestSimpleIndex(object):
         pkg_name = u'blah'
         assert not self.index.has(pkg_name)
 
-        pkg = datapkg.package.Package(pkg_name)
+        pkg = datapkg.package.Package(name=pkg_name)
         self.index.register(pkg)
         assert self.index.has(pkg_name)
 
     def test_get(self):
         pkg_name = u'blah'
-        pkg = datapkg.package.Package(pkg_name)
+        pkg = datapkg.package.Package(name=pkg_name)
         self.index.register(pkg)
         out = self.index.get(pkg_name)
         assert out.name == pkg_name
-        assert out.metadata.name == pkg_name
 
 
 class TestDbIndex(TestSimpleIndex):
@@ -43,14 +42,14 @@ class TestDbIndex(TestSimpleIndex):
         pkgs = self.index.list()
         assert len(pkgs) == 0
 
-        pkg = datapkg.package.Package(u'blah')
+        pkg = datapkg.package.Package(name=u'blah')
         self.index.register(pkg)
         pkgs = self.index.list()
         assert len(pkgs) == 1
 
     def test_get_when_loaded_as_new_and_init_not_called(self):
         pkg_name = u'blah'
-        pkg = datapkg.package.Package(pkg_name)
+        pkg = datapkg.package.Package(name=pkg_name)
         self.index.register(pkg)
 
         # clear session so we know this is loaded from db
@@ -58,6 +57,4 @@ class TestDbIndex(TestSimpleIndex):
 
         out = self.index.get(pkg_name)
         assert out.name == pkg_name
-        print out.metadata.name
-        assert out.metadata.name == pkg_name
 
