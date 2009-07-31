@@ -12,9 +12,35 @@ Session = sessionmaker()
 logger = logging.getLogger('datapkg.index')
 
 class IndexBase(object):
-    pass
+    def register(self, package):
+        '''Register `package` in the Index.'''
+        raise NotImplementedError
 
-class Index(IndexBase):
+    def get(self, name):
+        '''Get package with name `name`.'''
+        raise NotImplementedError
+    
+    def has(self, name):
+        '''Check if package with name `name` is in Index.'''
+        raise NotImplementedError
+        
+
+class SimpleIndex(IndexBase):
+    '''In memory Index based on a simple dict.'''
+    def __init__(self):
+        self._dict = {}
+
+    def register(self, package):
+        self._dict[package.name] = package
+
+    def get(self, name):
+        return self._dict[name]
+
+    def has(self, name):
+        return name in self._dict
+
+
+class DbIndex(IndexBase):
     '''Database-based index.
     '''
     def __init__(self, dburi):
@@ -53,6 +79,9 @@ class Index(IndexBase):
         pkgs = q.all()
         return pkgs
 
+# TODO: 2009-07-31 remove at some point
+# for backwards compatibility
+Index = DbIndex
 
 # Todo: Tests on these ckan- functions.
 class CkanIndex(IndexBase):
