@@ -1,10 +1,26 @@
-## v0.2 2009-03-18
+=======
+History
+=======
+
+v0.3 ????
+=========
+
+  * Distribution object to handle serialization and deserialization of packages
+  * PythonDistribution and SimpleIniDistribution created
+  * Create new SimpleIndex
+  * Rework Package metadata
+
+
+v0.2 2009-03-18
+===============
 
   * Completely refactor CLI making it better documented and easier to use
   * CKAN integration fully functional
   * Almost all commands now functioning *and* tested
 
-## v0.1 2008-12-15
+
+v0.1 2008-12-15
+===============
 
   * Manual much improved 
   * Several bugs fixed
@@ -12,7 +28,9 @@
   * Substantial improvements to interface to setuptools and easy_install (r329)
   * First official released to PyPI
 
-## v0.0.5 2008-07-15
+
+v0.0.5 2008-07-15
+=================
 
   * Start on manual
   * Core objects mostly working: Register, Repository, Package
@@ -20,5 +38,7 @@
   * Lots of tests
   * Basic functions but a way to go for proper upload/download cycle
   
-## 2007-06-20: Project Started
+
+2007-06-20: Project Started
+===========================
 

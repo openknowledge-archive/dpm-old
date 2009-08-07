@@ -1,17 +1,38 @@
-## Introduction
+Introduction
+============
 
-For a description of the project, as well as other project metadata, please either run::
+datapkg is a tool for distributing, discovering and installing knowledge and
+data 'packages'.
 
-  $ datapkg man
+For more information visit the documentation at:
+http://knowledgeforge.net/ckan/doc/datapkg/
 
-Or read the main package docstring.
+
+Installation
+============
+
+1. Install python: http://www.python.org/
+
+2. Install setuptools library
+
+3. Install datapkg using setuptool's easy_install::
+
+    $ easy_install datapkg
+
+   If you want to install from source datapkg's mercurial repository is here:
+   http://knowledgeforge.net/ckan/datapkg
+
+4. Take a look at the manual::
+
+    $ datapkg man
 
 
-## License
+License
+=======
 
 All material is licensed under the MIT License:
 
-Copyright (c) 2005-2008, Open Knowledge Foundation
+Copyright (c) 2005-2009, Open Knowledge Foundation
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -32,13 +53,3 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-## Installation
-
-1. Install [python](http://www.python.org/)
-
-2. Install the python setuptools package by downloading [ez_setup.py](...) and
-   then running it: $ python ez_setup.py
-
-3. Install datapkg: $ easy_install datapkg
-
-4. Run: $ datapkg man
