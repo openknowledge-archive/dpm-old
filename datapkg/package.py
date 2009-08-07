@@ -32,12 +32,18 @@ class Package(object):
     metadata_keys = [
        'name', 
        'title',
+       'version',
        'license',
+       'author',
+       'maintainer',
        'url',
        'download_url',
        'notes',
        'tags',
+       'extras',
        ]
+    metadata_defaults = { 'tags': [], 'extras': {} }
+
     def __init__(self, **kwargs):
         self.init_on_load(**kwargs)
 
@@ -55,7 +61,7 @@ class Package(object):
             setattr(self, k, v)
         for k in self.metadata_keys:
             if not hasattr(self, k):
-                setattr(self, k, None)
+                setattr(self, k, self.metadata_defaults.get(k, u''))
 
     def _get_metadata(self):
         return dict([ (k,getattr(self,k)) for k in self.metadata_keys ])

@@ -15,7 +15,7 @@ class TestPackage(TestCase):
         self.install_dir = os.path.join(self.tmp, 'installed')
         os.makedirs(self.install_dir)
         self.pkg_name = 'mytestpkg2'
-        self.pkg = datapkg.package.Package(name=self.pkg_name, version='1.0')
+        self.pkg = datapkg.package.Package(name=self.pkg_name, version=u'1.0')
 
     def test_package_name(self):
         name1 = 'abc3'
@@ -42,7 +42,15 @@ class TestPackage(TestCase):
 
     def test_package_attr(self):
         assert self.pkg.name == self.pkg_name
+        assert self.pkg.version == u'1.0'
+        # test defaulting
+        assert self.pkg.tags == []
+        assert self.pkg.extras == {}
+
+    def test_package_metadata(self):
         assert self.pkg.metadata['name'] == self.pkg.name
+        assert self.pkg.metadata['version'] == u'1.0'
+        assert self.pkg.metadata['title'] == u''
 
     def test_update_metadata(self):
         self.pkg.update_metadata({'name': 'zzzzzz'})
