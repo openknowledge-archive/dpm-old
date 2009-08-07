@@ -23,6 +23,10 @@ class IndexBase(object):
     def has(self, name):
         '''Check if package with name `name` is in Index.'''
         raise NotImplementedError
+
+    def list(self):
+        '''Return an iterator over all items in the Index'''
+        raise NotImplementedError
         
 
 class SimpleIndex(IndexBase):
@@ -38,6 +42,9 @@ class SimpleIndex(IndexBase):
 
     def has(self, name):
         return name in self._dict
+
+    def list(self):
+        return iter(self._dict.values())
 
 
 class DbIndex(IndexBase):

@@ -14,7 +14,7 @@ class DistributionBase(object):
     def __init__(self, package=None):
         self.package = package
 
-    def write(self, template='default'):
+    def write(self, **kwargs):
         '''Write this distribution to disk at self.package.installed_path.
         '''
         raise NotImplementedError
