@@ -8,6 +8,9 @@ Contents:
 1. Quickstart
 +++++++++++++
 
+Creating and Registering a Package
+==================================
+
 Create a new data package on disk using standard file layout::
 
     $ datapkg create MyNewDataPackage
@@ -22,7 +25,7 @@ Add some data::
     $ cp mydata.js MyNewDataPackage
     $ etc ...
 
-Register in your local repository on CKAN::
+Register in your local repository or on CKAN::
 
     $ datapkg repo init # if repo not already initialized
     $ datapkg register MyNewDataPackage
@@ -203,17 +206,17 @@ You can either do this by registering it on a public registry such as CKAN or,
 more simply, you can just upload it somewhere and point people to that
 location.
 
-The first step in either process is building/compiling the distribution into a
-standard form. This is most easily done by installing the package in your local
-repository:
-
-    $ datapkg install {path-to-distribution}
-
-[NOT YET FULLY IMPLEMENTED]
-
 Once that is done you register the package on CKAN by doing::
 
     $ datapkg --repository=http://ckan.net/api/rest/ register {path}
+
+
+3. Installing your package
+--------------------------
+
+You can also install the distribution into your local repository::
+
+    $ datapkg install {path-to-distribution}
 
 
 3. For Developers

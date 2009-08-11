@@ -36,6 +36,7 @@ class DistributionBase(object):
 
 class PythonDistribution(DistributionBase):
 
+    # TODO: write should write out package metadata ...
     def write(self, template='default'):
         '''Write this distribution to disk at self.package.installed_path.
         '''
