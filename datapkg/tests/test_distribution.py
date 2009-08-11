@@ -1,5 +1,5 @@
 from datapkg.tests.base import *
-from datapkg.distribution import DistributionBase, PythonDistribution
+from datapkg.distribution import DistributionBase, PythonDistribution, IniBasedDistribution
 from datapkg.package import Package
 
 
@@ -87,4 +87,65 @@ class TestPythonDistributionFromPath(TestCase):
         dist = PythonDistribution.from_path(self.dist_path)
         pkg = dist.package
         assert pkg.name == self.pkg_name
+
+
+class TestIniBasedDistribution:
+    @classmethod
+    def setup_class(self):
+        self.tmpDir = tempfile.mkdtemp()
+        self.title = 'annakarenina'
+        self.dist_path = os.path.join(self.tmpDir, self.title)
+    
+    @classmethod
+    def teardown_class(self):
+        shutil.rmtree(self.tmpDir)
+
+    @classmethod
+    def _make_test_data(self, basePath, title):
+        full_meta = \
+'''[DEFAULT]
+id : %s
+title: %s
+creator: abc
+description: a long description
+comments: here are some additional comments
+requires-compilation: y
+
+[data.csv]
+title: ...
+
+[xyz.png]
+title: my graph
+'''
+        os.makedirs(basePath)
+        ff = file(os.path.join(basePath, 'metadata.txt'), 'w')
+        metadata = full_meta % (title, title)
+        ff.write(metadata)
+        ff.close()
+
+    def test_from_path(self):
+        self._make_test_data(self.dist_path, self.title)
+        dist = IniBasedDistribution.from_path(self.dist_path)
+        pkg = dist.package
+        assert pkg.name == self.title, pkg
+        assert pkg.title == self.title
+        assert u'a long description' in pkg.notes
+        assert u'additional comment' in pkg.notes
+        assert pkg.author == u'abc'
+        assert pkg.extras['requires-compilation'] == 'y'
+        assert len(pkg.data_files) == 2
+        assert pkg.data_files['data.csv']['title'] == '...'
+    
+    def test_write(self):
+        name = 'abc'
+        destpath = os.path.join(self.tmpDir, name)
+        pkg = Package(name='abc', installed_path=destpath)
+        dist = IniBasedDistribution(pkg)
+        dist.write()
+        metapath = os.path.join(destpath, 'metadata.txt')
+        assert os.path.exists(destpath)
+        assert os.path.exists(metapath)
+        meta = file(metapath).read()
+        assert '[DEFAULT]' in meta, meta
+        assert 'name = abc' in meta, meta
 
