@@ -49,7 +49,7 @@ class TestCLI:
     def test_walkthrough(self):
 
         # init
-        cmd = self.cmd_base + 'repo init'
+        cmd = self.cmd_base + 'init repo'
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert os.path.exists(self.repo_path)

@@ -144,7 +144,7 @@ class CkanIndex(IndexBase):
     def register(self, pkg):
         pkg_dict = pkg.metadata
         pkg_dict = dict(pkg_dict)
-        pkg_dict['tags'] = []
+        # pkg_dict['tags'] = []
         self.ckan.package_register_post(pkg_dict)
         self.print_status()
         if self.ckan.last_status != 200:
@@ -158,7 +158,8 @@ class CkanIndex(IndexBase):
     def cvt_to_pkg(self, ckan_pkg_dict):
         name = ckan_pkg_dict.get('name', None)
         metadata = datapkg.metadata.Metadata(ckan_pkg_dict)
-        pkg = Package(name=name, metadata=metadata)
+        pkg = Package()
+        pkg.update_metadata(metadata)
         return pkg
 
     def print_status(self):

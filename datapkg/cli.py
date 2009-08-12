@@ -1,9 +1,6 @@
 '''datapkg command line interface.
 
-datapkg ondiskorpath create | dump | info | register | install
-datapkg repo init | list | sync | search
-          index list | sync | search
-datapkg doc about | license | man
+See datapkg help for details.
 '''
 import sys
 import os
@@ -112,7 +109,7 @@ class Command(object):
             repo = StubbedRepo()
             api_key = self.options.api_key
             if not api_key:
-                api_key = self.config.get('DEFAULT', 'ckan.api_key')
+                api_key = self._config.get('DEFAULT', 'ckan.api_key')
             repo.index = datapkg.index.CkanIndex(
                     rest_api_url=self.repository_path,
                     api_key=self.options.api_key)
@@ -156,11 +153,11 @@ class Command(object):
         self.repository_path = options.repository
         self.verbose = options.verbose
         import datapkg.config
-        self.config = datapkg.config.get_config(options.config)
+        self._config = datapkg.config.get_config(options.config)
         if not self.repository_path:
-            self.repository_path = self.config.get('DEFAULT', 'repo.default_path')
+            self.repository_path = self._config.get('DEFAULT', 'repo.default_path')
         if self.options.ckan:
-            self.repository_path = self.config.get('DEFAULT', 'ckan.url')
+            self.repository_path = self._config.get('DEFAULT', 'ckan.url')
         
 
         # TODO: fix up logger
@@ -336,15 +333,17 @@ DumpCommand()
     # print pkg.distribution.listdir
 
 
-class RepoCommand(Command):
-    name = 'repo'
-    summary = 'Manage a repository'
+class InitCommand(Command):
+    name = 'init'
+    summary = 'Initialise things (config, repository etc)'
     usage = '''%prog {action}
 
-init: Initialize a repository.
+config: Create configuration file at default location (see --config)
 
-    The repository will be created at the location specified via the
-    --repository option or default location if not specified (~/.datapkg).
+repo: Initialize a repository. The repository will be created at the location
+      specified via the --repository option or default location specified by
+      config.
+
 '''
 
     def run(self, options, args):
@@ -356,21 +355,19 @@ init: Initialize a repository.
         else:
             print 'You must supply an action'
     
-    def init(self, args, options):
+    def repo(self, args, options):
         import datapkg.repository
         repo = datapkg.repository.Repository(self.repository_path)
         repo.init()
         msg = 'Repository successfully initialized at %s' % self.repository_path
         self._print(msg)
     
-    # TODO: turn into an action?
-    def _config(self, args, options):
+    def config(self, args, options):
         '''Create default config file.'''
         import datapkg.config
-        cfg = datapkg.config.write_default_config(options.config,
-                options.repository)
+        cfg = datapkg.config.write_default_config()
     
-RepoCommand()
+InitCommand()
 
 
 class CreateCommand(Command):

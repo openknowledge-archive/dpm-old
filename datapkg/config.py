@@ -26,7 +26,7 @@ def make_default_config(repo_path=default_repo_path):
 def write_default_config(path=default_config_path, repo_path=default_repo_path):
     if os.path.exists(path):
         msg = 'init() failed. It looks like you already ' + \
-                'have something at %s' % path
+                'have configuration at %s' % path
         raise ValueError(msg)
     root_path = os.path.dirname(path)
     if not os.path.exists(root_path):
