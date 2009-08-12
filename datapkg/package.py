@@ -111,18 +111,10 @@ class Package(object):
         '''Dispatch to same method on default L{Distribution}.'''
         return self.dist.stream(*args, **kwargs)
 
-    @classmethod
-    def _default_distribution(self):
-        import datapkg.distribution
-        modpath, klassname = datapkg.distribution.default_distribution.split(':')
-        mod = __import__(modpath, fromlist=['anyoldthing'])
-        klass = getattr(mod, klassname)
-        return klass
-    
     def _dist_get(self):
         '''Get a L{Distribution} associated with this package.'''
-        # TODO: cache the attribute
-        klass = self._default_distribution()
+        import datapkg.distribution
+        klass = datapkg.distribution.default_distribution()
         dist = klass(self)
         return dist
 
@@ -154,16 +146,23 @@ class Package(object):
         return pkg
 
     @classmethod
-    def from_path(self, path):
-        '''Load a L{Package} object from a path to a package distribution
-        (assumed to be of type `default_distribution`).'''
-        klass = self._default_distribution()
-        dist = klass.from_path(path)
+    def load(self, path):
+        '''Load a L{Package} object from a path to a package distribution.'''
+        import datapkg.distribution
+        dist = datapkg.distribution.load(path)
+        # TODO: should we be recording the distribution type or something for
+        # future stuff ...
         return dist.package
 
     def __str__(self):
         repr = 'Package'
         for key in datapkg.metadata.Metadata.keys:
             repr += ' %s: %s' % (key, getattr(self,key))
+        return repr
+    
+    def pretty_print(self):
+        repr = ''
+        for key in datapkg.metadata.Metadata.keys:
+            repr += '%s: %s\n' % (key, getattr(self,key))
         return repr
 

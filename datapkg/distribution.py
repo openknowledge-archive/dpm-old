@@ -7,7 +7,33 @@ from datapkg.package import Package
 import datapkg.util
 import datapkg.metadata as M
 
-default_distribution = 'datapkg.distribution:PythonDistribution'
+default_distribution_name = 'datapkg.distribution:PythonDistribution'
+
+def default_distribution():
+    import datapkg.distribution
+    modpath, klassname = datapkg.distribution.default_distribution_name.split(':')
+    mod = __import__(modpath, fromlist=['anyoldthing'])
+    klass = getattr(mod, klassname)
+    return klass
+
+def load(path):
+    '''Load distribution at path.
+    
+    Cycle through all available distribution types trying to load using each on
+    in turn return first one which works.
+    '''
+    # TODO: replace this with something more pluggable e.g. from entry_points
+    distributions = [ PythonDistribution, IniBasedDistribution ]
+    errors = []
+    for klass in distributions:
+        try:
+            dist = klass.load(path)
+            return dist
+        except Exception, inst:
+            errors.append(str(inst))
+    msg = 'Failed to load distribution from %s\n%s' % (path, errors)
+    raise DatapkgException(msg)
+
 
 class DistributionBase(object):
     # distribution_type = None
@@ -21,7 +47,7 @@ class DistributionBase(object):
         raise NotImplementedError
 
     @classmethod
-    def from_path(self, path):
+    def load(self, path):
         '''Load a L{Package} object from a path to a package distribution.
         
         @return: the package object.
@@ -58,7 +84,7 @@ class PythonDistribution(DistributionBase):
         return self.package.installed_path
 
     @classmethod
-    def from_path(self, path):
+    def load(self, path):
         '''Load a L{Package} object from a path to a package distribution.'''
         import datapkg.pypkgtools
         pydist = datapkg.pypkgtools.load_distribution(path)
@@ -151,7 +177,7 @@ class IniBasedDistribution(DistributionBase):
         }
 
     @classmethod
-    def from_path(self, path):
+    def load(self, path):
         pkg = Package()
         pkg.installed_path = path 
         fp = os.path.join(path, 'metadata.txt')

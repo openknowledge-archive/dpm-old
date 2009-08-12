@@ -87,9 +87,9 @@ class TestPythonDistribution(TestCase):
 #        self.dist = PythonDistribution(self.pkg)
 #        self.dist_path = self.dist.write()
 
-    def test_from_path(self):
+    def test_load(self):
         pkg_path = self._mock_pkg()
-        dist = PythonDistribution.from_path(pkg_path)
+        dist = PythonDistribution.load(pkg_path)
         pkg = dist.package
         assert pkg.name == self.pkg_name
         assert pkg.installed_path == pkg_path
@@ -134,9 +134,9 @@ title: my graph
         ff.write(metadata)
         ff.close()
 
-    def test_from_path(self):
+    def test_load(self):
         self._make_test_data(self.dist_path, self.title)
-        dist = IniBasedDistribution.from_path(self.dist_path)
+        dist = IniBasedDistribution.load(self.dist_path)
         pkg = dist.package
         assert pkg.name == self.title, pkg
         assert pkg.title == self.title

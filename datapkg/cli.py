@@ -123,7 +123,7 @@ class Command(object):
     def _register(self, path):
         import datapkg.package
         repo = self._get_repo()
-        pkg = datapkg.package.Package.from_path(path)
+        pkg = datapkg.package.Package.load(path)
         repo.index.register(pkg)
         return (repo, pkg)
 
@@ -133,16 +133,17 @@ class Command(object):
         # this is crude
         is_path = os.path.exists(path_or_name)
         if is_path:
-            return datapkg.package.Package.from_path(path_or_name)
+            return datapkg.package.Package.load(path_or_name)
         else:
             repo = self._get_repo()
             return repo.index.get(path_or_name)
 
     def _print_pkg(self, pkg):
-        out = StringIO()
         print u'## Package: %s' % pkg.name
         print
-        print str(pkg)
+        out = pkg.pretty_print()
+        print out
+
 
     def main(self, complete_args, args, initial_options):
         options = initial_options
