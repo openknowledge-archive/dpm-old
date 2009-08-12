@@ -92,14 +92,10 @@ Index = DbIndex
 
 # Todo: Tests on these ckan- functions.
 class CkanIndex(IndexBase):
-    default_rest_api = 'http://ckan.net/rest/api'
 
-    def __init__(self, rest_api_url=None, api_key=None):
+    def __init__(self, rest_api_url, api_key=None):
         self.status_info = ''
-        if rest_api_url:
-            self.rest_api_url = rest_api_url
-        else:
-            rest_api_url = self.default_rest_api
+        self.rest_api_url = rest_api_url
         if self.rest_api_url.endswith('/'):
             self.rest_api_url = self.rest_api_url[:-1]
         from ckanclient import CkanClient

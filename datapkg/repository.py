@@ -1,9 +1,11 @@
 import os
 import ConfigParser
+import logging
 
 import datapkg
 import datapkg.index
 
+logger = logging.getLogger('datapkg.repository')
 
 class Repository(object):
     def __init__(self, repo_path):
@@ -15,6 +17,7 @@ class Repository(object):
 
     def init(self):
         if not os.path.exists(self.repo_path):
+            logger.info('Initializing repository at %s' % self.repo_path)
             os.makedirs(self.repo_path)
             self.index.init()
             os.makedirs(self.installed_path)

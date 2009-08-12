@@ -53,24 +53,26 @@ parser.add_option(
 parser.add_option(
     '--ckan',
     dest='ckan',
-    help='Use CKAN as the repository using info from ~/.datapkg/config.ini file')
+    action='store_true',
+    default=False,
+    help='Use CKAN as the repository')
 # TODO: put in defaults for repo and config
 import datapkg.config
 parser.add_option(
     '-c', '--config',
     dest='config',
-    help='Path to config file (if non-default)',
+    help='Path to config file (if any) - defaults to %default',
     default=datapkg.config.default_config_path)
 parser.add_option(
     '-r', '--repository',
     dest='repository',
-    help='Path to repository (if non-default)',
-    default=datapkg.config.default_repo_path)
+    help='Path to repository - overrides value in config'
+    )
 parser.add_option(
     '-k', '--api-key',
     dest='api_key',
     default=None,
-    help='CKAN API Key (overrides value in config file)')
+    help='CKAN API Key (overrides value in config)')
 
 _commands = {}
 
@@ -98,7 +100,7 @@ class Command(object):
         options.verbose += initial_options.verbose
 
     def _print(self, msg, force=False):
-        if self.verbose or force:
+        if self.level >= 1 or force:
             print(msg)
 
     def _get_repo(self):
@@ -115,8 +117,10 @@ class Command(object):
                     rest_api_url=self.repository_path,
                     api_key=self.options.api_key)
         else:
-            repo_path = self.config.get('DEFAULT', 'repo.default_path')
-            repo = datapkg.repository.Repository(repo_path)
+            if not os.path.exists(self.repository_path):
+                msg = 'ERROR: you need to initialize the repository (run: repo init).'
+                raise Exception(msg)
+            repo = datapkg.repository.Repository(self.repository_path)
         return repo
 
     def _register(self, path):
@@ -152,13 +156,18 @@ class Command(object):
         self.repository_path = options.repository
         self.verbose = options.verbose
         import datapkg.config
-        # may be None if no config yet
         self.config = datapkg.config.get_config(options.config)
+        if not self.repository_path:
+            self.repository_path = self.config.get('DEFAULT', 'repo.default_path')
+        if self.options.ckan:
+            self.repository_path = self.config.get('DEFAULT', 'ckan.url')
+        
 
         # TODO: fix up logger
         level = 1 # Notify
         level += options.verbose
         level -= options.quiet
+        self.level = level
         complete_log = []
         if options.log:
             log_fp = open_logfile_append(options.log)
@@ -348,15 +357,18 @@ init: Initialize a repository.
             print 'You must supply an action'
     
     def init(self, args, options):
-        import datapkg.config
-        cfg = datapkg.config.make_default_config(options.config,
-                options.repository)
         import datapkg.repository
-        repo_path = cfg.get('DEFAULT', 'repo.default_path')
-        repo = datapkg.repository.Repository(repo_path)
+        repo = datapkg.repository.Repository(self.repository_path)
         repo.init()
-        msg = 'Repository successfully initialized at %s' % repo_path
+        msg = 'Repository successfully initialized at %s' % self.repository_path
         self._print(msg)
+    
+    # TODO: turn into an action?
+    def _config(self, args, options):
+        '''Create default config file.'''
+        import datapkg.config
+        cfg = datapkg.config.write_default_config(options.config,
+                options.repository)
     
 RepoCommand()
 

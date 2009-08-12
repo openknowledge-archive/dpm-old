@@ -30,13 +30,13 @@ Register in your local repository or on CKAN::
     $ datapkg repo init # if repo not already initialized
     $ datapkg register MyNewDataPackage
     $ # OR
-    $ datapkg register --repository=http://ckan.net/api/rest/ --api-key=....  MyNewDataPackage
+    $ datapkg register --ckan --api-key=....  MyNewDataPackage
 
 Check it has registered ok::
 
     $ datapkg info MyNewDataPackage
-    $ # OR
-    $ datapkg info --repository=http://ckan.net/api/rest/ MyNewDataPackage
+    $ # OR (if on CKAN)
+    $ datapkg info --ckan MyNewDataPackage
 
 
 2. Tutorial
@@ -152,11 +152,11 @@ To access the package from python code do::
 
 Search for a package on CKAN::
 
-    $ datapkg --repository=http://ckan.net/api/rest/ list
+    $ datapkg --ckan list
 
 You can find out about a package on CKAN by doing::
 
-    $ datapkg --repository=http://ckan.net/api/rest/ info {pkg-name}
+    $ datapkg --ckan info {pkg-name}
 
 [NOT YET OPERATIONAL]
 
@@ -208,7 +208,7 @@ location.
 
 Once that is done you register the package on CKAN by doing::
 
-    $ datapkg --repository=http://ckan.net/api/rest/ register {path}
+    $ datapkg --ckan register {path}
 
 
 3. Installing your package

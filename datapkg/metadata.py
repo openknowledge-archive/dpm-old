@@ -38,7 +38,8 @@ class MetadataConverter(object):
         attrnames.remove('contact_email')
         attrnames.remove('contact')
         for attrname in attrnames:
-            inmeta[attrname] = getattr(data, attrname) or ''
+            value = getattr(data, attrname) or ''
+            inmeta[attrname] = unicode(value, encoding='utf8', errors='ignore') 
         newmeta = self.normalize_metadata(inmeta, self.distutils_keymap)
         return newmeta
 
