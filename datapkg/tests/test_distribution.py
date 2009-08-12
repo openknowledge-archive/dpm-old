@@ -7,25 +7,14 @@ class TestPythonDistribution(TestCase):
 
     def setUp(self):
         self.make_tmpdir()
-        self.tmp = self.tmpdir
-        self.install_dir = os.path.join(self.tmp, 'installed')
+        self.install_dir = os.path.join(self.tmpdir, 'installed')
         os.makedirs(self.install_dir)
         self.pkg_name = 'mytestpkg2'
         self.pkg = Package(name=self.pkg_name, version='1.0')
 
-    def test_write(self):
-        create_dir = os.path.join(self.tmp, 'create-test')
-        self.pkg.installed_path = os.path.join(create_dir, self.pkg_name)
-        dist = PythonDistribution(self.pkg)
-        dist.write()
-        dest = os.path.join(create_dir, self.pkg.name)
-        setuppy = os.path.join(dest, 'setup.py')
-        assert os.path.exists(setuppy), setuppy
-        manifest = os.path.join(dest, 'MANIFEST.in')
-        assert os.path.exists(manifest)
-
+    # do not include in setUp as uses write which we need to test
     def _mock_pkg(self):
-        create_dir = os.path.join(self.tmp, 'install-test')
+        create_dir = os.path.join(self.tmpdir, 'install-test')
         self.pkg.installed_path = os.path.join(create_dir, self.pkg_name)
         dist = PythonDistribution(self.pkg)
         self.dist = PythonDistribution(self.pkg)
@@ -36,7 +25,24 @@ class TestPythonDistribution(TestCase):
         fo = open(text_fp, 'w')
         fo.write('testing')
         fo.close()
+        # need to rebuild the egg_info at this point or abc.txt not picked up
+        # TODO: this is really non-optimal
+        current_dir = os.getcwd()
+        os.chdir(pkg_source_path)
+        os.system('python setup.py -q egg_info')
+        os.chdir(current_dir)
         return pkg_source_path
+
+    def test_write(self):
+        create_dir = os.path.join(self.tmpdir, 'create-test')
+        self.pkg.installed_path = os.path.join(create_dir, self.pkg_name)
+        dist = PythonDistribution(self.pkg)
+        dist.write()
+        dest = os.path.join(create_dir, self.pkg.name)
+        setuppy = os.path.join(dest, 'setup.py')
+        assert os.path.exists(setuppy), setuppy
+        manifest = os.path.join(dest, 'MANIFEST.in')
+        assert os.path.exists(manifest)
 
     def test_install(self):
         pkg_source_path = self._mock_pkg()
@@ -70,23 +76,28 @@ class TestPythonDistribution(TestCase):
         out = fo.read()
         assert out == 'testing'
 
-
-class TestPythonDistributionFromPath(TestCase):
-
-    def setUp(self):
-        self.make_tmpdir()
-        self.pkg_name = 'abc'
-        self.pkg = Package(name=self.pkg_name,
-                version='1.0',
-                installed_path=os.path.join(self.tmpdir, self.pkg_name),
-                )
-        self.dist = PythonDistribution(self.pkg)
-        self.dist_path = self.dist.write()
+#
+#    def setUp(self):
+#        self.make_tmpdir()
+#        self.pkg_name = 'abc'
+#        self.pkg = Package(name=self.pkg_name,
+#                version='1.0',
+#                installed_path=os.path.join(self.tmpdir, self.pkg_name),
+#                )
+#        self.dist = PythonDistribution(self.pkg)
+#        self.dist_path = self.dist.write()
 
     def test_from_path(self):
-        dist = PythonDistribution.from_path(self.dist_path)
+        pkg_path = self._mock_pkg()
+        dist = PythonDistribution.from_path(pkg_path)
         pkg = dist.package
         assert pkg.name == self.pkg_name
+        assert pkg.installed_path == pkg_path
+        # at the present write (used in _mock_pkg) does not use pkg metadata!
+        # assert pkg.version == '1.0', pkg
+        assert pkg.version == '0.1', pkg
+        print pkg_path
+        assert 'mytestpkg2/abc.txt' in pkg.manifest, pkg.manifest
 
 
 class TestIniBasedDistribution:
@@ -111,10 +122,10 @@ description: a long description
 comments: here are some additional comments
 requires-compilation: y
 
-[data.csv]
-title: ...
+[manifest::data.csv]
+title: my csv file
 
-[xyz.png]
+[manifest::xyz.png]
 title: my graph
 '''
         os.makedirs(basePath)
@@ -133,13 +144,15 @@ title: my graph
         assert u'additional comment' in pkg.notes
         assert pkg.author == u'abc'
         assert pkg.extras['requires-compilation'] == 'y'
-        assert len(pkg.data_files) == 2
-        assert pkg.data_files['data.csv']['title'] == '...'
+        # test manifest
+        assert len(pkg.manifest) == 2
+        assert pkg.manifest['data.csv']['title'] == 'my csv file'
     
     def test_write(self):
         name = 'abc'
         destpath = os.path.join(self.tmpDir, name)
         pkg = Package(name='abc', installed_path=destpath)
+        pkg.manifest['data.csv'] = None
         dist = IniBasedDistribution(pkg)
         dist.write()
         metapath = os.path.join(destpath, 'metadata.txt')
@@ -148,4 +161,5 @@ title: my graph
         meta = file(metapath).read()
         assert '[DEFAULT]' in meta, meta
         assert 'name = abc' in meta, meta
+        assert '[manifest::data.csv]' in meta, meta
 

@@ -14,7 +14,7 @@ class TestDistributionOnDisk(TestCase):
     def setup_class(self):
         self.make_tmpdir()
         import datapkg.package
-        self.pkgname = 'abc'
+        self.pkgname = 'xxxyyy'
         self.srcdir = os.path.join(self.tmpdir, self.pkgname)
         self.pkg = Package.create_on_disk(self.srcdir)
         self.offset = os.path.join(self.pkgname, 'info.txt')
@@ -47,6 +47,7 @@ class TestDistributionOnDisk(TestCase):
         self._test_pkg_name(dist)
         self._test_listdir(dist)
         self._test_resource_stream(dist)
+        self._test_filelist(dist)
 
     def _test_pkg_name(self, dist):
         assert dist.name == self.pkgname, dist.name
@@ -59,7 +60,7 @@ class TestDistributionOnDisk(TestCase):
 
     def _test_listdir(self, dist):
         out = dist.listdir('.')
-        assert 'abc' in out
+        assert 'xxxyyy' in out
         # will vary across types
         assert len(out) >= 2
 
@@ -67,6 +68,9 @@ class TestDistributionOnDisk(TestCase):
         fo = dist.resource_stream(self.offset)
         out = fo.read()
         assert out == self.content, out
+    
+    def _test_filelist(self, dist):
+        assert 'xxxyyy/info.txt' in dist.filelist, dist.filelist
 
 
 # encountering that weird error on any subsequent run of setup_lass

@@ -1,12 +1,27 @@
-'''
+'''Interface to Distutils/Setuptools code.
+
+Provide a simple Distribution object (`DistributionOnDiskBase`) providing
+access to a python distribution's metadata (PKG-INFO and MANIFEST/SOURCES.txt).
 
 General Remarks on Setuptools Etc
 =================================
 
 PkgResources and Setuptools can be difficult for the uninitiated to grapple
-with.
+with (putting it politely).
 
-Things are also made a little confusing by different objects having the same
+For us the most fundamental problem is that there is, at present, no simple way
+to get metadata about a distribution on disk (whether installed or just in raw
+source form). What one would **really, really** like is an interface like::
+
+    pydist = Distribution(path_on_disk)
+
+As of 2009-08-12 there is hope that this is going to be addressed -- see PEP
+376 http://www.python.org/dev/peps/pep-0376/.
+
+More Details
+------------
+
+Things are also confused by different objects having the same
 or similar names. For example a pkg_resources Distribution object is very
 different from a setuptools.core.Distribution object (which is like the
 distutils one).
@@ -29,6 +44,8 @@ import setuptools.package_index as pi
 import setuptools.command.easy_install
 
 def load_distribution(dist_path):
+    '''Given a path return an appropriate DistributionOnDisk* instance
+    '''
     built_egg_info = os.path.join(dist_path, 'EGG-INFO')
     setuppy = os.path.join(dist_path, 'setup.py')
     if not os.path.isdir(dist_path): # A.1
@@ -52,6 +69,8 @@ class DistributionOnDiskBase(object):
     @attrib metadata: distribution metadata (i.e. contents of PKG-INFO).
         Returned in the form of a distutils.dist.Distribution. Main metadata
         attributes are then accessible directly via property calls.
+    @attrib filelist: list of files (corresponds to SOURCES.txt). Returns as a
+    python list of file names.
 
     # 4 possible cases:
     # A.1: built distribution zipped
@@ -64,6 +83,7 @@ class DistributionOnDiskBase(object):
     def __init__(self, dist_path):
         self.dist_path = dist_path
         self.metadata = None
+        self.filelist = []
         self._init()
         self.name = self.metadata.name
 
@@ -94,6 +114,10 @@ class DistributionOnDiskBase(object):
             setattr(metadata, field, value)
         return metadata
 
+    def get_filelist(self):
+        import setuptools.command.egg_info
+        # can do this 2 ways 
+
     # could make this a class method
     def install(self, install_dir, tmpdir, zip_safe=False):
         '''Install a python distribution at {pkg_path} to {install_dir} using
@@ -110,7 +134,6 @@ class DistributionOnDiskBase(object):
 
         # setuptools stuff
         self.pi = pi.PackageIndex('http://random.url/')
-        import setuptools.dist
         tdist = setuptools.dist.Distribution()
         self.easy_install = setuptools.command.easy_install.easy_install(tdist)
 
@@ -136,16 +159,41 @@ class DistributionOnDiskBase(object):
             return installed_path
 
 class DistributionOnDiskRawSource(DistributionOnDiskBase):
+    '''A raw source distribution on disk (i.e. with a setup.py file.
+    '''
 
     def _init(self):
-        self.metadata = self.load_metadata(self.dist_path)
+        distutils_dist = self._get_distutils_dist(self.dist_path)
+        self.metadata = distutils_dist.metadata
 
-    def load_metadata(self, dist_path):
+        # WARNING none of this works if we don't have permission to write to
+        # source directory ...
+        current_dir = os.getcwd()
+        try:
+            os.chdir(self.dist_path)
+            # fails with
+            # DistutilsFileError: package directory 'datapkg' does not exist
+            # distutils_dist.run_command('egg_info')
+            # also fails ...
+            # import setuptools.command.egg_info as egg_info
+            # cmd = egg_info.egg_info(distutils_dist)
+            # cmd.run()
+            cmd = 'python setup.py -q egg_info'
+            os.system(cmd)
+            tmpdist = DistributionOnDiskEggSource(self.dist_path)
+            self.filelist = tmpdist.filelist
+        finally:
+            os.chdir(current_dir)
+
+    def _get_distutils_dist(self, dist_path):
+        '''Get a distutils.dist.Distribution instance associated to setup.py in
+        dist_path.'''
+
         '''Get metadata from a setup.py file.'''
         setuppy = os.path.join(self.dist_path, 'setup.py')
         import distutils.core
         dist = distutils.core.run_setup(setuppy, stop_after='init')
-        return dist.metadata
+        return dist
 
     def listdir(self, path):
         fullpath = os.path.join(self.dist_path, path)
@@ -169,6 +217,8 @@ class DistributionOnDiskEgg(DistributionOnDiskBase):
                 metadata=self.pkgr_metadata)
         pkg_info = StringIO.StringIO(self.pkgr_metadata.get_metadata('PKG-INFO'))
         self.metadata = self.parse_pkg_info(pkg_info)
+        sources = self.pkgr_metadata.get_metadata('SOURCES.txt')
+        self.filelist = sources.split('\n')
 
     def _load_pkgr_metadata(self):
         metadata_finder = pkg_resources.EggMetadata(zipimport.zipimporter(self.dist_path))
@@ -202,3 +252,4 @@ class DistributionOnDiskEggSource(DistributionOnDiskEgg):
         egg_info = os.path.join(self.dist_path, egginfos[0])
         metadata_finder = pkg_resources.PathMetadata(self.dist_path, egg_info)
         return  metadata_finder
+

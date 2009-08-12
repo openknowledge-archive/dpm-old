@@ -18,6 +18,16 @@ def normalize_name(name):
         raise ValueError(msg)
     return unicode(new_name)
 
+class Manifest(dict):
+    '''A package manifest, i.e. a list of resources the package provides.
+
+    At present a simple dictionary keyed by file pathes.
+
+    # TODO: use an ordered dictionary (waiting until available in standard
+    # python distribution.)
+    '''
+    pass
+
 
 ## TODO: do we want to normalize name?
 class Package(object):
@@ -29,42 +39,26 @@ class Package(object):
     If it has an associated distribution then this material will be directly
     accessible. 
     '''
-    metadata_keys = [
-       'name', 
-       'title',
-       'version',
-       'license',
-       'author',
-       'maintainer',
-       'url',
-       'download_url',
-       'notes',
-       'tags',
-       'extras',
-       ]
-    metadata_defaults = { 'tags': [], 'extras': {} }
-
     def __init__(self, **kwargs):
         self.init_on_load(**kwargs)
 
-    # TODO: deprecate usage of name
     def init_on_load(self, **kwargs):
         '''Additional __init__ method.
         
         Separated out from __init__ for the benefit of sqlalchemy
         '''
+        # TODO: rename to something like path_on_disk
         # path to distribution on disk associated to package (if any)
         self.installed_path = None
-        # TODO: most of these attributes should run off metadata
-        self.download_url = None
+        self.manifest = Manifest()
         for k,v in kwargs.items():
             setattr(self, k, v)
-        for k in self.metadata_keys:
+        for k in datapkg.metadata.Metadata.keys:
             if not hasattr(self, k):
-                setattr(self, k, self.metadata_defaults.get(k, u''))
+                setattr(self, k, datapkg.metadata.Metadata.defaults.get(k, u''))
 
     def _get_metadata(self):
-        return dict([ (k,getattr(self,k)) for k in self.metadata_keys ])
+        return dict([ (k,getattr(self,k)) for k in datapkg.metadata.Metadata.keys ])
     
     metadata = property(_get_metadata)
 
@@ -169,7 +163,7 @@ class Package(object):
 
     def __str__(self):
         repr = 'Package'
-        for key in self.metadata_keys:
+        for key in datapkg.metadata.Metadata.keys:
             repr += ' %s: %s' % (key, getattr(self,key))
         return repr
 

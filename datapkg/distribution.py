@@ -5,6 +5,7 @@ import os
 from datapkg import DatapkgException
 from datapkg.package import Package
 import datapkg.util
+import datapkg.metadata as M
 
 default_distribution = 'datapkg.distribution:PythonDistribution'
 
@@ -61,11 +62,10 @@ class PythonDistribution(DistributionBase):
         '''Load a L{Package} object from a path to a package distribution.'''
         import datapkg.pypkgtools
         pydist = datapkg.pypkgtools.load_distribution(path)
-        import datapkg.metadata as M
         metadata = M.MetadataConverter.from_distutils(pydist.metadata)
         pkg = Package(name=pydist.metadata.name, installed_path=unicode(path))
-        for k,v in metadata.items():
-            setattr(pkg, k, v)
+        pkg.update_metadata(metadata)
+        pkg.manifest = dict([ (x,None) for x in pydist.filelist])
         dist = self(pkg)
         return dist
 
@@ -140,6 +140,7 @@ class PythonDistribution(DistributionBase):
 
 import ConfigParser
 class IniBasedDistribution(DistributionBase):
+    manifest_prefix = 'manifest::'
     keymap = {
         'id': 'name',
         'creator': 'author',
@@ -158,31 +159,17 @@ class IniBasedDistribution(DistributionBase):
         cfp = ConfigParser.SafeConfigParser()
         cfp.readfp(open(fp))
         filemeta = cfp.defaults()
-        if not 'name' in filemeta and 'id' in filemeta:
-            filemeta['name'] = filemeta['id']
-        extras = {}
-        newmeta = dict(filemeta)
-        if not 'extras' in newmeta:
-            newmeta['extras'] = {}
-        for inkey,value in filemeta.items():
-            if inkey in Package.metadata_keys:
-                continue
-            elif inkey in self.keymap:
-                actualkey = self.keymap.get(inkey, inkey)
-                if actualkey == 'notes':
-                    # TODO: do we need to trim leading '\n' that may result?
-                    newmeta[actualkey] = newmeta.get(actualkey, '') + '\n' + value
-                elif not actualkey in newmeta:
-                    newmeta[actualkey] = value
-            else:
-                newmeta['extras'][inkey] = value
+        newmeta = M.MetadataConverter.normalize_metadata(filemeta,
+                keymap=self.keymap)
         pkg.update_metadata(newmeta)
         # TODO: deprecate this in favour of the manifest
         # TODO: default to 'data.csv' if no sections ...
         pkg.data_path = os.path.join(pkg.installed_path, 'data.csv')
         pkg.data_files = {}
         for section in cfp.sections():
-            pkg.data_files[section] = dict(cfp.items(section))
+            if section.startswith(self.manifest_prefix):
+                filepath = section[len(self.manifest_prefix):]
+                pkg.manifest[filepath] = dict(cfp.items(section))
         return self(pkg)
 
     def write(self):
@@ -191,7 +178,15 @@ class IniBasedDistribution(DistributionBase):
             os.makedirs(destpath)
         meta_path = os.path.join(destpath, 'metadata.txt')
         cfp = ConfigParser.SafeConfigParser(self.package.metadata)
+        for filepath, metadata in self.package.manifest.items():
+            section = self.manifest_prefix + filepath
+            cfp.add_section(section)
+            if metadata:
+                for k,v in metadata.items():
+                    # TODO: (?) json dump of v
+                    # will be weird for text values json.dumps('x') => '"x"'
+                    cfg.set(section, k, unicode(v))
         fo = file(meta_path, 'w')
         cfp.write(fo)
         fo.close()
-    
+ 

@@ -16,6 +16,8 @@ class TestPackage(TestCase):
         os.makedirs(self.install_dir)
         self.pkg_name = 'mytestpkg2'
         self.pkg = datapkg.package.Package(name=self.pkg_name, version=u'1.0')
+        self.pkg.manifest['data.csv'] = None
+        self.pkg.manifest['data.js'] = {'format': 'json'}
 
     def test_package_name(self):
         name1 = 'abc3'
@@ -55,6 +57,11 @@ class TestPackage(TestCase):
     def test_update_metadata(self):
         self.pkg.update_metadata({'name': 'zzzzzz'})
         assert self.pkg.name == 'zzzzzz'
+    
+    def test_manifest(self):
+        assert len(self.pkg.manifest) == 2
+        assert 'data.csv' in self.pkg.manifest
+        assert self.pkg.manifest['data.js']['format'] == 'json'
 
     def test_info_from_path(self):
         base = os.path.abspath('.')
