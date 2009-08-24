@@ -53,12 +53,13 @@ class Package(object):
         self.manifest = Manifest()
         for k,v in kwargs.items():
             setattr(self, k, v)
-        for k in datapkg.metadata.Metadata.keys:
+        for k in datapkg.metadata.Metadata.key_list:
             if not hasattr(self, k):
                 setattr(self, k, datapkg.metadata.Metadata.defaults.get(k, u''))
 
     def _get_metadata(self):
-        return dict([ (k,getattr(self,k)) for k in datapkg.metadata.Metadata.keys ])
+        return datapkg.metadata.Metadata([ (k,getattr(self,k)) for k in
+            datapkg.metadata.Metadata.key_list ])
     
     metadata = property(_get_metadata)
 
@@ -69,7 +70,7 @@ class Package(object):
     def _path_set(self, v):
         self.installed_path = v
     # TODO: rename installed path to path
-    path = property(lambda: self.installed_path, _path_set)
+    path = property(lambda self: self.installed_path, _path_set)
 
     def download(self, tmpdir):
         filepath = self.pi.download(self.download_url, tmpdir)
@@ -162,7 +163,7 @@ class Package(object):
     
     def pretty_print(self):
         repr = ''
-        for key in datapkg.metadata.Metadata.keys:
+        for key in datapkg.metadata.Metadata.key_list:
             repr += '%s: %s\n' % (key, getattr(self,key))
         return repr
 

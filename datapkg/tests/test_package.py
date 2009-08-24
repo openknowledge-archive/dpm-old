@@ -41,7 +41,7 @@ class TestPackage(TestCase):
         except:
             ok = True
         assert ok, name1
-
+    
     def test_package_attr(self):
         assert self.pkg.name == self.pkg_name
         assert self.pkg.version == u'1.0'
@@ -77,6 +77,12 @@ class TestPackage(TestCase):
         path = os.path.join(self.tmpdir, self.pkg_name)
         pkg = datapkg.package.Package.create_on_disk(path)
         assert os.path.exists(path)
+        assert pkg.installed_path == path
+        assert pkg.path == path
+
+    def test_pretty_print(self):
+        out = self.pkg.pretty_print()
+        assert out
 
 
 class TestPackageFromUrlWhenNotAPythonDistribution:

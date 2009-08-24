@@ -1,7 +1,7 @@
 import os
 
 class Metadata(dict):
-    keys = [
+    key_list = [
        'name', 
        'title',
        'version',
@@ -18,12 +18,6 @@ class Metadata(dict):
 
 
 class MetadataConverter(object):
-    distutils_keymap = {
-        'description': 'title',
-        'long_description': 'notes',
-        'keywords': 'tags',
-        }
-
     @classmethod
     def from_distutils(self, data):
         '''Convert distutils metadata to a simple metadata dictionary suitable
@@ -31,16 +25,33 @@ class MetadataConverter(object):
 
         @param data: a `distutils.dist.DistributionMetadata` instance
         '''
+        # bit of a nightmare here since we can load either direct from setup.py
+        # or from PKG-INFO
+        # In PKG-INFO description in the setup.py becomes a summary and
+        # long_description becomes description ...
+        # Note also keywords are comma separated!
         inmeta = {}
         # python distutils/PKG-INFO attr names
         attrnames = set(data._METHOD_BASENAMES)
         attrnames.remove('fullname')
         attrnames.remove('contact_email')
         attrnames.remove('contact')
+        attrnames.add('summary')
         for attrname in attrnames:
-            value = getattr(data, attrname) or ''
+            value = getattr(data, attrname, None) or ''
             inmeta[attrname] = unicode(value, encoding='utf8', errors='ignore') 
-        newmeta = self.normalize_metadata(inmeta, self.distutils_keymap)
+        distutils_keymap = {
+            'summary': 'title',
+            'description': 'title',
+            'long_description': 'notes',
+            'keywords': 'tags',
+            }
+        # in case where loading from PKG-INFO
+        if inmeta['summary']:
+            distutils_keymap['description'] = 'notes'
+        else:
+            del distutils_keymap['summary']
+        newmeta = self.normalize_metadata(inmeta, distutils_keymap)
         return newmeta
 
     @classmethod
@@ -71,7 +82,7 @@ class MetadataConverter(object):
         if not 'extras' in newmeta:
             newmeta['extras'] = {}
         for inkey,value in metadata.items():
-            if inkey in Metadata.keys:
+            if inkey in Metadata.key_list:
                 continue
             elif inkey in keymap:
                 actualkey = keymap[inkey]
@@ -84,7 +95,7 @@ class MetadataConverter(object):
                     newmeta[actualkey] = value
             else:
                 newmeta['extras'][inkey] = value
-        if newmeta['notes'].startswith(os.linesep):
+        if 'notes' in newmeta and newmeta['notes'].startswith(os.linesep):
             newmeta['notes'] = newmeta['notes'][len(os.linesep):]
         # TODO: normalize tags (?) (space separated list)
         return newmeta

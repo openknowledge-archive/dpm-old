@@ -188,14 +188,15 @@ class IniBasedDistribution(DistributionBase):
         newmeta = M.MetadataConverter.normalize_metadata(filemeta,
                 keymap=self.keymap)
         pkg.update_metadata(newmeta)
-        # TODO: deprecate this in favour of the manifest
-        # TODO: default to 'data.csv' if no sections ...
-        pkg.data_path = os.path.join(pkg.installed_path, 'data.csv')
-        pkg.data_files = {}
         for section in cfp.sections():
             if section.startswith(self.manifest_prefix):
                 filepath = section[len(self.manifest_prefix):]
                 pkg.manifest[filepath] = dict(cfp.items(section))
+        # TODO: manifest approach (i.e. walk the directory looking for material)
+        for fn in ['data.csv', 'data.js']:
+            fullpath = os.path.join(pkg.installed_path, fn)
+            if os.path.exists(fullpath) and not fn in pkg.manifest:
+                pkg.manifest[fn] = None
         return self(pkg)
 
     def write(self):
