@@ -64,7 +64,7 @@ class DbIndex(IndexBase):
         return self.session.query(Package).all()
 
     def register(self, pkg):
-        self.session.save(pkg)
+        self.session.add(pkg)
         self.session.commit()
 
     def has(self, pkg_name):
