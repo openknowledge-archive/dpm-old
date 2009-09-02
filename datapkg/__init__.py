@@ -1,5 +1,8 @@
-'''datapkg is a tool for distributing, discovering and installing knowledge and
-data 'packages'.
+'''datapkg is a tool for easily distributing knowledge and data by using the 'packaging' concept, which is well established in free software distribution.
+
+By putting data in a package, it gets labelled with standardized metadata and
+can be put in a datapkg repository, such as CKAN or a local one. Once in such
+a repository, the packages are easy to find and retrieve.
 
 Contents:
     1. Quickstart
@@ -8,18 +11,42 @@ Contents:
 1. Quickstart
 +++++++++++++
 
+Obtaining a Package
+===================
+
+We're going to search for a name of a Package on the CKAN server::
+
+    $ datapkg --ckan search testpkg
+    1 Package found:
+    testpkg
+
+Let's get it::
+
+    $ datapkg --ckan install testpkg.
+
+This will download the Distribution file testpkg.egg containing the Package
+'testpkg' to the current directory (.). Now let's take a look inside it::
+
+    $ datapkg info testpkg.egg
+
+We can see from the metadata that it is a book by Gerald Manley Hopkin's called
+"The Windhover" and the payload for the Package is one file, 'windhover.txt'.
+Let's extract that file.
+
+    $ datapkg dump windhover.txt
+
 Creating and Registering a Package
 ==================================
 
-Create a new data package on disk using standard file layout::
+Create a new data Package on disk using datapkg file layout::
 
     $ datapkg create MyNewDataPackage
 
-Edit the metadata::
+Edit the Package's metadata::
 
     $ vim MyNewDataPackage/setup.py
 
-Add some data::
+Add some data to the Package::
 
     $ cp mydata.csv MyNewDataPackage
     $ cp mydata.js MyNewDataPackage
@@ -27,7 +54,7 @@ Add some data::
 
 Register in your local repository or on CKAN::
 
-    $ datapkg repo init # if repo not already initialized
+    $ datapkg init repo # if repo not already initialized
     $ datapkg register MyNewDataPackage
     $ # OR
     $ datapkg register --ckan --api-key=....  MyNewDataPackage
@@ -38,14 +65,17 @@ Check it has registered ok::
     $ # OR (if on CKAN)
     $ datapkg info --ckan MyNewDataPackage
 
+Download the Package again::
+
+(TBD)
 
 2. Tutorial
 +++++++++++
 
 datapkg has two distinct uses:
 
-    1. Finding, obtaining and accessing material made available *by* others.
-    2. Assisting you to make material available *to* others.
+    1. Finding and obtaining data made available *by* others.
+    2. Making material available *to* others.
 
 NB: in what follows items prefixed with $ should be run on the command line.
 
@@ -55,16 +85,15 @@ Basic Concepts
 
 Before we begin it is useful to understand some basic datapkg concepts:
 
-    1. A Package -- metadata plus some set of resources (code, data etc)
-    2. A Distribution -- a Package serialized to a structure on disk or at a url
+    1. A Package -- details about the data.
+    2. A Distribution -- disk files which are the Package and optionally the data too (code, database, a book etc).
 
-For managing packages datapkg uses:
+For managing Packages datapkg uses:
 
-    1. An Index: a list of package metadata (but not package resources)
-    2. Repository: an index plus a place to store package resources (as well as
-       other miscellaneous facilities such as caches, configuration files etc)
+    1. A Registry: a list of Package metadata (but not Package payload data)
+    2. Repository: a Registry plus a storage for Packages.
 
-When you start off, the first thing you will do is create a local repository.
+When you start off, the first thing you will do is create a local Repository.
 
 
 1. Obtaining Material
@@ -75,44 +104,51 @@ When you start off, the first thing you will do is create a local repository.
 
 First set up your local repository::
 
-    $ datapkg init
+    $ datapkg init repo
 
-This will create a .datapkg directory in your home directory along with various
+This will create a .datapkg directory in your home directory containing various
 files including a main configuration file (config.ini).
 
-NB: you can choose any location you like for your repository by passing the
---repository option to the init command. If you do so you will need to pass
-this option to all other commands that require use of the repository.
+(Alternatively you can choose another location for your repository by passing
+the --repository option to the init command. If you do so, you will need to
+pass this option to all other commands that require use of the repository.)
 
-[Optional] Edit your configuration file::
+[Optional] Edit your repository configuration file:
 
-    $ vi .datapkg/config.ini
-
+    $ vi .datapkgrc
 
 1.2 Install Material
 --------------------
 
-Suppose you have downloaded an existing datapkg distribution to your local
-filesystem at {path}. (If you don't have one available you can download a demo
-distribution from: http://knowledgeforge.net/ckan/pkgdemo.egg). Then you can
-get info about it by doing:
+A datapkg Distribution file doesn't have to be associated with a repository to
+query or extract its data. Download to your computer this example Distribution:
+http://knowledgeforge.net/ckan/pkgdemo.egg
+Let's examine it:
 
-    $ datapkg info {path}
+    $ datapkg info pkgdemo.egg
 
-You can register (this will not install it!) the package in your local index by
-doing::
+We can see that it contains a Package metadata, including name='pkgdemo', as
+well as the Package's payload data - a text file.
 
-    $ datapkg register {path}
+Next we will register it with our local Registry. The Registry takes a copy of
+the metadata and stores the path to the Distribution file.
 
-Once you have registered a package with name {name} you can replace any {path}
-with {name} in most actions, e.g. you can now do::
+    $ datapkg register pkgdemo.egg
 
-    $ datapkg info {name}
+Now because it is in the Registry, instead of using the filepath we can refer
+to this the Package (inside the Distribution) by its name (from the metadata):
 
-You can install a package in your local repository either from a distribution
-or a registered package by doing::
+    $ datapkg info pkgdemo
 
-    $ datapkg install {path-or-name}
+It may well be convenient to store the whole of the Package in the repository.
+Here we 'install' the Package in our local Repository (which behind the scenes
+copies the text file into the .datapkg directory).:
+
+    $ datapkg install pkgdemo
+
+This is particularly useful if we are dealing with a Repository which can be
+accessed on the Internet. For example you can specify the datapkg Repository
+CKAN with: '--ckan' or one elsewhere with something like: '--repository=http:someserver.com/rest'.
 
 NB: to install from a registered package the package will need to have a
 download_url associated.
@@ -150,17 +186,17 @@ To access the package from python code do::
 1.4 Find Material
 -----------------
 
-Search for a package on CKAN::
+Search for a Package on CKAN::
 
     $ datapkg --ckan list
 
-You can find out about a package on CKAN by doing::
+You can find out about a Package on CKAN by doing::
 
     $ datapkg --ckan info {pkg-name}
 
 [NOT YET OPERATIONAL]
 
-Pull CKAN index in your local index
+Copy metadata from the CKAN Registry in your local Registry
 
 
 2. Making Your Material Available to Others
