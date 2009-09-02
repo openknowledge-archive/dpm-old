@@ -6,8 +6,10 @@ v0.3 ????
 =========
 
   * Distribution objects for writing and reading packages to disk
+
     * existing code refactored to PythonDistribution and new
       IniBasedDistribution implementation
+
   * Improved approach for configuration with config stored in a dedicated ini
     file
   * Create new Index object SimpleIndex
