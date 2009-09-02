@@ -32,6 +32,7 @@ setup(
     description=__description__,
     long_description=__description_long__,
     keywords='data packaging component tool',
+    test_suite='nose.collector',
     url='http://www.okfn.org/datapkg',
     classifiers=[
     ],
