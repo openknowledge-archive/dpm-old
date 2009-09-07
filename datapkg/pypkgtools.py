@@ -11,7 +11,8 @@ with (putting it politely).
 
 For us the most fundamental problem is that there is, at present, no simple way
 to get metadata about a distribution on disk (whether installed or just in raw
-source form). What one would **really, really** like is an interface like::
+source form) and one has to hack around with various different approaches. What
+one would **really, really** like is an interface like::
 
     pydist = Distribution(path_on_disk)
 
@@ -37,6 +38,9 @@ of metadata directories and files.
 '''
 import zipimport, os
 import StringIO
+import logging
+
+logger = logging.getLogger(__file__)
 
 import setuptools
 import setuptools.dist
@@ -99,7 +103,8 @@ class DistributionOnDiskBase(object):
         # http://mail.python.org/pipermail/distutils-sig/2007-June/007783.html
         from distutils.dist import DistributionMetadata
         metadata = DistributionMetadata()
-        fields = metadata._METHOD_BASENAMES
+        # description in setup.py is summary in egg-info!
+        fields = list(metadata._METHOD_BASENAMES) + ['summary']
 
         import rfc822
         messages=rfc822.Message(fileobj)
@@ -158,14 +163,7 @@ class DistributionOnDiskBase(object):
             self.easy_install.process_distribution(spec, dist, deps)
             return installed_path
 
-class DistributionOnDiskRawSource(DistributionOnDiskBase):
-    '''A raw source distribution on disk (i.e. with a setup.py file.
-    '''
-
-    def _init(self):
-        distutils_dist = self._get_distutils_dist(self.dist_path)
-        self.metadata = distutils_dist.metadata
-
+    def _build_egg_info(self, dist_path):
         # WARNING none of this works if we don't have permission to write to
         # source directory ...
         current_dir = os.getcwd()
@@ -178,12 +176,37 @@ class DistributionOnDiskRawSource(DistributionOnDiskBase):
             # import setuptools.command.egg_info as egg_info
             # cmd = egg_info.egg_info(distutils_dist)
             # cmd.run()
+
+            # this is done right in pip.py run_egg_info function ...
             cmd = 'python setup.py -q egg_info'
-            os.system(cmd)
+            notok = os.system(cmd)
+            assert not notok, 'RawSource: Failed to build egg_info so manifest may be unavailable'
             tmpdist = DistributionOnDiskEggSource(self.dist_path)
             self.filelist = tmpdist.filelist
+        except Exception, inst:
+            logger.error(inst)
         finally:
             os.chdir(current_dir)
+
+
+class DistributionOnDiskRawSource(DistributionOnDiskBase):
+    '''A raw source distribution on disk (i.e. with a setup.py file.
+    '''
+
+    def _init(self):
+        distutils_dist = self._get_distutils_dist(self.dist_path)
+        self.metadata = distutils_dist.metadata
+        # normalize metadata (seems to be slightly different ...)
+        if self.metadata.keywords:
+            self.metadata.keywords = ' '.join(self.metadata.keywords)
+        self.filelist = []
+
+        self._build_egg_info(self.dist_path)
+        try: # this may fail if build_egg_info fails
+            tmpdist = DistributionOnDiskEggSource(self.dist_path)
+            self.filelist = tmpdist.filelist
+        except ValueError, inst:
+            logger.error(inst)
 
     def _get_distutils_dist(self, dist_path):
         '''Get a distutils.dist.Distribution instance associated to setup.py in
@@ -234,6 +257,7 @@ class DistributionOnDiskEgg(DistributionOnDiskBase):
         manager = None
         return self.pkgr_dist.get_resource_stream(manager, path)
 
+
 class DistributionOnDiskEggUnpacked(DistributionOnDiskEgg):
     
     def _load_pkgr_metadata(self):
@@ -241,8 +265,13 @@ class DistributionOnDiskEggUnpacked(DistributionOnDiskEgg):
         metadata_finder = pkg_resources.PathMetadata(self.dist_path, built_egg_info)
         return  metadata_finder
 
+
 class DistributionOnDiskEggSource(DistributionOnDiskEgg):
     def _load_pkgr_metadata(self):
+        # Doesn't work! Leads to infinite recursion ...
+        # rebuild egg_info so that we pick up any changed metadata
+        # self._build_egg_info(self.dist_path)
+
         egginfos = filter(lambda x: x.endswith('.egg-info'),
                 os.listdir(self.dist_path))
         if not len(egginfos) > 0:

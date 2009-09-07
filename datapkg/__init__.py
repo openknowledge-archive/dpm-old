@@ -261,14 +261,14 @@ You can also install the distribution into your local repository::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.3a'
+__version__ = '0.3b'
 __description__ = 'Data packaging system and utilities.'
 __description_long__ = __doc__
 __license__ = 'MIT'
 __license_full__ = \
 '''All material is licensed under the MIT License:
 
-Copyright (c) 2005-2008, Open Knowledge Foundation
+Copyright (c) 2005-2009, Open Knowledge Foundation
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

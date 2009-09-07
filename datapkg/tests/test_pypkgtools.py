@@ -55,6 +55,7 @@ class TestDistributionOnDisk(TestCase):
     def _test_metadata(self, dist):
         assert dist.metadata.name == self.pkgname
         assert dist.metadata.download_url == None
+        assert dist.metadata.keywords == '' or dist.metadata.keywords is None, dist.metadata.keywords
         # TODO: why does this fail?
         # assert dist.metadata.version == '0.0.0', dist.metadata.version
 

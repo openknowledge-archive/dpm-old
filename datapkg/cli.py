@@ -183,13 +183,16 @@ class Command(object):
         if log_fp is not None:
             log_fp.close()
         if exit:
-            log_fn = 'datapkg-log.txt'
-            text = '\n'.join(complete_log)
-            # Not sure we need to tell people ...
-            # logger.fatal('Storing complete log in %s' % log_fn)
-            log_fp = open_logfile_append(log_fn)
-            log_fp.write(text)
-            log_fp.close()
+            try:
+                log_fn = 'datapkg-log.txt'
+                text = '\n'.join(complete_log)
+                # Not sure we need to tell people ...
+                # logger.fatal('Storing complete log in %s' % log_fn)
+                log_fp = open_logfile_append(log_fn)
+                log_fp.write(text)
+                log_fp.close()
+            except IOError:
+                pass
         sys.exit(exit)
 
 
@@ -291,9 +294,13 @@ class InfoCommand(Command):
     name = 'info'
     summary = 'Get information about a package'
     usage = \
-'''%prog {path-or-pkg-name}
+'''%prog {path-or-pkg-name} [manifest]
 
-Get information about a package.
+Get information about a package (print package metadata). If manifest specified
+then show manifest info rather than package metadata.
+
+WARNING: if you change the metadata for a python distribution you may need to
+rebuild the egg-info for changes to show up here.
 '''
 
     def run(self, options, args):
@@ -302,7 +309,12 @@ Get information about a package.
         if pkg is None:
             print 'No package was found for: "%s"' % pkg_locator
             return 1
-        self._print_pkg(pkg)
+        if len(args) > 1 and args[1] == 'manifest':
+            print '### Manifest\n'
+            for resource in pkg.manifest:
+                print resource
+        else:
+            self._print_pkg(pkg)
 
 InfoCommand()
 
