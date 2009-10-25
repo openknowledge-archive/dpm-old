@@ -28,3 +28,14 @@ class TestMetadataConverter:
         outmeta = M.MetadataConverter.normalize_metadata(inmeta)
         assert 'provides' not in outmeta['extras'], outmeta
 
+    def test__standardize_distutils(self):
+        inmeta = distutils.dist.DistributionMetadata()
+        inmeta.home_page = 'http://xyz.com'
+        outmeta = M.MetadataConverter.from_distutils(inmeta)
+        assert outmeta['url'] == inmeta.home_page, outmeta
+
+    def test_tags_are_normalized(self):
+        inmeta = { 'tags':  u'be here,now, everyone' }
+        outmeta = M.MetadataConverter.normalize_metadata(inmeta)
+        assert outmeta['tags'] == ['be', 'here', 'now', 'everyone'], outmeta['tags']
+

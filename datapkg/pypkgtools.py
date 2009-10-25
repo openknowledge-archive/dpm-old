@@ -19,6 +19,12 @@ one would **really, really** like is an interface like::
 As of 2009-08-12 there is hope that this is going to be addressed -- see PEP
 376 http://www.python.org/dev/peps/pep-0376/.
 
+2009-10-25: see also this recent thread:
+
+http://mail.python.org/pipermail/distutils-sig/2009-July/012765.html
+
+This also could be useful: http://pypi.python.org/pypi/pkginfo/
+
 More Details
 ------------
 
@@ -98,24 +104,18 @@ class DistributionOnDiskBase(object):
         '''Parse PKG-INFO fileobj and return DistributionMetadata object.
         
         task is to invert distutils.dist.DistributionMetadata.write_pkg_file
+
+        Partially based on http://mail.python.org/pipermail/distutils-sig/2007-June/007783.html
         '''
-        # partially based on
-        # http://mail.python.org/pipermail/distutils-sig/2007-June/007783.html
         from distutils.dist import DistributionMetadata
         metadata = DistributionMetadata()
         # description in setup.py is summary in egg-info!
         fields = list(metadata._METHOD_BASENAMES) + ['summary']
 
         import rfc822
-        messages=rfc822.Message(fileobj)
-        for field in fields:
-            if field in ['home_page','author_email']:
-                prop=field.replace('_','-')
-            else:
-                prop=field
-            value=messages.getheader(prop)
-            # TODO: do this properly
-            # need to invert metadata._write_list
+        message =rfc822.Message(fileobj)
+        for name, value in message.items():
+            field = name.lower().replace('-', '_')
             setattr(metadata, field, value)
         return metadata
 
