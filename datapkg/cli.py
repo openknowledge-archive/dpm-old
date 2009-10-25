@@ -112,7 +112,7 @@ class Command(object):
                 api_key = self._config.get('DEFAULT', 'ckan.api_key')
             repo.index = datapkg.index.CkanIndex(
                     rest_api_url=self.repository_path,
-                    api_key=self.options.api_key)
+                    api_key=api_key)
         else:
             if not os.path.exists(self.repository_path):
                 msg = 'ERROR: you need to initialize the repository (run: repo init).'
