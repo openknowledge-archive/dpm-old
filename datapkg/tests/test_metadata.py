@@ -21,3 +21,10 @@ class TestMetadataConverter:
         assert outmeta['name'] == 'XXX'
         assert outmeta['title'] == 'YYY'
         assert outmeta['notes'].endswith(inmeta.description), outmeta
+    
+    def test_normalize_metadata_strip_empty_extras(self):
+        # these are keys that distutils provides by default
+        inmeta = { 'provides':  u'' }
+        outmeta = M.MetadataConverter.normalize_metadata(inmeta)
+        assert 'provides' not in outmeta['extras'], outmeta
+
