@@ -32,14 +32,7 @@ For Developers
 
 1. Building the documentation.
 
-You need sphinx (python-sphinx) to do this. You will also need to create empty
-directories in ./doc/ (mercurial can't track empty directories)::
-
-    cd doc
-    mkdir .static
-    mkdir .templates
-
-Now you can build the docs::
+You need sphinx (python-sphinx) to do this. Now you can build the docs::
 
     python setup.py build_sphinx
 
