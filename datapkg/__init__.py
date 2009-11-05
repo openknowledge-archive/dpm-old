@@ -22,7 +22,7 @@ We're going to search for a name of a Package on the CKAN server::
 
 Let's get it::
 
-    $ datapkg --ckan install testpkg.
+    $ datapkg --ckan install testpkg
 
 This will download the Distribution file testpkg.egg containing the Package
 'testpkg' to the current directory (.). Now let's take a look inside it::
@@ -148,7 +148,8 @@ copies the text file into the .datapkg directory).:
 
 This is particularly useful if we are dealing with a Repository which can be
 accessed on the Internet. For example you can specify the datapkg Repository
-CKAN with: '--ckan' or one elsewhere with something like: '--repository=http:someserver.com/rest'.
+CKAN with: '--ckan' or one elsewhere with something like:
+    '--repository=http:someserver.com/api'.
 
 NB: to install from a registered package the package will need to have a
 download_url associated.

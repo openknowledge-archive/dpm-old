@@ -5,16 +5,19 @@ History
 v0.3 ????
 =========
 
-  * Distribution objects for writing and reading packages to disk
+This release features major improvements over v0.2 particularly in area of CKAN integration with 'write' support especially improved.
 
-    * existing code refactored to PythonDistribution and new
-      IniBasedDistribution implementation
+  * Better and more flexible system for reading and writing packages to disk 
+
+    * New Distribution object to encapsulate writing and reading to disk
+    * Implemenations for Python packages (PythonDistribution) and simple ini
+      file (metadata.txt) format (IniBasedDistribution)
 
   * Improved approach for configuration with config stored in a dedicated ini
-    file
+    file and lots of minor fixes to improve CLI experience
   * Create new Index object SimpleIndex
-  * Significantly rework package metadata and additional attributes (author,
-    maintainer, extras etc)
+  * Completely overhaul package metadata with support for man additional
+    attribues (author, maintainer, extras etc)
   * Improved, sphinx-built docs (http://knowledgeforge.net/ckan/doc/datapkg/)
 
 

@@ -18,7 +18,7 @@ def get_config(config_path=default_config_path):
 def make_default_config(repo_path=default_repo_path):
     cfg = ConfigParser.SafeConfigParser()
     cfg.set('DEFAULT', 'version', datapkg.__version__)
-    cfg.set('DEFAULT', 'ckan.url',  'http://ckan.net/api/rest/')
+    cfg.set('DEFAULT', 'ckan.url',  'http://ckan.net/api/')
     cfg.set('DEFAULT', 'ckan.api_key', '')
     cfg.set('DEFAULT', 'repo.default_path', repo_path)
     return cfg

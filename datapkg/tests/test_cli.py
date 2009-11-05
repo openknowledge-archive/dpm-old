@@ -102,8 +102,8 @@ class TestCLI:
     
     # For this need dummy ckan running locally with standard test data
     def test_ckan(self):
-        # localckan = 'http://localhost:5000/api/rest'
-        localckan = 'http://test.ckan.net/api/rest'
+        # localckan = 'http://localhost:5000/api/'
+        localckan = 'http://test.ckan.net/api/'
         apikey = 'tester'
         ckanbase = 'datapkg --repository %s ' % localckan
         ckanbase += '--api-key %s ' % apikey
