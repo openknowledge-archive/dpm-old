@@ -8,13 +8,14 @@ class TestSimpleIndex(object):
     def setup(self):
         self.index = datapkg.index.SimpleIndex()
 
-    def test_has(self):
+    def test_has_register_update(self):
         pkg_name = u'blah'
         assert not self.index.has(pkg_name)
 
         pkg = datapkg.package.Package(name=pkg_name)
         self.index.register(pkg)
         assert self.index.has(pkg_name)
+        self.index.update(pkg)
 
     def test_get(self):
         pkg_name = u'blah'
@@ -22,7 +23,7 @@ class TestSimpleIndex(object):
         self.index.register(pkg)
         out = self.index.get(pkg_name)
         assert out.name == pkg_name
-
+        
 
 class TestDbIndex(TestSimpleIndex):
     tmpfile = '/tmp/datapkg.db'

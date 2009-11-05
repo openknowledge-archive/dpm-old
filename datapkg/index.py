@@ -27,6 +27,10 @@ class IndexBase(object):
     def list(self):
         '''Return an iterator over all items in the Index'''
         raise NotImplementedError
+
+    def update(self, package):
+        '''Update `package` in the Index.'''
+        raise NotImplementedError
         
 
 class SimpleIndex(IndexBase):
@@ -35,6 +39,10 @@ class SimpleIndex(IndexBase):
         self._dict = {}
 
     def register(self, package):
+        if package.name in self._dict:
+            # TODO: make a DatapkgException
+            raise Exception('Package already registered with name: %s' %
+                    package.name)
         self._dict[package.name] = package
 
     def get(self, name):
@@ -45,6 +53,13 @@ class SimpleIndex(IndexBase):
 
     def list(self):
         return iter(self._dict.values())
+
+    def update(self, package): 
+        if not package.name in self._dict:
+            # TODO: make a DatapkgException
+            raise Exception('No package registered with name: %s' %
+                    package.name)
+        self._dict[package.name] = package
 
 
 class DbIndex(IndexBase):
@@ -63,8 +78,12 @@ class DbIndex(IndexBase):
     def list(self):
         return self.session.query(Package).all()
 
-    def register(self, pkg):
-        self.session.add(pkg)
+    def register(self, package):
+        self.session.add(package)
+        self.session.commit()
+
+    def update(self, package):
+        self.session.merge(package)
         self.session.commit()
 
     def has(self, pkg_name):
@@ -141,19 +160,22 @@ class CkanIndex(IndexBase):
         else:
             raise Exception(self.status_info)
 
-    def register(self, pkg):
-        pkg_dict = pkg.metadata
-        pkg_dict = dict(pkg_dict)
-        # pkg_dict['tags'] = []
-        self.ckan.package_register_post(pkg_dict)
+    def register(self, package):
+        package_dict = package.metadata
+        package_dict = dict(package_dict)
+        # package_dict['tags'] = []
+        self.ckan.package_register_post(package_dict)
         self.print_status()
         if self.ckan.last_status != 200:
             raise Exception(self.status_info)
 
-    def update(self, pkg):
-        pkg_dict = self.cvt_pkg_metadata(pkg)
-        self.ckan.package_entity_put(pkg_dict)
+    def update(self, package):
+        package_dict = dict(package.metadata)
+        self.ckan.package_entity_put(package_dict)
         self.print_status()
+        print package_dict['name']
+        if self.ckan.last_status != 200:
+            raise Exception(self.status_info)
 
     def cvt_to_pkg(self, ckan_pkg_dict):
         name = ckan_pkg_dict.get('name', None)
@@ -175,7 +197,7 @@ class CkanIndex(IndexBase):
         elif self.ckan.last_status == 404:
             self._print("Resource not found (404). Please check names and locations.")
         elif self.ckan.last_status == 409:
-            self._print("Package already registered (409). Update with 'ckanupdate'?")
+            self._print("Package already registered (409). Update with 'update'?")
         elif self.ckan.last_status == 500:
             self._print("Server error (500). Unable to service request. Seek help")
         else:

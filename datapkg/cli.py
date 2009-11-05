@@ -429,6 +429,25 @@ Register package at path in the local index.
 RegisterCommand()
 
 
+class UpdateCommand(Command):
+    name = 'update'
+    summary = 'Update a package'
+    usage = \
+'''%prog {path}
+
+Update package at path in the local index.
+'''
+
+    def run(self, options, args):
+        path = args[0]
+        import datapkg.package
+        repo = self._get_repo()
+        pkg = datapkg.package.Package.load(path)
+        repo.index.update(pkg)
+
+UpdateCommand()
+
+
 class InstallCommand(Command):
     name = 'install'
     summary = 'Install a package'

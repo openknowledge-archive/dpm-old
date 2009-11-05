@@ -66,6 +66,11 @@ class TestCLI:
         pkgnames = [ pkg.name for pkg in repo.index.list() ]
         assert self.pkg_name in pkgnames
 
+        # not a particularly good test because we won't change anything
+        cmd = self.cmd_base + 'update %s' % self.pkg_path 
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+
         # install
         cmd = self.cmd_base + 'install %s' % self.pkg_path 
         status, output = datapkg.util.getstatusoutput(cmd)
@@ -96,8 +101,9 @@ class TestCLI:
         assert not status, output
     
     # For this need dummy ckan running locally with standard test data
-    def _test_ckan(self):
-        localckan = 'http://localhost:5000/api/rest'
+    def test_ckan(self):
+        # localckan = 'http://localhost:5000/api/rest'
+        localckan = 'http://test.ckan.net/api/rest'
         apikey = 'tester'
         ckanbase = 'datapkg --repository %s ' % localckan
         ckanbase += '--api-key %s ' % apikey
@@ -128,4 +134,9 @@ class TestCLI:
         assert not status, output
         assert self.pkg_name in output, output
         # TODO: test other info is registered
+
+        # update - won't do anything as nothing has changed
+        registercmd = ckanbase + 'update %s' % self.pkg_path
+        status, output = datapkg.util.getstatusoutput(registercmd)
+        assert not status, output
 
