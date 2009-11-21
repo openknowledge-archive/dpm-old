@@ -1,8 +1,4 @@
-'''datapkg is a tool for easily distributing knowledge and data by using the 'packaging' concept, which is well established in free software distribution.
-
-By putting data in a package, it gets labelled with standardized metadata and
-can be put in a datapkg repository, such as CKAN or a local one. Once in such
-a repository, the packages are easy to find and retrieve.
+'''datapkg is a tool for easily distributing knowledge and data by using the 'packaging' concept, which is well established in software distribution.
 
 Contents:
     1. Quickstart
