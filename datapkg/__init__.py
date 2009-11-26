@@ -10,20 +10,27 @@ Contents:
 Obtaining a Package
 ===================
 
-We're going to search for a name of a Package on the CKAN server::
+We're going to list names of Packages on the CKAN server::
 
-    $ datapkg --ckan search testpkg
-    1 Package found:
-    testpkg
+    $ datapkg --ckan list
+    XX Packages found:
+    ...
+    pkgdemo
+    ...
 
-Let's get it::
+Get some information about one of them (our demonstration package on
+ckan.net)::
 
-    $ datapkg --ckan install testpkg
+    $ datapkg --ckan info pkgdemo
+
+[Not Functional] Let's get one of them::
+
+    $ datapkg --ckan install 
 
 This will download the Distribution file testpkg.egg containing the Package
 'testpkg' to the current directory (.). Now let's take a look inside it::
 
-    $ datapkg info testpkg.egg
+    $ datapkg info pkgdemo.egg
 
 We can see from the metadata that it is a book by Gerald Manley Hopkin's called
 "The Windhover" and the payload for the Package is one file, 'windhover.txt'.
@@ -81,16 +88,18 @@ Basic Concepts
 
 Before we begin it is useful to understand some basic datapkg concepts:
 
-    1. A Package -- details about the data.
-    2. A Distribution -- disk files which are the Package and optionally the data too (code, database, a book etc).
+    1. A Package -- the 'package' of data.
+    2. A Distribution -- a serialization of the Package and optionally the data
+       too (code, database, a book etc) to some concretely addressable form.
+       For example: file(s) on disk, an API at a specific url.
 
 For managing Packages datapkg uses:
 
     1. A Registry: a list of Package metadata (but not Package payload data)
-    2. Repository: a Registry plus a storage for Packages.
+    2. Repository: a Registry plus associated storage for association
+       Distributions.
 
-When you start off, the first thing you will do is create a local Repository.
-
+Most commands operate with a 'source' and a 'destination'.
 
 1. Obtaining Material
 =====================
