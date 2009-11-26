@@ -12,29 +12,29 @@ Obtaining a Package
 
 We're going to list names of Packages on the CKAN server::
 
-    $ datapkg --ckan list
+    $ datapkg list ckan://
     XX Packages found:
     ...
-    pkgdemo
+    datapkgdemo
     ...
 
 Get some information about one of them (our demonstration package on
 ckan.net)::
 
-    $ datapkg --ckan info pkgdemo
+    $ datapkg info ckan://datapkgdemo
 
-[Not Functional] Let's get one of them::
+[Not Functional] Let's install one of them::
 
-    $ datapkg --ckan install 
+    $ datapkg install ckan://datapkgdemo .
 
-This will download the Distribution file testpkg.egg containing the Package
-'testpkg' to the current directory (.). Now let's take a look inside it::
+This will download the Distribution file for Package 'datapkgdemo' and
+'install' it in current directory ('.'). Now let's take a look inside it::
 
-    $ datapkg info pkgdemo.egg
+    $ datapkg info datapkgdemo
 
-We can see from the metadata that it is a book by Gerald Manley Hopkin's called
-"The Windhover" and the payload for the Package is one file, 'windhover.txt'.
-Let's extract that file.
+From the metadata that it is a poem by Gerald Manley Hopkin's called "The
+Windhover" and the payload for the Package is one file, 'windhover.txt'.  Let's
+extract that file.
 
     $ datapkg dump windhover.txt
 
@@ -55,22 +55,19 @@ Add some data to the Package::
     $ cp mydata.js MyNewDataPackage
     $ etc ...
 
-Register in your local repository or on CKAN::
+Register it on CKAN::
 
-    $ datapkg init repo # if repo not already initialized
-    $ datapkg register MyNewDataPackage
-    $ # OR
-    $ datapkg register --ckan --api-key=....  MyNewDataPackage
+    # NB: to register on CKAN you'll need to have an api-key
+    # This can either be stored in your config file (see datapkg init config)
+    # Or you can set it with the --api-key option
+    $ datapkg register MyNewDataPackage ckan://
 
 Check it has registered ok::
 
-    $ datapkg info MyNewDataPackage
-    $ # OR (if on CKAN)
-    $ datapkg info --ckan MyNewDataPackage
+    $ datapkg info ckan://mynewdatapkg
 
-Download the Package again::
+[TODO]: uploading package distributions.
 
-(TBD)
 
 2. Tutorial
 +++++++++++
@@ -99,110 +96,35 @@ For managing Packages datapkg uses:
     2. Repository: a Registry plus associated storage for association
        Distributions.
 
-Most commands operate with a 'source' and a 'destination'.
+To specify a package (or just an index/repository) we often use a 'package
+spec' (often termed just 'spec'), which have the following form::
+
+    # for CKAN
+    ckan://{package-name}
+    # on disk
+    file://{package-or-index-path}
+    # or even just
+    {package-or-index-path}
+
 
 1. Obtaining Material
 =====================
 
-1.1 Set Up Your Local Repository
---------------------------------
+1.1 [Optional] Set Up Configuration
+-----------------------------------
 
-First set up your local repository::
+You may want to alter the default configuration, for example to specify your
+CKAN apikey. To do this, first set up your local config::
 
-    $ datapkg init repo
+    $ datapkg init config
 
-This will create a .datapkg directory in your home directory containing various
-files including a main configuration file (config.ini).
+This will create a .datapkgrc file in your home directory. You can then edit
+this with your favourite text editor.
 
-(Alternatively you can choose another location for your repository by passing
-the --repository option to the init command. If you do so, you will need to
-pass this option to all other commands that require use of the repository.)
+1.2 Locating and Installing Material
+------------------------------------
 
-[Optional] Edit your repository configuration file:
-
-    $ vi .datapkgrc
-
-1.2 Install Material
---------------------
-
-A datapkg Distribution file doesn't have to be associated with a repository to
-query or extract its data. Download to your computer this example Distribution:
-http://knowledgeforge.net/ckan/pkgdemo.egg
-Let's examine it:
-
-    $ datapkg info pkgdemo.egg
-
-We can see that it contains a Package metadata, including name='pkgdemo', as
-well as the Package's payload data - a text file.
-
-Next we will register it with our local Registry. The Registry takes a copy of
-the metadata and stores the path to the Distribution file.
-
-    $ datapkg register pkgdemo.egg
-
-Now because it is in the Registry, instead of using the filepath we can refer
-to this the Package (inside the Distribution) by its name (from the metadata):
-
-    $ datapkg info pkgdemo
-
-It may well be convenient to store the whole of the Package in the repository.
-Here we 'install' the Package in our local Repository (which behind the scenes
-copies the text file into the .datapkg directory).:
-
-    $ datapkg install pkgdemo
-
-This is particularly useful if we are dealing with a Repository which can be
-accessed on the Internet. For example you can specify the datapkg Repository
-CKAN with: '--ckan' or one elsewhere with something like:
-    '--repository=http:someserver.com/api'.
-
-NB: to install from a registered package the package will need to have a
-download_url associated.
-
-[NOT YET OPERATIONAL] You can also do this with non-datapkg material Install a
-package directly from a url::
-
-    $ datapkg install {url}
-
-TODO: support for replacing path at any point with a url
-
-
-1.3 Using Material
-------------------
-
-Whether you just have a distribution on disk or have installed a package you
-can access this material from the command line by using the `dump` command::
-
-    $ datapkg dump {path-or-name} {path-in-package}
-
-For example, if you have installed the pkgdemo package from earlier you could
-do::
-
-    $ datapkg dump pkgdemo windhover.txt
-
-Which should result in Gerald Manley Hopkin's "The Windhover" being printed
-out (as this is the contents of windhover.txt).
-
-To access the package from python code do::
-
-    >>> import datapkg
-    >>> datapkg.make_available('{name-or-path}')
-
-
-1.4 Find Material
------------------
-
-Search for a Package on CKAN::
-
-    $ datapkg --ckan list
-
-You can find out about a Package on CKAN by doing::
-
-    $ datapkg --ckan info {pkg-name}
-
-[NOT YET OPERATIONAL]
-
-Copy metadata from the CKAN Registry in your local Registry
+See Quickstart section above.
 
 
 2. Making Your Material Available to Others
@@ -224,7 +146,7 @@ be 3 files/directories:
      * For instructions on using the MANIFEST.in to specify what files to
        include see http://docs.python.org/distutils/commandref.html#sdist-cmd
 
-  2. .egg-info: this directory you can safely ignore (though don't delete it)
+  2. .egg-info: this directory you can safely ignore
   3. setup.py: this files holds metadata about your package.
 
 Generally the only file you should have to alter is setup.py. Open this up in
@@ -267,7 +189,7 @@ You can also install the distribution into your local repository::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.3b'
+__version__ = '0.3c'
 __description__ = 'Data packaging system and utilities.'
 __description_long__ = __doc__
 __license__ = 'MIT'

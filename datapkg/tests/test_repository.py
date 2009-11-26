@@ -7,7 +7,7 @@ from datapkg.tests.base import TestCase
 import datapkg.repository
 
 
-class TestFileRepository(TestCase):
+class _TestFileRepository(TestCase):
     @classmethod
     def setup_class(self):
         self.make_tmpdir()

@@ -104,6 +104,7 @@ class Package(object):
         '''Dispatch to same method on default L{Distribution}.'''
         return self.dist.install(*args, **kwargs)
 
+    # TODO: deprecate this
     def write(self, *args, **kwargs):
         '''Dispatch to same method on default L{Distribution}.'''
         return self.dist.write(*args, **kwargs)

@@ -15,6 +15,7 @@ logger = logging.getLogger('datapkg.cli')
 logging.basicConfig()
 
 import datapkg
+import datapkg.index
 
 parser = optparse.OptionParser(
     usage='''%prog COMMAND [OPTIONS]
@@ -100,50 +101,59 @@ class Command(object):
         if self.level >= 1 or force:
             print(msg)
 
-    def _get_repo(self):
-        import datapkg.repository
-        # HACK: fix this up
-        if self.repository_path and 'http://' in self.repository_path:
-            class StubbedRepo(object):
-                pass
-            repo = StubbedRepo()
+    @classmethod
+    def parse_spec(self, spec=None):
+        '''
+        @params spec: if None default to file://
+        '''
+        import urlparse
+        if spec is None:
+            spec = 'file://'
+        scheme, netloc, path, query, fragment = urlparse.urlsplit(spec)
+        # case where we just provide a path ...
+        if scheme == '':
+            scheme = 'file'
+        if scheme == 'file':
+            # for file netloc is everything up to last name
+            netloc = os.path.join(netloc, os.path.dirname(path))
+        if scheme == 'ckan':
+            path = path.split('/')[-1]
+        return scheme, netloc, path
+
+    def index_from_spec(self, spec=None):
+        '''Load an `Index` from a spec.
+
+        @return: `Index` and path
+
+        schemes = [
+            'file',
+            'ckan',
+            'db',
+            ]
+        '''
+        scheme, netloc, path = self.parse_spec(spec)
+        if scheme == 'file':
+            # for file netloc is everything up to last name
+            netloc = os.path.join(netloc, os.path.dirname(path))
+            index = datapkg.index.FileIndex(netloc)
+        elif scheme == 'ckan':
             api_key = self.options.api_key
             if not api_key:
                 api_key = self._config.get('DEFAULT', 'ckan.api_key')
-            repo.index = datapkg.index.CkanIndex(
-                    rest_api_url=self.repository_path,
+            ckan_url = self._config.get('DEFAULT', 'ckan.url')
+            index = datapkg.index.CkanIndex(
+                    rest_api_url=ckan_url,
                     api_key=api_key)
         else:
-            if not os.path.exists(self.repository_path):
-                msg = 'ERROR: you need to initialize the repository (run: repo init).'
-                raise Exception(msg)
-            repo = datapkg.repository.Repository(self.repository_path)
-        return repo
-
-    def _register(self, path):
-        import datapkg.package
-        repo = self._get_repo()
-        pkg = datapkg.package.Package.load(path)
-        repo.index.register(pkg)
-        return (repo, pkg)
-
-    def _get_package(self, path_or_name):
-        path_or_name = unicode(path_or_name)
-        import datapkg.package
-        # this is crude
-        is_path = os.path.exists(path_or_name)
-        if is_path:
-            return datapkg.package.Package.load(path_or_name)
-        else:
-            repo = self._get_repo()
-            return repo.index.get(path_or_name)
+            msg = 'Scheme "%s" not recognized' % scheme
+            raise Exception(msg)
+        return index, path
 
     def _print_pkg(self, pkg):
         print u'## Package: %s' % pkg.name
         print
         out = pkg.pretty_print()
         print out
-
 
     def main(self, complete_args, args, initial_options):
         options = initial_options
@@ -283,9 +293,10 @@ class ListCommand(Command):
 List registered packages.
 '''
     def run(self, options, args):
-        repo = self._get_repo()
-        for pkg in repo.index.list():
-            print pkg.name
+        spec_from = args[0]
+        index, path = self.index_from_spec(spec_from)
+        for pkg in index.list():
+            print u'%s -- %s' % (pkg.name, pkg.title)
 
 ListCommand()
 
@@ -294,7 +305,7 @@ class InfoCommand(Command):
     name = 'info'
     summary = 'Get information about a package'
     usage = \
-'''%prog {path-or-pkg-name} [manifest]
+'''%prog {package-spec} [manifest]
 
 Get information about a package (print package metadata). If manifest specified
 then show manifest info rather than package metadata.
@@ -304,10 +315,11 @@ rebuild the egg-info for changes to show up here.
 '''
 
     def run(self, options, args):
-        pkg_locator = args[0]
-        pkg = self._get_package(pkg_locator)
+        spec_from = args[0]
+        index, path = self.index_from_spec(spec_from)
+        pkg = index.get(path)
         if pkg is None:
-            print 'No package was found for: "%s"' % pkg_locator
+            print 'No package was found for: "%s"' % spec_from
             return 1
         if len(args) > 1 and args[1] == 'manifest':
             print '### Manifest\n'
@@ -329,21 +341,15 @@ Dump contents of specified resource in specified package to stdout.
 '''
 
     def run(self, options, args):
-        # assuming no spaces in the paths!
-        pkg_locator = args[0]
+        spec_from = args[0]
+        index, path = self.index_from_spec(spec_from)
+        pkg = index.get(path)
         offset = args[1]
-        pkg = self._get_package(pkg_locator)
         stream = pkg.stream(offset)
         import sys
         sys.stdout.write(stream.read()) 
 
 DumpCommand()
-
-
-# def do_inspect(self, line):
-    # pkg_locator = line.strip()
-    # pkg = self._get_package(pkg_locator)
-    # print pkg.distribution.listdir
 
 
 class InitCommand(Command):
@@ -417,14 +423,18 @@ class RegisterCommand(Command):
     name = 'register'
     summary = 'Register a package'
     usage = \
-'''%prog {path}
+'''%prog {src-spec} {dest-spec}
 
-Register package at path in the local index.
+Register package at {src-spec} into index at {dest-spec}.
 '''
 
     def run(self, options, args):
-        path = args[0]
-        self._register(path)
+        spec_from = args[0]
+        spec_to = args[1]
+        index, path = self.index_from_spec(spec_from)
+        index_to, path_to = self.index_from_spec(spec_to)
+        pkg = index.get(path)
+        index_to.register(pkg)
 
 RegisterCommand()
 
@@ -433,17 +443,18 @@ class UpdateCommand(Command):
     name = 'update'
     summary = 'Update a package'
     usage = \
-'''%prog {path}
+'''%prog {src-spec} {dest-spec}
 
-Update package at path in the local index.
+As for register.
 '''
 
     def run(self, options, args):
-        path = args[0]
-        import datapkg.package
-        repo = self._get_repo()
-        pkg = datapkg.package.Package.load(path)
-        repo.index.update(pkg)
+        spec_from = args[0]
+        spec_to = args[1]
+        index, path = self.index_from_spec(spec_from)
+        index_to, path_to = self.index_from_spec(spec_to)
+        pkg = index.get(path)
+        index_to.update(pkg)
 
 UpdateCommand()
 
@@ -452,20 +463,21 @@ class InstallCommand(Command):
     name = 'install'
     summary = 'Install a package'
     usage = \
-'''%prog {path}
+'''%prog {src-spec} {dest-spec}
 
-Install a package located at path on disk.
+Install a package located {src-spec} to {dest-spec}, e.g.::
+
+    install ckan://name path-on-disk
 '''
 
     def run(self, options, args):
-        pkg_path = args[0]
-        # TODO: check whether it is registered already
-        # TODO: option of installing an existing registered package
-        repo, pkg = self._register(pkg_path)
-        install_dir = repo.installed_path
-        pkg.install(install_dir, pkg_path)
-        # TODO: save package again as e.g. installed path may have changed
-        # This should probably be moved down into package object
+        raise NotImplementedError
+        spec_from = args[0]
+        spec_to = args[1]
+        index, path = self.index_from_spec(spec_from)
+        index_to, path_to = self.index_from_spec(spec_to)
+        pkg = index.get(path)
+        # pkg.install
 
 InstallCommand()
 

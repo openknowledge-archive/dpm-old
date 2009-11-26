@@ -12,7 +12,7 @@ setup(
         'setuptools>=0.6c',
         'PasteDeploy>=1.0',
         'PasteScript>=1.0',
-        'SQLAlchemy>=0.4',
+        # 'SQLAlchemy>=0.4',
         # make ckan support obligatory for time being
         'ckanclient>=0.2',
     ],
