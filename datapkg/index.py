@@ -1,13 +1,9 @@
+import os
 import logging
 import distutils.dist
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 import datapkg.metadata
 from datapkg.package import Package
-from datapkg.db import dbmetadata
-Session = sessionmaker()
 
 logger = logging.getLogger('datapkg.index')
 
@@ -62,16 +58,79 @@ class SimpleIndex(IndexBase):
         self._dict[package.name] = package
 
 
+class FileIndex(IndexBase):
+    '''Index based on files on disk.
+    
+    TODO: Could cache in a SimpleIndex
+
+    ourindex = datapkg.index.SimpleIndex()
+    for root, dirs, files in os.walk(basePath):
+        if 'setup.py' in files or 'metadata.txt' in files:
+            try:
+                pkg = Package.load(root)
+                ourindex.register(pkg)
+            except Exception, inst:
+                logger.warn('Failed to load package at %s because: %s' % (root,
+                    inst))
+    return ourindex
+    '''
+    def __init__(self, path):
+        self.index_path = path
+        # if not os.path.exists(self.index_path):
+        #    os.makedirs(self.index_path)
+
+    def _simple_index(self):
+        ourindex = datapkg.index.SimpleIndex()
+        for root, dirs, files in os.walk(self.index_path):
+            if 'setup.py' in files or 'metadata.txt' in files:
+                try:
+                    pkg = Package.load(root)
+                    ourindex.register(pkg)
+                except Exception, inst:
+                    logger.warn('Failed to load package at %s because: %s' % (root,
+                        inst))
+        return ourindex
+
+    def register(self, package):
+        import datapkg.distribution
+        pkg_path = os.path.join(self.index_path, package.name)
+        package.installed_path = pkg_path
+        dist = datapkg.distribution.IniBasedDistribution(package)
+        # TODO: fix this (this is rubbish that we have to set package installed
+        # path ...)
+        dist.write()
+
+    def get(self, name):
+        path = os.path.join(self.index_path, name)
+        return Package.load(path)
+
+    def has(self, name):
+        return name in os.listdir(self.index_path)
+
+    def list(self):
+        return self._simple_index().list()
+
+    def update(self, package): 
+        # TODO: do something useful (remove existing and re-register?)
+        pass
+
+
 class DbIndex(IndexBase):
     '''Database-based index.
     '''
     def __init__(self, dburi):
+        # import here as we do not want to require sqlalchemy
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
         self.dburi = dburi
         self.engine = create_engine(self.dburi)
+        print self.engine
+        Session = sessionmaker()
         Session.configure(bind=self.engine)
         self.session = Session()
 
     def init(self):
+        from datapkg.db import dbmetadata
         dbmetadata.create_all(bind=self.engine)
 
     # TODO: DEPRECATE or limit number of results

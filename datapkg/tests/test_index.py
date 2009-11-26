@@ -1,10 +1,11 @@
 import os
 import tempfile
 
+import datapkg.tests.base
 import datapkg.index
 import datapkg.package
 
-class TestSimpleIndex(object):
+class TestSimpleIndex(datapkg.tests.base.TestCase):
     def setup(self):
         self.index = datapkg.index.SimpleIndex()
 
@@ -24,6 +25,12 @@ class TestSimpleIndex(object):
         out = self.index.get(pkg_name)
         assert out.name == pkg_name
         
+
+class TestFileIndex(TestSimpleIndex):
+    def setup(self):
+        self.make_tmpdir()
+        self.index = datapkg.index.FileIndex(self.tmpdir)
+
 
 class TestDbIndex(TestSimpleIndex):
     tmpfile = '/tmp/datapkg.db'
