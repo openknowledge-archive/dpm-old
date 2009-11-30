@@ -6,28 +6,6 @@ from sqlalchemy import orm
 # _sqla_version = pkg_resources.parse_version(_sqla_version)
 
 
-import simplejson
-class JsonType(types.TypeDecorator):
-    '''Store data as JSON serializing on save and unserializing on use.
-    '''
-    impl = types.UnicodeText
-
-    def process_bind_param(self, value, engine):
-        if not value:
-            return None
-        else:
-            # ensure_ascii=False => allow unicode but still need to convert
-            return unicode(simplejson.dumps(value, ensure_ascii=False))
-
-    def process_result_value(self, value, engine):
-        if value is None:
-            return None
-        else:
-            return simplejson.loads(value)
-
-    def copy(self):
-        return JsonType(self.impl.length)
-
 # Instantiate meta data manager.
 dbmetadata = MetaData()
 

@@ -12,8 +12,8 @@ V0.4 ????
   * Simple installation onto disk
 
 
-V0.3 ????
-=========
+V0.3 2009-08-25
+===============
 
 This release features major improvements over v0.2 particularly in area of CKAN
 integration with 'write' support especially improved.
