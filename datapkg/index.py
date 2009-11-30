@@ -24,6 +24,10 @@ class IndexBase(object):
         '''Return an iterator over all items in the Index'''
         raise NotImplementedError
 
+    def search(self, query):
+        '''Return an iterator over search results corresponding to query.'''
+        raise NotImplementedError
+
     def update(self, package):
         '''Update `package` in the Index.'''
         raise NotImplementedError
@@ -49,6 +53,12 @@ class SimpleIndex(IndexBase):
 
     def list(self):
         return iter(self._dict.values())
+
+    def search(self, query):
+        '''Search packages names using query string.'''
+        for name in self._dict:
+            if query in name:
+                yield self._dict[name]
 
     def update(self, package): 
         if not package.name in self._dict:
@@ -110,6 +120,10 @@ class FileIndex(IndexBase):
     def list(self):
         return self._simple_index().list()
 
+    def search(self, query):
+        for pkg in self._simple_index().search(query):
+            yield pkg
+
     def update(self, package): 
         # TODO: do something useful (remove existing and re-register?)
         pass
@@ -156,9 +170,9 @@ class DbIndex(IndexBase):
             self.session.update(pkg)
         return pkg
     
-    def search(self, name):
+    def search(self, query):
         q = self.session.query(Package).filter(
-                Package.name.ilike('%' + query + '%')
+                Package.name.ilike(u'%' + query + u'%')
                 )
         q = q.limit(100)
         pkgs = q.all()
@@ -204,6 +218,11 @@ class CkanIndex(IndexBase):
                 self._print("No response data. Check the resource location.")
                 # TODO: convert to CKAN exception
         raise Exception(self.status_info)
+
+    def search(self, query):
+        # TODO: think this automatically limits results to 20 or so
+        for pkg in self.ckan.package_search(query)['results']:
+            yield pkg
 
     def get(self, pkg_name):
         # TODO: convert to return a package object
