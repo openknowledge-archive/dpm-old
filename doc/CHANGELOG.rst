@@ -2,10 +2,21 @@
 History
 =======
 
-v0.3 ????
+V0.4 ????
 =========
 
-This release features major improvements over v0.2 particularly in area of CKAN integration with 'write' support especially improved.
+  * Use 'package specs' in CLI to simplify and standardize operations on
+    packages and indexes
+  * Support for searching indices from CLI, e.g.::
+        datapkg search ckan:// myquery
+  * Simple installation onto disk
+
+
+V0.3 ????
+=========
+
+This release features major improvements over v0.2 particularly in area of CKAN
+integration with 'write' support especially improved.
 
   * Better and more flexible system for reading and writing packages to disk 
 
@@ -16,7 +27,7 @@ This release features major improvements over v0.2 particularly in area of CKAN 
   * Improved approach for configuration with config stored in a dedicated ini
     file and lots of minor fixes to improve CLI experience
   * Create new Index object SimpleIndex
-  * Completely overhaul package metadata with support for man additional
+  * Completely overhaul package metadata with support for many additional
     attribues (author, maintainer, extras etc)
   * Improved, sphinx-built docs (http://knowledgeforge.net/ckan/doc/datapkg/)
 

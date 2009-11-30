@@ -79,6 +79,7 @@ class TestDbIndex(TestSimpleIndex):
         assert out.name == pkg_name
 
 
+# TODO: disable this when not online
 class TestCkanIndex:
     '''Read only test.
     
@@ -93,5 +94,6 @@ class TestCkanIndex:
 
     def test_search(self):
         out = [ x for x in self.index.search('ckan') ]
-        assert len(out) == 3, out
+        assert len(out) >= 3, out
+        assert out[0].name == u'ckan'
 

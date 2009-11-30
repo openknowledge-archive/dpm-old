@@ -288,7 +288,7 @@ class ListCommand(Command):
     name = 'list'
     summary = 'List registered packages'
     usage = \
-'''%prog
+'''%prog {index-spec}
 
 List registered packages.
 '''
@@ -299,6 +299,27 @@ List registered packages.
             print u'%s -- %s' % (pkg.name, pkg.title)
 
 ListCommand()
+
+
+class SearchCommand(Command):
+    name = 'search'
+    summary = 'Search registered packages'
+    usage = \
+'''%prog {index-spec} {query}
+
+Search registered packages in index-spec.
+'''
+    def run(self, options, args):
+        spec_from = args[0]
+        if len(args) > 1:
+            query = args[1]
+        else:
+            query = ''
+        index, path = self.index_from_spec(spec_from)
+        for pkg in index.search(query):
+            print u'%s -- %s' % (pkg.name, pkg.title)
+
+SearchCommand()
 
 
 class InfoCommand(Command):

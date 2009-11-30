@@ -107,6 +107,11 @@ class TestCLI:
         assert not status, output
         assert self.pkg_name in output
 
+        cmd = self.cmd_base + 'search %s %s' % (self.repo_spec, self.pkg_name)
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        assert self.pkg_name in output
+
         # not a particularly good test because we won't change anything
         cmd = self.cmd_base + 'update %s %s' % (self.file_spec, self.repo_spec)
         status, output = datapkg.util.getstatusoutput(cmd)

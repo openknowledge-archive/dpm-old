@@ -221,8 +221,8 @@ class CkanIndex(IndexBase):
 
     def search(self, query):
         # TODO: think this automatically limits results to 20 or so
-        for pkg in self.ckan.package_search(query)['results']:
-            yield pkg
+        for pkg_name in self.ckan.package_search(query)['results']:
+            yield self.get(pkg_name)
 
     def get(self, pkg_name):
         # TODO: convert to return a package object

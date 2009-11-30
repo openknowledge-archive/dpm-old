@@ -10,15 +10,15 @@ Contents:
 Obtaining a Package
 ===================
 
-We're going to list names of Packages on the CKAN server::
+Search for a package in an Index e.g. on CKAN.net::
 
-    $ datapkg list ckan://
-    XX Packages found:
+    $ datapkg search ckan:// windhover
     ...
-    datapkgdemo
+    datapkgdemo -- ...
     ...
 
-Get some information about one of them (our demonstration package on
+Get some information about one of them (in this case our demonstration package
+on
 ckan.net)::
 
     $ datapkg info ckan://datapkgdemo
@@ -37,6 +37,7 @@ Windhover" and the payload for the Package is one file, 'windhover.txt'.  Let's
 extract that file.
 
     $ datapkg dump windhover.txt
+
 
 Creating and Registering a Package
 ==================================
