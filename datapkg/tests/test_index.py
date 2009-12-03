@@ -44,7 +44,7 @@ class TestFileIndex(TestSimpleIndex):
         self.index = datapkg.index.FileIndex(self.tmpdir)
 
 
-class TestDbIndex(TestSimpleIndex):
+class _TestDbIndex(TestSimpleIndex):
     tmpfile = '/tmp/datapkg.db'
     dburi = 'sqlite:///%s' % tmpfile
 

@@ -158,7 +158,7 @@ class Package(object):
 
     def __str__(self):
         repr = 'Package'
-        for key in datapkg.metadata.Metadata.keys:
+        for key in datapkg.metadata.Metadata.key_list:
             repr += ' %s: %s' % (key, getattr(self,key))
         return repr
     
