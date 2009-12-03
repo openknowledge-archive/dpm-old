@@ -28,15 +28,7 @@ ckan.net)::
     $ datapkg install ckan://datapkgdemo .
 
 This will download the Distribution file for Package 'datapkgdemo' and
-'install' it in current directory ('.'). Now let's take a look inside it::
-
-    $ datapkg info datapkgdemo
-
-From the metadata that it is a poem by Gerald Manley Hopkin's called "The
-Windhover" and the payload for the Package is one file, 'windhover.txt'.  Let's
-extract that file.
-
-    $ datapkg dump windhover.txt
+'install' it in current directory ('.').
 
 
 Creating and Registering a Package
