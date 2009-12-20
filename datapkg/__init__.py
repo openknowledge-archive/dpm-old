@@ -1,4 +1,6 @@
-'''datapkg is a tool for easily distributing knowledge and data by using the 'packaging' concept, which is well established in software distribution.
+'''datapkg is a tool for easily distributing knowledge and data by using the
+'packaging' concept, which is well established in software distribution. Full
+documentation can be found at: http://knowledgeforge.net/ckan/doc/datapkg/
 
 Contents:
     1. Quickstart
@@ -165,13 +167,13 @@ location.
 
 Once that is done you register the package on CKAN by doing::
 
-    $ datapkg --ckan register {path}
+    $ datapkg register {path} ckan://
 
 
 3. Installing your package
 --------------------------
 
-You can also install the distribution into your local repository::
+[Disabled] You can also install the distribution into your local repository::
 
     $ datapkg install {path-to-distribution}
 
