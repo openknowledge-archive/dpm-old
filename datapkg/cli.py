@@ -48,12 +48,6 @@ parser.add_option(
     dest='template',
     default='default',
     help='Specify a template to use when creating on disk (default or flat)')
-parser.add_option(
-    '--ckan',
-    dest='ckan',
-    action='store_true',
-    default=False,
-    help='Use CKAN as the repository')
 # TODO: put in defaults for repo and config
 import datapkg.config
 parser.add_option(
@@ -117,6 +111,13 @@ class Command(object):
             # for file netloc is everything up to last name
             netloc = os.path.join(netloc, os.path.dirname(path))
         if scheme == 'ckan':
+            # deal with preceding slashes in ckan://...
+            while path.startswith('/'):
+                path = path[1:]
+            netloc = '/'.join(path.split('/')[:-1])
+            # we have a path but did not put http:// ...
+            if netloc and not netloc.startswith('http'):
+                netloc = 'http://' + netloc
             path = path.split('/')[-1]
         return scheme, netloc, path
 
@@ -140,7 +141,10 @@ class Command(object):
             api_key = self.options.api_key
             if not api_key:
                 api_key = self._config.get('DEFAULT', 'ckan.api_key')
-            ckan_url = self._config.get('DEFAULT', 'ckan.url')
+            if netloc:
+                ckan_url = netloc
+            else:
+                ckan_url = self._config.get('DEFAULT', 'ckan.url')
             index = datapkg.index.CkanIndex(
                     rest_api_url=ckan_url,
                     api_key=api_key)
@@ -167,8 +171,6 @@ class Command(object):
         self._config = datapkg.config.get_config(options.config)
         if not self.repository_path:
             self.repository_path = self._config.get('DEFAULT', 'repo.default_path')
-        if self.options.ckan:
-            self.repository_path = self._config.get('DEFAULT', 'ckan.url')
         
 
         # TODO: fix up logger
@@ -492,12 +494,23 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
 '''
 
     def run(self, options, args):
-        raise NotImplementedError
         spec_from = args[0]
         spec_to = args[1]
         index, path = self.index_from_spec(spec_from)
         index_to, path_to = self.index_from_spec(spec_to)
         pkg = index.get(path)
+        if not isinstance(index_to, datapkg.index.FileIndex):
+            msg = u'You can only install to the local filesystem'
+            raise Exception(msg)
+        if pkg.installed_path: # on local filesystem ...
+            import shutil
+            dest = os.path.join(path_to, pkg.name)
+            shutil.copytree(pkg.installed_path, dest)
+        elif pkg.download_url:
+            pass
+        else:
+            msg = u'Cannot install from package %s (relevant info not present)' % pkg.name
+            raise Exception(msg)
         # pkg.install
 
 InstallCommand()

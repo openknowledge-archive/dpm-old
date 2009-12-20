@@ -13,7 +13,9 @@ class TestCLI:
     def setup_class(self):
         self.tmp_base = tempfile.gettempdir()
         self.tmpdir = os.path.join(self.tmp_base, 'datapkg-test-cli')
-        self.repo_path = os.path.join(self.tmpdir, '.datapkg')
+        self.index_path = os.path.join(self.tmpdir, '.datapkg-index')
+        self.repo_path = os.path.join(self.tmpdir, '.datapkg-repo')
+        self.index_spec = 'file://%s' % self.repo_path
         self.repo_spec = 'file://%s' % self.repo_path
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
@@ -47,7 +49,7 @@ class TestCLI:
         assert scheme == 'file'
         assert path == '.', path
 
-        scheme, netloc, path = datapkg.cli.Command.parse_spec(self.repo_spec)
+        scheme, netloc, path = datapkg.cli.Command.parse_spec(self.index_spec)
         assert scheme == 'file', (scheme,netloc,path)
         assert path == self.repo_path
 
@@ -61,6 +63,12 @@ class TestCLI:
 
         scheme, netloc, path = datapkg.cli.Command.parse_spec('ckan://datapkgdemo')
         assert scheme == 'ckan', scheme
+        assert netloc == '', netloc 
+        assert path == 'datapkgdemo', path
+
+        scheme, netloc, path = datapkg.cli.Command.parse_spec('ckan://test.ckan.net/api/datapkgdemo')
+        assert scheme == 'ckan', scheme
+        assert netloc == 'http://test.ckan.net/api', netloc
         assert path == 'datapkgdemo', path
 
     def test_3_index_from_spec(self):
@@ -86,9 +94,9 @@ class TestCLI:
         # cmd = self.cmd_base + 'init repo'
         # status, output = datapkg.util.getstatusoutput(cmd)
         # assert not status, output
-        # assert os.path.exists(self.repo_spec)
+        # assert os.path.exists(self.index_spec)
 
-        cmd = self.cmd_base + 'list %s' % (self.repo_spec)
+        cmd = self.cmd_base + 'list %s' % (self.index_spec)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert not self.pkg_name in output
@@ -98,35 +106,36 @@ class TestCLI:
 
         # register
         cmd = self.cmd_base + 'register %s %s' % (self.file_spec,
-                self.repo_spec)
+                self.index_spec)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
 
-        cmd = self.cmd_base + 'list %s' % (self.repo_spec)
+        cmd = self.cmd_base + 'list %s' % (self.index_spec)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert self.pkg_name in output
 
-        cmd = self.cmd_base + 'search %s %s' % (self.repo_spec, self.pkg_name)
+        cmd = self.cmd_base + 'search %s %s' % (self.index_spec, self.pkg_name)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert self.pkg_name in output
 
         # not a particularly good test because we won't change anything
-        cmd = self.cmd_base + 'update %s %s' % (self.file_spec, self.repo_spec)
+        cmd = self.cmd_base + 'update %s %s' % (self.file_spec, self.index_spec)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
 
         # install
         cmd = self.cmd_base + 'install %s %s' % (self.file_spec,
                 self.repo_spec)
-        # TODO: reinstate
-        # status, output = datapkg.util.getstatusoutput(cmd)
-        # assert not status, output
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
         # dest path with be self.pkg_name-version-*
         # dirs = os.listdir(repo.installed_path)
         # filtered = filter(lambda x: x.startswith(self.pkg_name), dirs)
         # assert len(filtered) > 0, dirs
+        dest_path = os.path.join(self.repo_path, self.pkg_name)
+        assert os.path.exists(dest_path), dest_path
 
         # info
         # A: from self.pkg_name
@@ -187,4 +196,19 @@ class TestCLI:
         registercmd = ckanbase + 'update %s' % self.pkg_path
         status, output = datapkg.util.getstatusoutput(registercmd)
         assert not status, output
+
+    def _test_6_ckan_readonly(self):
+        # this depends on datapkgdemo existing on ckan.net 
+        localckan = 'http://ckan.net/api'
+        ckanspec = 'ckan://%s' % localckan
+        ckanbase = 'datapkg '
+
+        pkgname = u'datapkgdemo'
+        # install
+        cmd = ckanbase + 'install %s/%s %s' % (ckanspec, pkgname,
+            self.repo_spec)
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        dest_path = os.path.join(self.repo_path, pkgname)
+        assert os.path.exists(dest_path)
 
