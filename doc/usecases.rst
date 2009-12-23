@@ -11,11 +11,16 @@ Consumer user role
      $ datapkg get [url|name] [path]
 
    If specifying name (using a Registry) then:
+
      * get metadata from registry
      * locate the distribution URL
-   * Discover at URL: targz/zip file, version controlled repo, URL page with links (ask user which one)
-   * download the compressed distribution to temp dir (progress bar)
-   * unpack it to destination path
+
+   Basic steps:
+
+     * Discover at URL: targz/zip file, version controlled repo, URL page with links (ask user which one)
+     * download the compressed distribution to temp dir (progress bar)
+     * unpack it to destination path
+
    Future: maybe need to build/compile data
 
  4. Explore package

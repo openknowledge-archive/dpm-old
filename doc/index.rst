@@ -31,6 +31,12 @@ For developers we recommend starting with the design overview:
 .. toctree::
 
    design
+
+There are also a set of use cases and details of the API.
+
+.. toctree::
+
+   usecases
    api
 
 Other material
@@ -38,9 +44,10 @@ Other material
 
 .. toctree::
 
-   install.rst
-   license.rst
-   CHANGELOG.rst
+   install
+   license
+   CHANGELOG
+   external
 
 Indices and tables
 ==================

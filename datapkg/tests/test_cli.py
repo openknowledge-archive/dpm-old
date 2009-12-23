@@ -197,18 +197,21 @@ class TestCLI:
         status, output = datapkg.util.getstatusoutput(registercmd)
         assert not status, output
 
-    def _test_6_ckan_readonly(self):
+    # requires external access
+    def test_6_ckan_readonly(self):
         # this depends on datapkgdemo existing on ckan.net 
         localckan = 'http://ckan.net/api'
         ckanspec = 'ckan://%s' % localckan
         ckanbase = 'datapkg '
 
-        pkgname = u'datapkgdemo'
+        pkg_name = u'datapkgdemo'
+        pkg_version = '0.1'
+        fullname = '%s-%s' % (pkg_name, pkg_version)
         # install
-        cmd = ckanbase + 'install %s/%s %s' % (ckanspec, pkgname,
+        cmd = ckanbase + 'install %s/%s %s' % (ckanspec, pkg_name,
             self.repo_spec)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
-        dest_path = os.path.join(self.repo_path, pkgname)
-        assert os.path.exists(dest_path)
+        dest_path = os.path.join(self.repo_path, fullname)
+        assert os.path.exists(dest_path), dest_path
 

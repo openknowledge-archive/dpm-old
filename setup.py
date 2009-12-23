@@ -15,6 +15,7 @@ setup(
         # 'SQLAlchemy>=0.4',
         # make ckan support obligatory for time being
         'ckanclient>=0.2',
+        'pip>=0.6',
     ],
     entry_points='''
     [paste.paster_create_template]

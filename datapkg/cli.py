@@ -499,6 +499,8 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
         index, path = self.index_from_spec(spec_from)
         index_to, path_to = self.index_from_spec(spec_to)
         pkg = index.get(path)
+        # TODO: have to reimport here for this to work. Why?
+        import datapkg.index
         if not isinstance(index_to, datapkg.index.FileIndex):
             msg = u'You can only install to the local filesystem'
             raise Exception(msg)
@@ -507,7 +509,9 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
             dest = os.path.join(path_to, pkg.name)
             shutil.copytree(pkg.installed_path, dest)
         elif pkg.download_url:
-            pass
+            import datapkg.util
+            downloader = datapkg.util.Downloader(path_to)
+            downloader.download(pkg.download_url)
         else:
             msg = u'Cannot install from package %s (relevant info not present)' % pkg.name
             raise Exception(msg)
