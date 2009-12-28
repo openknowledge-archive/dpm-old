@@ -6,6 +6,9 @@ Contents:
     1. Quickstart
     2. Tutorial
 
+NB: in what follows items prefixed with $ should be run on the command line.
+
+
 1. Quickstart
 +++++++++++++
 
@@ -25,12 +28,12 @@ ckan.net)::
 
     $ datapkg info ckan://datapkgdemo
 
-[Not Functional] Let's install one of them::
+Let's install one of them (to the current directory)::
 
     $ datapkg install ckan://datapkgdemo .
 
 This will download the Distribution file for Package 'datapkgdemo' and
-'install' it in current directory ('.').
+unpack it in the current directory '.'.
 
 
 Creating and Registering a Package
@@ -61,7 +64,7 @@ Check it has registered ok::
 
     $ datapkg info ckan://mynewdatapkg
 
-[TODO]: uploading package distributions.
+[Not Yet Functional]: uploading package distributions.
 
 
 2. Tutorial
@@ -71,8 +74,6 @@ datapkg has two distinct uses:
 
     1. Finding and obtaining data made available *by* others.
     2. Making material available *to* others.
-
-NB: in what follows items prefixed with $ should be run on the command line.
 
 
 Basic Concepts
@@ -173,9 +174,9 @@ Once that is done you register the package on CKAN by doing::
 3. Installing your package
 --------------------------
 
-[Disabled] You can also install the distribution into your local repository::
+You can also install a distribution::
 
-    $ datapkg install {path-to-distribution}
+    $ datapkg install {package-spec} {file-spec}
 
 
 3. For Developers
@@ -184,7 +185,7 @@ Once that is done you register the package on CKAN by doing::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.4a'
+__version__ = '0.4'
 __description__ = 'Data packaging system and utilities.'
 __description_long__ = __doc__
 __license__ = 'MIT'
@@ -214,19 +215,6 @@ SOFTWARE.
 
 import os
 
-# TODO: 2009-03-09 Remove this.
-# def install(name):
-#     from manager import PackageManager
-#     mgr = PackageManager()
-#     mgr.install(name)
-# 
-# def upload(path='.'):
-#     fns = os.listdir('.')
-#     if 'setup.py' not in fns:
-#         msg = '%s does not look like a data package (no setup.py ...)' % path
-#         raise Exception(msg)
-#     # TODO: implement the rest of this
-    
-
 class DatapkgException(Exception):
     pass
+
