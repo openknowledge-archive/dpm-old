@@ -2,14 +2,18 @@
 History
 =======
 
-V0.4 ????
-=========
+HEAD
+====
 
-  * Use 'package specs' in CLI to simplify and standardize operations on
-    packages and indexes
+
+V0.4 2009-12-28
+===============
+
+  * Major refactoring to simplify and standardize CLI using 'package specs'
   * Support for searching indices from CLI, e.g.::
         datapkg search ckan:// myquery
   * Simple installation onto disk
+  * Overhauled and improved documentation and put docs online
 
 
 V0.3 2009-08-25
