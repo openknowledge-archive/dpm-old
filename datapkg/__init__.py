@@ -185,7 +185,7 @@ You can also install a distribution::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.4'
+__version__ = '0.4.1'
 __description__ = 'Data packaging system and utilities.'
 __description_long__ = __doc__
 __license__ = 'MIT'

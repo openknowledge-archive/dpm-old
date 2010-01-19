@@ -6,6 +6,17 @@ from datapkg import __version__, __license__, __description__, __description_lon
 setup(
     name='datapkg',
     version=__version__,
+    # metadata
+    author='Open Knowledge Foundation',
+    author_email='info@okfn.org',
+    license=__license__,
+    description=__description__,
+    long_description=__description_long__,
+    keywords='data, packaging, component, tool',
+    url='http://www.okfn.org/datapkg',
+    classifiers=[
+    ],
+
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
@@ -15,7 +26,7 @@ setup(
         # 'SQLAlchemy>=0.4',
         # make ckan support obligatory for time being
         'ckanclient>=0.2',
-        'pip>=0.6',
+        'pip>=0.6,<=0.6.1',
     ],
     entry_points='''
     [paste.paster_create_template]
@@ -25,16 +36,6 @@ setup(
     [console_scripts]
     datapkg=datapkg.cli:main
     ''',
-
-    # metadata
-    author='Open Knowledge Foundation, Appropriate Software Foundation',
-    author_email='info@okfn.org',
-    license=__license__,
-    description=__description__,
-    long_description=__description_long__,
-    keywords='data packaging component tool',
     test_suite='nose.collector',
-    url='http://www.okfn.org/datapkg',
-    classifiers=[
-    ],
+    zip_safe=False,
 )
