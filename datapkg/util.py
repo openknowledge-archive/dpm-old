@@ -66,7 +66,9 @@ class Downloader(object):
             location = os.path.join(self.base_dir, filename)
         else:
             location = dest
+
         only_download = not unpack
+        print location
         try:
             self.reqset.unpack_url(link, location, only_download)
         except urllib2.HTTPError, e:
@@ -75,4 +77,22 @@ class Downloader(object):
             raise Exception(
                 'Could not download %s because of HTTP error %s for URL %s'
                 % (url, e, url))
+        # pip does not handle unpacking anything other than zip and tgz
+        # and raise an error if you give it e.g. an xls
+        # something of a hack as we need to check Exception message
+        except pip.InstallationError, e:
+            if str(e).startswith('Cannot determine archive format of'):
+                # try again with unpack off
+                # v. inefficient but hope it will reuse the cache ...
+                if link.url.lower().startswith('file:'): # pip always unpacks file:///!
+                    # content_type not used by this method
+                    src = pip.url_to_filename(link.url)
+                    if not os.path.exists(location):
+                        os.makedirs(location)
+                    self.reqset.copy_file(src, location, content_type=None,
+                            link=link)
+                else:
+                    self.reqset.unpack_url(link, location, only_download=True)
+            else:
+                raise
 

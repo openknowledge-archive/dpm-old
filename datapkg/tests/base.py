@@ -7,7 +7,7 @@ class TestCase(object):
 
     @classmethod
     def set_tmpdir(self):
-        name = self.__module__ + '-' + self.__class__.__name__
+        name = self.__module__ + '-' + self.__name__.lower()
         name = name.replace('.', '-')
         self.tmpdir = os.path.join(self.system_tmpdir, name)
 
