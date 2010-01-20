@@ -4,3 +4,4 @@ datapkg.egg-info/*
 sandbox/*
 TODO.txt
 build/*
+dist/*
