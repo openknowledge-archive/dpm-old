@@ -5,6 +5,13 @@ History
 HEAD
 ====
 
+  * Greatly improve downloading of package resources
+
+V0.4.1 2010-01-19
+=================
+
+  * Restrict to pip<=0.6.1 (just released pip 0.6.2 has major code re-layout
+    which causes breakages)
 
 V0.4 2009-12-28
 ===============
