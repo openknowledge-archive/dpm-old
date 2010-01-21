@@ -15,7 +15,7 @@ logger = logging.getLogger('datapkg.cli')
 logging.basicConfig()
 
 import datapkg
-import datapkg.index
+import datapkg.spec
 
 parser = optparse.OptionParser(
     usage='''%prog COMMAND [OPTIONS]
@@ -91,67 +91,13 @@ class Command(object):
         options.quiet += initial_options.quiet
         options.verbose += initial_options.verbose
 
+    def index_from_spec(self, spec_str):
+        spec = datapkg.spec.Spec.parse_spec(spec_str)
+        return spec.index_from_spec(config=self._config)
+
     def _print(self, msg, force=False):
         if self.level >= 1 or force:
             print(msg)
-
-    @classmethod
-    def parse_spec(self, spec=None):
-        '''
-        @params spec: if None default to file://
-        '''
-        import urlparse
-        if spec is None:
-            spec = 'file://'
-        scheme, netloc, path, query, fragment = urlparse.urlsplit(spec)
-        # case where we just provide a path ...
-        if scheme == '':
-            scheme = 'file'
-        if scheme == 'file':
-            # for file netloc is everything up to last name
-            netloc = os.path.join(netloc, os.path.dirname(path))
-        if scheme == 'ckan':
-            # deal with preceding slashes in ckan://...
-            while path.startswith('/'):
-                path = path[1:]
-            netloc = '/'.join(path.split('/')[:-1])
-            # we have a path but did not put http:// ...
-            if netloc and not netloc.startswith('http'):
-                netloc = 'http://' + netloc
-            path = path.split('/')[-1]
-        return scheme, netloc, path
-
-    def index_from_spec(self, spec=None):
-        '''Load an `Index` from a spec.
-
-        @return: `Index` and path
-
-        schemes = [
-            'file',
-            'ckan',
-            'db',
-            ]
-        '''
-        scheme, netloc, path = self.parse_spec(spec)
-        if scheme == 'file':
-            # for file netloc is everything up to last name
-            netloc = os.path.join(netloc, os.path.dirname(path))
-            index = datapkg.index.FileIndex(netloc)
-        elif scheme == 'ckan':
-            api_key = self.options.api_key
-            if not api_key:
-                api_key = self._config.get('DEFAULT', 'ckan.api_key')
-            if netloc:
-                ckan_url = netloc
-            else:
-                ckan_url = self._config.get('DEFAULT', 'ckan.url')
-            index = datapkg.index.CkanIndex(
-                    rest_api_url=ckan_url,
-                    api_key=api_key)
-        else:
-            msg = 'Scheme "%s" not recognized' % scheme
-            raise Exception(msg)
-        return index, path
 
     def _print_pkg(self, pkg):
         print u'## Package: %s' % pkg.name
@@ -169,6 +115,8 @@ class Command(object):
         self.verbose = options.verbose
         import datapkg.config
         self._config = datapkg.config.get_config(options.config)
+        if options.api_key:
+            self._config.set('DEFAULT', 'ckan.api_key', self.options.api_key)
         if not self.repository_path:
             self.repository_path = self._config.get('DEFAULT', 'repo.default_path')
         

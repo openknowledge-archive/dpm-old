@@ -40,45 +40,6 @@ class TestCLI:
         exp = 'datapkg version'
         assert exp in output
 
-    def test_2_parse_spec(self):
-        scheme, netloc, path = datapkg.cli.Command.parse_spec()
-        assert scheme == 'file'
-        assert path == netloc == ''
-
-        scheme, netloc, path = datapkg.cli.Command.parse_spec('.')
-        assert scheme == 'file'
-        assert path == '.', path
-
-        scheme, netloc, path = datapkg.cli.Command.parse_spec(self.index_spec)
-        assert scheme == 'file', (scheme,netloc,path)
-        assert path == self.repo_path
-
-        scheme, netloc, path = datapkg.cli.Command.parse_spec(self.repo_path)
-        assert scheme == 'file', (scheme,netloc,path)
-        assert path == self.repo_path
-
-        scheme, netloc, path = datapkg.cli.Command.parse_spec('ckan:datapkgdemo')
-        assert scheme == 'ckan', scheme
-        assert path == 'datapkgdemo', path
-
-        scheme, netloc, path = datapkg.cli.Command.parse_spec('ckan://datapkgdemo')
-        assert scheme == 'ckan', scheme
-        assert netloc == '', netloc 
-        assert path == 'datapkgdemo', path
-
-        scheme, netloc, path = datapkg.cli.Command.parse_spec('ckan://test.ckan.net/api/datapkgdemo')
-        assert scheme == 'ckan', scheme
-        assert netloc == 'http://test.ckan.net/api', netloc
-        assert path == 'datapkgdemo', path
-
-    def test_3_index_from_spec(self):
-        import datapkg.index
-        index, path = datapkg.cli.RegisterCommand().index_from_spec(self.file_spec)
-        assert isinstance(index, datapkg.index.FileIndex)
-
-        index, path = datapkg.cli.RegisterCommand().index_from_spec('.')
-        assert isinstance(index, datapkg.index.FileIndex)
-
     def _test_create(self):
         cmd = self.cmd_base + 'create %s' % self.pkg_path
         status, output = datapkg.util.getstatusoutput(cmd)
