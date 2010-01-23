@@ -7,7 +7,7 @@ from datapkg.package import Package
 import datapkg.util
 import datapkg.metadata as M
 
-default_distribution_name = 'datapkg.distribution:PythonDistribution'
+default_distribution_name = 'datapkg.distribution:IniBasedDistribution'
 
 def default_distribution():
     import datapkg.distribution
@@ -41,8 +41,8 @@ class DistributionBase(object):
     def __init__(self, package=None):
         self.package = package
 
-    def write(self, **kwargs):
-        '''Write this distribution to disk at self.package.installed_path.
+    def write(self, path, **kwargs):
+        '''Write this distribution to disk at `path`.
         '''
         raise NotImplementedError
 
@@ -60,19 +60,18 @@ class DistributionBase(object):
         raise NotImplementedError
 
 
-
 class PythonDistribution(DistributionBase):
 
     # TODO: write should write out package metadata ...
-    def write(self, template='default'):
-        '''Write this distribution to disk at self.package.installed_path.
+    def write(self, path, template='default'):
+        '''See parent.
 
-        TODO: write out the metadata ...
+        @param template: paster template to use
         '''
         # TODO: import PasteScript direct and use
         # use no-interactive to avoid querying on vars
         cmd = 'paster create --no-interactive --template=datapkg-%s ' % template
-        base_path, xxx = Package.info_from_path(self.package.installed_path)
+        base_path, xxx = Package.info_from_path(path)
         if base_path:
             cmd += '--output-dir %s ' % base_path
         cmd += self.package.name
@@ -201,11 +200,12 @@ class IniBasedDistribution(DistributionBase):
                 pkg.manifest[fn] = None
         return self(pkg)
 
-    def write(self):
-        destpath = self.package.installed_path
-        if not os.path.exists(destpath):
-            os.makedirs(destpath)
-        meta_path = os.path.join(destpath, 'metadata.txt')
+    def write(self, path, **kwargs):
+        '''See parent.
+        '''
+        if not os.path.exists(path):
+            os.makedirs(path)
+        meta_path = os.path.join(path, 'metadata.txt')
         cfp = ConfigParser.SafeConfigParser(self.package.metadata)
         for filepath, metadata in self.package.manifest.items():
             section = self.manifest_prefix + filepath
@@ -219,3 +219,7 @@ class IniBasedDistribution(DistributionBase):
         cfp.write(fo)
         fo.close()
  
+    def stream(self, path):
+        full_path = os.path.join(self.package.installed_path, path)
+        return open(full_path)
+

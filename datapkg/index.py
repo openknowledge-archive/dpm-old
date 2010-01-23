@@ -104,11 +104,8 @@ class FileIndex(IndexBase):
     def register(self, package):
         import datapkg.distribution
         pkg_path = os.path.join(self.index_path, package.name)
-        package.installed_path = pkg_path
         dist = datapkg.distribution.IniBasedDistribution(package)
-        # TODO: fix this (this is rubbish that we have to set package installed
-        # path ...)
-        dist.write()
+        dist.write(pkg_path)
 
     def get(self, name):
         path = os.path.join(self.index_path, name)

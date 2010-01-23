@@ -445,25 +445,37 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
         spec_from = args[0]
         spec_to = args[1]
         index, path = self.index_from_spec(spec_from)
-        index_to, path_to = self.index_from_spec(spec_to)
+        index_to, index_to_path = self.index_from_spec(spec_to)
         pkg = index.get(path)
         # TODO: have to reimport here for this to work. Why?
         import datapkg.index
         if not isinstance(index_to, datapkg.index.FileIndex):
             msg = u'You can only install to the local filesystem'
             raise Exception(msg)
-        if pkg.installed_path: # on local filesystem ...
-            import shutil
-            dest = os.path.join(path_to, pkg.name)
-            shutil.copytree(pkg.installed_path, dest)
-        elif pkg.download_url:
+        # This is a mess and needs to be sorted out
+        # Need to distinguish Distribution from a simple Package and much else
+
+        # TODO: decide what to do with stuff on local filesystem
+        # if pkg.installed_path: # on local filesystem ...
+        #     import shutil
+        #     dest = os.path.join(path_to, pkg.name)
+        #     shutil.copytree(pkg.installed_path, dest)
+
+        # go through normal process (may just be metadata right ... not a dist)
+        install_path = os.path.join(index_to_path, pkg.name)
+        if pkg.download_url:
+            # we can assume for present that this is not a real 'package' and
+            # therefore first register package on disk
+            pkg.create_on_disk(install_path)
+
             import datapkg.util
-            downloader = datapkg.util.Downloader(path_to)
+            downloader = datapkg.util.Downloader(install_path)
             downloader.download(pkg.download_url)
         else:
-            msg = u'Cannot install from package %s (relevant info not present)' % pkg.name
-            raise Exception(msg)
-        # pkg.install
+            pkg.create_on_disk(install_path)
+            msg = u'Warning: no resources to install for package %s (no download url)' % pkg.name
+            logger.warn(msg)
+            print msg
 
 InstallCommand()
 

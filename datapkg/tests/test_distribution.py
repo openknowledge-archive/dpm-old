@@ -15,10 +15,10 @@ class TestPythonDistribution(TestCase):
     # do not include in setUp as uses write which we need to test
     def _mock_pkg(self):
         create_dir = os.path.join(self.tmpdir, 'install-test')
-        self.pkg.installed_path = os.path.join(create_dir, self.pkg_name)
+        dest_path = os.path.join(create_dir, self.pkg_name)
         dist = PythonDistribution(self.pkg)
         self.dist = PythonDistribution(self.pkg)
-        self.dist.write()
+        self.dist.write(dest_path)
         pkg_source_path = os.path.join(create_dir, self.pkg.name)
         pkg_pkgs_path = os.path.join(pkg_source_path, self.pkg.name)
         text_fp = os.path.join(pkg_pkgs_path, 'abc.txt')
@@ -35,9 +35,10 @@ class TestPythonDistribution(TestCase):
 
     def test_write(self):
         create_dir = os.path.join(self.tmpdir, 'create-test')
-        self.pkg.installed_path = os.path.join(create_dir, self.pkg_name)
+        dest_path = os.path.join(create_dir, self.pkg_name)
+        print dest_path
         dist = PythonDistribution(self.pkg)
-        dist.write()
+        dist.write(dest_path)
         dest = os.path.join(create_dir, self.pkg.name)
         setuppy = os.path.join(dest, 'setup.py')
         assert os.path.exists(setuppy), setuppy
@@ -151,10 +152,10 @@ title: my graph
     def test_write(self):
         name = 'abc'
         destpath = os.path.join(self.tmpDir, name)
-        pkg = Package(name='abc', installed_path=destpath)
+        pkg = Package(name='abc')
         pkg.manifest['data.csv'] = None
         dist = IniBasedDistribution(pkg)
-        dist.write()
+        dist.write(destpath)
         metapath = os.path.join(destpath, 'metadata.txt')
         assert os.path.exists(destpath)
         assert os.path.exists(metapath)

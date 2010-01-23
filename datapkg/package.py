@@ -131,7 +131,7 @@ class Package(object):
         return dir, name
 
     @classmethod
-    def create_on_disk(self, path, *args, **kwargs):
+    def create_on_disk(self, path, **kwargs):
         '''Helper method to create distribution at path.
 
         Assumes path gives both package name (last part of path) and path to
@@ -144,7 +144,7 @@ class Package(object):
         dir, name = self.info_from_path(path)
         pkg = Package(name=name)
         pkg.installed_path = path
-        pkg.dist.write(*args, **kwargs)
+        pkg.dist.write(path, **kwargs)
         return pkg
 
     @classmethod

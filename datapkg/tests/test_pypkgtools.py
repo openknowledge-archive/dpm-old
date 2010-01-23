@@ -4,6 +4,7 @@ import shutil
 from datapkg.tests.base import TestCase
 import datapkg.pypkgtools
 from datapkg.package import Package
+import datapkg.distribution
 
 
 class TestDistributionOnDisk(TestCase):
@@ -16,7 +17,9 @@ class TestDistributionOnDisk(TestCase):
         import datapkg.package
         self.pkgname = 'xxxyyy'
         self.srcdir = os.path.join(self.tmpdir, self.pkgname)
-        self.pkg = Package.create_on_disk(self.srcdir)
+        self.pkg = Package(name=self.pkgname)
+        self.dist = datapkg.distribution.PythonDistribution(self.pkg)
+        self.dist.write(self.srcdir)
         self.offset = os.path.join(self.pkgname, 'info.txt')
         pkg_pkg_path = os.path.join(self.srcdir, self.offset)
         f = open(pkg_pkg_path, 'w')
@@ -27,7 +30,7 @@ class TestDistributionOnDisk(TestCase):
         shutil.copytree(self.srcdir, self.rawsrcdir)
         # behind the scenes this is actually using distribution which could
         # create some circularity
-        self.pkg.install(self.tmpdir, self.srcdir)
+        self.dist.install(self.tmpdir, self.srcdir)
         self.installed_pkg_path = self.pkg.installed_path
 
     def test_egg_unpacked(self):

@@ -23,7 +23,6 @@ class TestCLI:
         self.cwd = os.getcwd()
         self.cmd_base = 'datapkg '
 
-        # from beginning to end ...
         self.pkg_name = u'mytestpkg'
         self.pkg_path = os.path.join(self.tmpdir, self.pkg_name)
         self.file_spec = u'file://%s' % self.pkg_path
@@ -45,7 +44,7 @@ class TestCLI:
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert os.path.exists(self.pkg_path)
-        fp = os.path.join(self.pkg_path, self.pkg_name, 'abc.txt')
+        fp = os.path.join(self.pkg_path, 'abc.txt')
         fo = open(fp, 'w')
         fo.write('Ideas are cheap, implementation is costly.')
         fo.close()
