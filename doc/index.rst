@@ -13,38 +13,46 @@ By putting data in a package, it gets labelled with standardized metadata and
 can be put in a datapkg repository, such as CKAN or a local one. Once in such
 a repository, the packages are easy to find and retrieve.
 
-Users
-=====
+Installation
+============
 
-We recommend users get started by taking a look at the manual (if you haven't
-installed datapkg yet see the installation instructions below):
+.. toctree::
+
+   install
+
+Getting Started: Users
+======================
+
+We recommend users get started by taking a look at the manual:
 
 .. toctree::
 
    manual
 
-Developers
-==========
+Getting Started: Developers
+===========================
 
-For developers we recommend starting with the design overview:
+Source mercurial repository can be found at:
+http://knowledgeforge.net/ckan/datapkg
+
+For developers we recommend starting with the design document:
 
 .. toctree::
 
    design
 
-There are also a set of use cases and details of the API.
+There are also a set of use cases and research on other similar tools:
 
 .. toctree::
 
    usecases
-   api
+   research
 
 Other material
 ==============
 
 .. toctree::
 
-   install
    license
    CHANGELOG
    external
