@@ -20,79 +20,125 @@ def getstatusoutput(cmd):
         return commands.getstatusoutput(cmd)
 
 
-import urllib2
-import sys
-import pip
-complete_log = []
-pip.logger = pip.Logger([(pip.Logger.NOTIFY, sys.stdout),
-                     (pip.Logger.DEBUG, complete_log.append)])
-
+import urlgrabber
+import urlgrabber.progress
+import posixpath
+import zipfile
 class Downloader(object):
     '''Handling downloading (and unnpacking) of resources.
-
-    Do not just handle normal urls but also version control systems (e.g. hg,
-    svn, git).
-
-    Much of our functionality is obtained by wrapping the pip
-    (http://pypi.python.org/pypi/pip). More information on pip can be found in
-    the docs (doc/external.rst).
     '''
 
-    def __init__(self,  base_dir):
+    def __init__(self,  base_dir='.', **kwargs):
         '''
-        @param base_dir: base directory to use for downloading material as
-        necessary (e.g. when ``dest`` not specified in ``download``.
+        @param base_dir: default base directory to use for downloading
+        material.
         '''
-        self.base_dir = base_dir
+        self.base_dir = os.path.abspath(os.path.expanduser(base_dir))
         self.cache_dir = os.path.join(self.base_dir, '.download_cache')
         # makes self.base_dir too ...
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
-        self.reqset = pip.RequirementSet(build_dir=None, src_dir=None,
-                download_dir=self.base_dir, download_cache=self.cache_dir)
 
-    def download(self, url, dest=None, unpack=True):
-        '''Download a 'resource' (normal file, vcs repo etc) at url to dest.
+    def download(self, url, dest=None, **kwargs):
+        '''Download a 'resource' at url to dest.
 
-        @param dest: destination to download to -- if None save to
-        self.base_dir/{url-file-name}.
+        @param dest: if dest is None download to self.base_dir.
+        @param kwargs: as for urlgrabber.urlgrab
+        @return: path to downloaded file
 
-        Warning if unpack=True then dest is ignored and file is always unpacked
-        to self.base_dir
+        Notes: by default a progress meter is provided. To disable this pass
+        progress_obj=None as a kwarg.
+
+        TODO: support vcs backend (e.g. svn, hg etc)
         '''
-        link = pip.Link(url)
-        if dest is None:
-            filename = link.splitext()[0]
+        ourkwargs = {
+            'progress_obj': urlgrabber.progress.TextMeter()
+            }
+        ourkwargs.update(kwargs)
+        location = dest
+        if location is None:
+            link = Link(url)
+            filename = link.filename
             location = os.path.join(self.base_dir, filename)
-        else:
-            location = dest
-
-        only_download = not unpack
-        print location
+        filename = urlgrabber.urlgrab(url, location, **ourkwargs)
+        return filename
+    
+    def unpack_file(self, src, dest):
+        # if a zip, targz etc then unpack o/w leave it
+        if (filename.endswith('.zip')
+            or zipfile.is_zipfile(filename)):
+            self.unzip_file(filename, location, flatten=not filename.endswith('.pybundle'))
+        
+    # from pip
+    def unzip_file(self, filename, location, flatten=True):
+        """Unzip the file (zip file located at filename) to the destination
+        location"""
+        if not os.path.exists(location):
+            os.makedirs(location)
+        zipfp = open(filename, 'rb')
         try:
-            self.reqset.unpack_url(link, location, only_download)
-        except urllib2.HTTPError, e:
-            logger.fatal('Could not download %s because of error %s'
-                         % (url, e))
-            raise Exception(
-                'Could not download %s because of HTTP error %s for URL %s'
-                % (url, e, url))
-        # pip does not handle unpacking anything other than zip and tgz
-        # and raise an error if you give it e.g. an xls
-        # something of a hack as we need to check Exception message
-        except pip.InstallationError, e:
-            if str(e).startswith('Cannot determine archive format of'):
-                # try again with unpack off
-                # v. inefficient but hope it will reuse the cache ...
-                if link.url.lower().startswith('file:'): # pip always unpacks file:///!
-                    # content_type not used by this method
-                    src = pip.url_to_filename(link.url)
-                    if not os.path.exists(location):
-                        os.makedirs(location)
-                    self.reqset.copy_file(src, location, content_type=None,
-                            link=link)
+            zip = zipfile.ZipFile(zipfp)
+            leading = has_leading_dir(zip.namelist()) and flatten
+            for name in zip.namelist():
+                data = zip.read(name)
+                fn = name
+                if leading:
+                    fn = split_leading_dir(name)[1]
+                fn = os.path.join(location, fn)
+                dir = os.path.dirname(fn)
+                if not os.path.exists(dir):
+                    os.makedirs(dir)
+                if fn.endswith('/') or fn.endswith('\\'):
+                    # A directory
+                    if not os.path.exists(fn):
+                        os.makedirs(fn)
                 else:
-                    self.reqset.unpack_url(link, location, only_download=True)
-            else:
-                raise
+                    fp = open(fn, 'wb')
+                    try:
+                        fp.write(data)
+                    finally:
+                        fp.close()
+        finally:
+            zipfp.close()
+
+
+# taken from pip v0.6.2
+# MIT licensed
+class Link(object):
+    def __init__(self, url):
+        self.url = url
+
+    def __str__(self):
+        return self.url
+
+    def __repr__(self):
+        return '<Link %s>' % self
+
+    def __eq__(self, other):
+        return self.url == other.url
+
+    def __hash__(self):
+        return hash(self.url)
+
+    @property
+    def filename(self):
+        url = self.url
+        url = url.split('#', 1)[0]
+        url = url.split('?', 1)[0]
+        url = url.rstrip('/')
+        name = posixpath.basename(url)
+        assert name, (
+            'URL %r produced no filename' % url)
+        return name
+
+    @property
+    def scheme(self):
+        return urlparse.urlsplit(self.url)[0]
+
+    @property
+    def path(self):
+        return urlparse.urlsplit(self.url)[2]
+
+    def splitext(self):
+        return splitext(posixpath.basename(self.path.rstrip('/')))
 
