@@ -95,5 +95,5 @@ class TestCkanIndex:
     def test_search(self):
         out = [ x for x in self.index.search('ckan') ]
         assert len(out) >= 3, out
-        assert out[0].name == u'ckan'
+        assert out[0].name in [u'ckan', u'ckanclient'], out[0]
 
