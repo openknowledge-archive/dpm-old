@@ -106,6 +106,7 @@ class FileIndex(IndexBase):
         pkg_path = os.path.join(self.index_path, package.name)
         dist = datapkg.distribution.IniBasedDistribution(package)
         dist.write(pkg_path)
+        return pkg_path
 
     def get(self, name):
         path = os.path.join(self.index_path, name)
@@ -125,6 +126,8 @@ class FileIndex(IndexBase):
         # TODO: do something useful (remove existing and re-register?)
         pass
 
+    def __str__(self):
+        return '<datapkg.index.FileIndex %s>' % self.index_path
 
 class DbIndex(IndexBase):
     '''Database-based index.

@@ -40,14 +40,6 @@ parser.add_option(
     dest='log',
     metavar='FILENAME',
     help='Log file where a complete (maximum verbosity) record will be kept')
-# TODO: this should be made specific to CreateCommand
-# problem is how to have general parser and specific parser ...
-# http://osdir.com/ml/python.optik.user/2008-02/msg00001.html
-parser.add_option(
-    '-t', '--template',
-    dest='template',
-    default='default',
-    help='Specify a template to use when creating on disk (default or flat)')
 # TODO: put in defaults for repo and config
 import datapkg.config
 parser.add_option(
@@ -91,8 +83,8 @@ class Command(object):
         options.quiet += initial_options.quiet
         options.verbose += initial_options.verbose
 
-    def index_from_spec(self, spec_str):
-        spec = datapkg.spec.Spec.parse_spec(spec_str)
+    def index_from_spec(self, spec_str, all_index=False):
+        spec = datapkg.spec.Spec.parse_spec(spec_str, all_index=all_index)
         return spec.index_from_spec(config=self._config)
 
     def _print(self, msg, force=False):
@@ -244,7 +236,7 @@ List registered packages.
 '''
     def run(self, options, args):
         spec_from = args[0]
-        index, path = self.index_from_spec(spec_from)
+        index, path = self.index_from_spec(spec_from, all_index=True)
         for pkg in index.list():
             print u'%s -- %s' % (pkg.name, pkg.title)
 
@@ -382,10 +374,9 @@ directory.'''
     def run(self, options, args):
         path = args[0]
         import datapkg.distribution
-        template = options.template 
         msg = 'Creating new datapkg: %s' %  path
         self._print(msg)
-        datapkg.package.Package.create_on_disk(path, template=template)
+        datapkg.package.Package.create_on_disk(path)
 
 CreateCommand()
 
@@ -403,7 +394,7 @@ Register package at {src-spec} into index at {dest-spec}.
         spec_from = args[0]
         spec_to = args[1]
         index, path = self.index_from_spec(spec_from)
-        index_to, path_to = self.index_from_spec(spec_to)
+        index_to, path_to = self.index_from_spec(spec_to, all_index=True)
         pkg = index.get(path)
         index_to.register(pkg)
 
@@ -445,7 +436,7 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
         spec_from = args[0]
         spec_to = args[1]
         index, path = self.index_from_spec(spec_from)
-        index_to, index_to_path = self.index_from_spec(spec_to)
+        index_to, empty_path = self.index_from_spec(spec_to, all_index=True)
         pkg = index.get(path)
         # TODO: have to reimport here for this to work. Why?
         import datapkg.index
@@ -462,17 +453,18 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
         #     shutil.copytree(pkg.installed_path, dest)
 
         # go through normal process (may just be metadata right ... not a dist)
-        install_path = os.path.join(index_to_path, pkg.name)
+        install_path = os.path.join(index_to.index_path, pkg.name)
+        # we can assume for present that this is not a real 'package' and
+        # therefore first register package on disk
+        print 'Registering ... '
+        install_path = index_to.register(pkg)
+        print 'Created on disk at: %s' % install_path
         if pkg.download_url:
-            # we can assume for present that this is not a real 'package' and
-            # therefore first register package on disk
-            pkg.create_on_disk(install_path)
-
             import datapkg.util
             downloader = datapkg.util.Downloader(install_path)
+            print 'Downloading package resources ...'
             downloader.download(pkg.download_url)
         else:
-            pkg.create_on_disk(install_path)
             msg = u'Warning: no resources to install for package %s (no download url)' % pkg.name
             logger.warn(msg)
             print msg

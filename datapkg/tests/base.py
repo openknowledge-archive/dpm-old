@@ -18,4 +18,6 @@ class TestCase(object):
         if os.path.exists(self.tmpdir):
             shutil.rmtree(self.tmpdir)
         os.makedirs(self.tmpdir)
+        return self.tmpdir
+
         

@@ -2,15 +2,29 @@ import os
 import urlparse
 
 class Spec(object):
+    '''A "spec" is a string identifying a package.
+    
+    It therefore combines index/repository information with an identifier for
+    that package within the index. It is directly based on URIs.
+
+    Examples:
+        ckan://{package-name}
+        file://{index-path}/{package-name}
+
+    Issues: file specs are ambiguous as to division into index path and package
+    name (if we were allow names to be paths)
+    '''
     def __init__(self, scheme='file', netloc='', path=''):
         self.scheme = scheme
         self.netloc = netloc
         self.path = path
 
     @classmethod
-    def parse_spec(self, spec_str=None):
+    def parse_spec(self, spec_str=None, all_index=False):
         '''
         @params spec: if None default to file://
+        @params all_index: this spec_str is just an index (useful for file
+        specs)
         '''
         if spec_str is None:
             spec_str = 'file://'
@@ -20,7 +34,12 @@ class Spec(object):
             scheme = 'file'
         if scheme == 'file':
             # for file netloc is everything up to last name
-            netloc = os.path.join(netloc, os.path.dirname(path))
+            if all_index:
+                netloc = os.path.join(netloc, path)
+                path = ''
+            else:
+                netloc = os.path.join(netloc, os.path.dirname(path))
+                path = os.path.basename(path)
         if scheme == 'ckan':
             # deal with preceding slashes in ckan://...
             while path.startswith('/'):
