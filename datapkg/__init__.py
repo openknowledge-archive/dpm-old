@@ -17,23 +17,32 @@ Obtaining a Package
 
 Search for a package in an Index e.g. on CKAN.net::
 
-    $ datapkg search ckan:// windhover
+    # let's search for iso country/language codes data (iso 3166 ...)
+    $ datapkg search ckan:// iso
     ...
-    datapkgdemo -- ...
+    iso-3166-2-data -- Linked ISO 3166-2 Data
     ...
 
-Get some information about one of them (in this case our demonstration package
-on
+Get some information about one of them (in this case 2-digit ISO country codes on
 ckan.net)::
 
-    $ datapkg info ckan://datapkgdemo
+    $ datapkg info ckan://iso-3166-2-data
 
-Let's install one of them (to the current directory)::
+Let's install it (to the current directory)::
 
+    # should result in a new directory ./iso-3166-2-data
     $ datapkg install ckan://datapkgdemo .
 
 This will download the Distribution file for Package 'datapkgdemo' and
-unpack it in the current directory '.'.
+unpack it into a directory named 'iso-3166-2-data'.
+
+Note that, if you replace the ckan:// spec with a file:// spec, you can use
+most of the commands for files on disk. For example, if you've downloaded a
+data package to, say, /tmp/xyz you could do::
+
+    $ datapkg info file:///tmp/xyz
+
+See the help on indivdual commands for more information.
 
 
 Creating and Registering a Package
@@ -185,7 +194,7 @@ You can also install a distribution::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.4.1'
+__version__ = '0.5'
 __description__ = 'Data packaging system and utilities.'
 __description_long__ = __doc__
 __license__ = 'MIT'
