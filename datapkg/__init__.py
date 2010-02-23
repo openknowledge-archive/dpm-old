@@ -23,18 +23,16 @@ Search for a package in an Index e.g. on CKAN.net::
     iso-3166-2-data -- Linked ISO 3166-2 Data
     ...
 
-Get some information about one of them (in this case 2-digit ISO country codes on
-ckan.net)::
+Get some information about one of them::
 
     $ datapkg info ckan://iso-3166-2-data
 
 Let's install it (to the current directory)::
 
-    # should result in a new directory ./iso-3166-2-data
-    $ datapkg install ckan://datapkgdemo .
+    $ datapkg install ckan://iso-3166-2-data .
 
-This will download the Distribution file for Package 'datapkgdemo' and
-unpack it into a directory named 'iso-3166-2-data'.
+This will download the Package 'iso-3166-2-data' together with its "Resources"
+and unpack it into a directory named 'iso-3166-2-data'.
 
 Note that, if you replace the ckan:// spec with a file:// spec, you can use
 most of the commands for files on disk. For example, if you've downloaded a
@@ -143,20 +141,10 @@ First a skeletal distribution on disk::
     $ datapkg create {pkg-name-or-path}
 
 Take a look inside your newly created distribution directory. There should
-be 3 files/directories:
+be 1 file:
 
-  1. MANIFEST.in: this specifies what files/directories within the distribution
-     directory should actually be included in the package.
-
-     * For instructions on using the MANIFEST.in to specify what files to
-       include see http://docs.python.org/distutils/commandref.html#sdist-cmd
-
-  2. .egg-info: this directory you can safely ignore
-  3. setup.py: this files holds metadata about your package.
-
-Generally the only file you should have to alter is setup.py. Open this up in
-your favourite editor and then modify the various attributes to be as you would
-like them.
+  1. metadata.txt. This is an ini-style file that contains metadata in the form
+  of Key: Value.
 
 Having sorted out the metadata you will actually want to add some material to
 your package. You do this by simply copying material into the distribution
@@ -183,7 +171,7 @@ Once that is done you register the package on CKAN by doing::
 3. Installing your package
 --------------------------
 
-You can also install a distribution::
+You can also install a distribution (only onto disk at the moment!)::
 
     $ datapkg install {package-spec} {file-spec}
 
