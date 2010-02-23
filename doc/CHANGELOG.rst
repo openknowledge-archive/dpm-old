@@ -5,7 +5,14 @@ History
 HEAD
 ====
 
-  * Greatly improve downloading of package resources
+V0.5 2010-02-12
+===============
+
+  * Improve downloading of package resources (and remove dependency on pip)
+  * Improved installation with metadata written consistently (install now
+    really, really works!)
+  * Register to disk works (writes metadata to disk)
+  * Continued improvements to CLI and documentation
 
 V0.4.1 2010-01-19
 =================
