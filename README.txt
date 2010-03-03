@@ -29,4 +29,7 @@ You need sphinx (python-sphinx) to do this. Now you can build the docs::
 
     python setup.py build_sphinx
 
+2. Running tests. We suggest you use nose::
+
+    nosetests datapkg/tests/
 
