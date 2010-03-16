@@ -433,6 +433,9 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
 '''
 
     def run(self, options, args):
+        if not len(args) >= 3:
+            print('ERROR: insufficient arguments - see help')
+            return 1
         spec_from = args[0]
         spec_to = args[1]
         index, path = self.index_from_spec(spec_from)
