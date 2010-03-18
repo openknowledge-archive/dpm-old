@@ -28,6 +28,21 @@ class TestMetadataConverter:
         outmeta = M.MetadataConverter.normalize_metadata(inmeta)
         assert 'provides' not in outmeta['extras'], outmeta
 
+    def test_normalize_metadata_tags(self):
+        exp = [u'tag1', u'tag2']
+
+        inmeta = { 'tags':  exp }
+        outmeta = M.MetadataConverter.normalize_metadata(inmeta)
+        assert outmeta['tags'] == exp, outmeta
+
+        inmeta = { 'tags':  u'tag1, tag2' }
+        outmeta = M.MetadataConverter.normalize_metadata(inmeta)
+        assert outmeta['tags'] == exp, outmeta
+
+        inmeta = { 'tags':  u"[u'tag1', u'tag2']" }
+        outmeta = M.MetadataConverter.normalize_metadata(inmeta)
+        assert outmeta['tags'] == exp, outmeta
+
     def test__standardize_distutils(self):
         inmeta = distutils.dist.DistributionMetadata()
         inmeta.home_page = 'http://xyz.com'

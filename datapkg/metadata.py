@@ -148,9 +148,15 @@ class MetadataConverter(object):
         # TODO extract_extras_from_notes ...
 
         # normalize tags (from space or comma separated list)
-        # TODO: deal with case where tags = [ 'some thing', 'tag2' ]
+        # ast.literal is there for case where tags = [ 'some thing', 'tag2' ]
+        import ast
         if 'tags' in newmeta and isinstance(newmeta['tags'], basestring):
-            newmeta['tags'] = re.split('[,\s]+', newmeta['tags'])
+            out = newmeta['tags'].strip()
+            # still some risk that we have: tags = [weirdtag, ..., otherweirdtag]
+            if out.startswith('[') and out.endswith(']'):
+                newmeta['tags'] = ast.literal_eval(out)
+            else:
+                newmeta['tags'] = re.split('[,\s]+', out)
 
         return newmeta
 

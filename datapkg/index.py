@@ -265,19 +265,23 @@ class CkanIndex(IndexBase):
     def print_status(self):
         if self.ckan.last_status == None:
             if self.ckan.last_url_error:
+                print self.ckan.last_url_error
                 self._print("Network error: %s" % self.ckan.last_url_error.reason[1])
         elif self.ckan.last_status == 200:
             pass #self._print("Datapkg operation was a success.")
         elif self.ckan.last_status == 400:
             self._print("Bad request (400). Please check the submission.")
+            self._print(str(self.ckan.last_message))
         elif self.ckan.last_status == 403:
             self._print("Operation not authorised (403). Check the API key.")
         elif self.ckan.last_status == 404:
             self._print("Resource not found (404). Please check names and locations.")
         elif self.ckan.last_status == 409:
-            self._print("Package already registered (409). Update with 'update'?")
+            self._print("Package already registered or failed to validate (409). Update with 'update'?")
+            self._print(str(self.ckan.last_message))
         elif self.ckan.last_status == 500:
             self._print("Server error (500). Unable to service request. Seek help")
+            self._print(str(self.ckan.last_message))
         else:
             self._print("System error (%s). Seek help." %  self.ckan.last_status)
 
