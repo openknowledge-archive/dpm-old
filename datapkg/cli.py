@@ -433,7 +433,7 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
 '''
 
     def run(self, options, args):
-        if not len(args) >= 3:
+        if not len(args) >= 2:
             print('ERROR: insufficient arguments - see help')
             return 1
         spec_from = args[0]

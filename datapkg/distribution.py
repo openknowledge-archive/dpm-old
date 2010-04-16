@@ -4,7 +4,6 @@ import os
 
 from datapkg import DatapkgException
 from datapkg.package import Package
-import datapkg.util
 import datapkg.metadata as M
 
 default_distribution_name = 'datapkg.distribution:IniBasedDistribution'
@@ -78,6 +77,7 @@ class PythonDistribution(DistributionBase):
         # TODO: catch stdout and only print if error
         import commands
         # os.system(cmd)
+        import datapkg.util
         status, output = datapkg.util.getstatusoutput(cmd)
         if status:
             msg = 'Error on attempt to create file structure:\n\n%s' % output
@@ -153,6 +153,7 @@ class PythonDistribution(DistributionBase):
 
     def install_python_package(self, install_dir, pkg_path, tmpdir,
             zip_safe=False):
+        import datapkg.pypkgtools
         pydist = datapkg.pypkgtools.load_distribution(pkg_path)
         installed_path = pydist.install(install_dir, tmpdir, zip_safe)
         self.package.installed_path = installed_path

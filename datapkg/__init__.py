@@ -189,7 +189,7 @@ __license__ = 'MIT'
 __license_full__ = \
 '''All material is licensed under the MIT License:
 
-Copyright (c) 2005-2009, Open Knowledge Foundation
+Copyright (c) 2005-2010, Open Knowledge Foundation
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -210,8 +210,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 
-import os
-
 class DatapkgException(Exception):
     pass
+
+
+import datapkg.spec
+def load_index(spec_str, all_index=False, config=None):
+    '''Load a `datapkg.index.Index` specified by spec string.
+    
+    @param all_index: hack param to state that spec is all about index (no
+        package name). 
+    @param config: config information
+    '''
+    spec = datapkg.spec.Spec.parse_spec(spec_str, all_index=all_index)
+    index, path = spec.index_from_spec(config=config)
+    return index
+
+
+def load_package(spec_str):
+    '''Load `Package` specified by `spec_str`.
+    '''
+    spec = datapkg.spec.Spec.parse_spec(spec_str)
+    index, path = spec.index_from_spec()
+    return index.get(path)
 

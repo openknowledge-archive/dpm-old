@@ -5,7 +5,6 @@ import urllib
 import re
 import distutils.dist
 
-import datapkg.util
 import datapkg.metadata
 import datapkg.pypkgtools
 from datapkg import DatapkgException
@@ -72,33 +71,34 @@ class Package(object):
     # TODO: rename installed path to path
     path = property(lambda self: self.installed_path, _path_set)
 
-    def download(self, tmpdir):
-        filepath = self.pi.download(self.download_url, tmpdir)
-        # if a local file/dir will not actually move it to tmpdir but will just return link
-        # Make sure the file has been downloaded to the temp dir.
-        if os.path.dirname(filepath) != tmpdir:
-            basename = os.path.basename(filepath)
-            dst = os.path.join(tmpdir, basename)
-            if os.path.isdir(filepath):
-                # TODO: if dst already exists check if the same in which case
-                # we can avoid this
-                if os.path.exists(dst):
-                    shutil.rmtree(dst)
-                shutil.copytree(filepath, dst)
-            else:
-                from setuptools.command.easy_install import samefile
-                if not samefile(filepath, dst):
-                    shutil.copy2(filepath, dst)
-            filepath=dst
-        return filepath
-
-    def unpack(self, dist_filename, extract_dir):
-        if os.path.isfile(dist_filename) and not dist_filename.endswith('.py'):
-            from setuptools.archive_util import unpack_archive
-            unpack_archive(dist_filename, extract_dir)
-            return extract_dir
-        elif os.path.isdir(dist_filename):
-            return os.path.abspath(dist_filename)
+# TODO: remove (out of date as of 2010-04-09)
+#     def download(self, tmpdir):
+#         filepath = self.pi.download(self.download_url, tmpdir)
+#         # if a local file/dir will not actually move it to tmpdir but will just return link
+#         # Make sure the file has been downloaded to the temp dir.
+#         if os.path.dirname(filepath) != tmpdir:
+#             basename = os.path.basename(filepath)
+#             dst = os.path.join(tmpdir, basename)
+#             if os.path.isdir(filepath):
+#                 # TODO: if dst already exists check if the same in which case
+#                 # we can avoid this
+#                 if os.path.exists(dst):
+#                     shutil.rmtree(dst)
+#                 shutil.copytree(filepath, dst)
+#             else:
+#                 from setuptools.command.easy_install import samefile
+#                 if not samefile(filepath, dst):
+#                     shutil.copy2(filepath, dst)
+#             filepath=dst
+#         return filepath
+# 
+#     def unpack(self, dist_filename, extract_dir):
+#         if os.path.isfile(dist_filename) and not dist_filename.endswith('.py'):
+#             from setuptools.archive_util import unpack_archive
+#             unpack_archive(dist_filename, extract_dir)
+#             return extract_dir
+#         elif os.path.isdir(dist_filename):
+#             return os.path.abspath(dist_filename)
 
     def install(self, *args, **kwargs):
         '''Dispatch to same method on default L{Distribution}.'''

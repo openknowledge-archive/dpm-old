@@ -2,6 +2,7 @@ import os
 import logging
 import distutils.dist
 
+from datapkg import DatapkgException
 import datapkg.metadata
 from datapkg.package import Package
 
@@ -32,6 +33,10 @@ class IndexBase(object):
         '''Update `package` in the Index.'''
         raise NotImplementedError
         
+    def __contains__(self, name):
+        '''Implement `in` operator using `has` method'''
+        return self.has(name)
+
 
 class SimpleIndex(IndexBase):
     '''In memory Index based on a simple dict.'''
@@ -40,9 +45,8 @@ class SimpleIndex(IndexBase):
 
     def register(self, package):
         if package.name in self._dict:
-            # TODO: make a DatapkgException
-            raise Exception('Package already registered with name: %s' %
-                    package.name)
+            msg = 'Package already registered with name: %s' % package.name
+            raise DatapkgException(msg)
         self._dict[package.name] = package
 
     def get(self, name):
@@ -62,9 +66,8 @@ class SimpleIndex(IndexBase):
 
     def update(self, package): 
         if not package.name in self._dict:
-            # TODO: make a DatapkgException
-            raise Exception('No package registered with name: %s' %
-                    package.name)
+            msg = 'No package registered with name: %s' % package.name
+            raise DatapkgException(msg)
         self._dict[package.name] = package
 
 
@@ -109,6 +112,9 @@ class FileIndex(IndexBase):
         return pkg_path
 
     def get(self, name):
+        if not name in self:
+            msg = 'No package in %s with name %s. Have you registered/installed it?' % (self, name)
+            raise DatapkgException(msg)
         path = os.path.join(self.index_path, name)
         return Package.load(path)
 
@@ -198,10 +204,6 @@ class CkanIndex(IndexBase):
         self._print("datapkg: CKAN config: %s" % service_kwds )
         self.ckan = CkanClient(**service_kwds)
 
-    def init(self):
-        # since remote, no initialization needed
-        pass
-
     def _print(self, msg):
         self.status_info += msg + '\n'
         logger.debug(msg)
@@ -223,10 +225,20 @@ class CkanIndex(IndexBase):
         # TODO: think this automatically limits results to 20 or so
         for pkg_name in self.ckan.package_search(query)['results']:
             yield self.get(pkg_name)
+    
+    def has(self, name):
+        try:
+            out = self.get(name)
+            return True
+        except Exception, inst:
+            if self.ckan.last_status == 404:
+                return False
+            else:
+                raise
 
-    def get(self, pkg_name):
+    def get(self, name):
         # TODO: convert to return a package object
-        self.ckan.package_entity_get(pkg_name)
+        self.ckan.package_entity_get(name)
         self.print_status()
         if self.ckan.last_status == 200:
             if self.ckan.last_message != None:
