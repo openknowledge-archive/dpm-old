@@ -186,6 +186,7 @@ class IniBasedDistribution(DistributionBase):
         # Read metadata from config.ini style fileobj
         cfp = ConfigParser.SafeConfigParser()
         cfp.readfp(open(fp))
+        # TODO: utf8 to unicode conversion?
         filemeta = cfp.defaults()
         newmeta = M.MetadataConverter.normalize_metadata(filemeta,
                 keymap=self.keymap)
@@ -202,12 +203,19 @@ class IniBasedDistribution(DistributionBase):
         return self(pkg)
 
     def write(self, path, **kwargs):
-        '''See parent.
+        '''Writes distribution to disk.
+        
+        Metadata written to metadata.txt in ini style (python ConfigParser)
+        with encoding to utf8.
         '''
         if not os.path.exists(path):
             os.makedirs(path)
         meta_path = os.path.join(path, 'metadata.txt')
-        cfp = ConfigParser.SafeConfigParser(self.package.metadata)
+        # use RawConfigParser to avoid magical interpolation feature (and hence
+        # issues with %s in data)
+        cfp = ConfigParser.RawConfigParser()
+        for k,v in self.package.metadata.items():
+            cfp.set('DEFAULT', k, unicode(v).encode('utf8'))
         for filepath, metadata in self.package.manifest.items():
             section = self.manifest_prefix + filepath
             cfp.add_section(section)
@@ -215,7 +223,7 @@ class IniBasedDistribution(DistributionBase):
                 for k,v in metadata.items():
                     # TODO: (?) json dump of v
                     # will be weird for text values json.dumps('x') => '"x"'
-                    cfg.set(section, k, unicode(v))
+                    cfp.set(section, k, unicode(v).encode('utf8'))
         fo = file(meta_path, 'w')
         cfp.write(fo)
         fo.close()

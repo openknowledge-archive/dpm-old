@@ -153,7 +153,9 @@ title: my graph
         name = 'abc'
         destpath = os.path.join(self.tmpDir, name)
         pkg = Package(name='abc')
-        pkg.manifest['data.csv'] = None
+        # have % and unicode values
+        pkg.title = u'\xa3 1000 %'
+        pkg.manifest['data.csv'] = {'price': u'\xa3 1000'}
         dist = IniBasedDistribution(pkg)
         dist.write(destpath)
         metapath = os.path.join(destpath, 'metadata.txt')
@@ -162,5 +164,6 @@ title: my graph
         meta = file(metapath).read()
         assert '[DEFAULT]' in meta, meta
         assert 'name = abc' in meta, meta
+        assert u'title = \xa3 1000'.encode('utf8') in meta, meta
         assert '[manifest::data.csv]' in meta, meta
 
