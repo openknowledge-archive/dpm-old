@@ -149,12 +149,16 @@ class MetadataConverter(object):
 
         # normalize tags (from space or comma separated list)
         # ast.literal is there for case where tags = [ 'some thing', 'tag2' ]
-        import ast
+        # ast is only in python >= 2.6
+        # import ast
+        import re
         if 'tags' in newmeta and isinstance(newmeta['tags'], basestring):
             out = newmeta['tags'].strip()
             # still some risk that we have: tags = [weirdtag, ..., otherweirdtag]
             if out.startswith('[') and out.endswith(']'):
-                newmeta['tags'] = ast.literal_eval(out)
+                # see comment on ast above
+                # newmeta['tags'] = ast.literal_eval(out)
+                newmeta['tags'] = re.findall(r'''["']\s*([^"]*?)\s*["']''', out)
             else:
                 newmeta['tags'] = re.split('[,\s]+', out)
 
