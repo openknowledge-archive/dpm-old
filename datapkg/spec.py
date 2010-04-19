@@ -20,19 +20,19 @@ class Spec(object):
         self.path = path
 
     @classmethod
-    def parse_spec(self, spec_str=None, all_index=False):
+    def parse_spec(self, spec_str, all_index=False):
         '''
-        @params spec: if None default to file://
+        @params spec_str: the spec string.
         @params all_index: this spec_str is just an index (useful for file
         specs)
         '''
-        if spec_str is None:
-            spec_str = 'file://'
         scheme, netloc, path, query, fragment = urlparse.urlsplit(spec_str)
         # case where we just provide a path ...
         if scheme == '':
             scheme = 'file'
         if scheme == 'file':
+            # correct for non-absolute pathes
+            path = os.path.abspath(path)
             # for file netloc is everything up to last name
             if all_index:
                 netloc = os.path.join(netloc, path)
@@ -80,4 +80,8 @@ class Spec(object):
             msg = 'Scheme "%s" not recognized' % self.scheme
             raise Exception(msg)
         return index, self.path
+    
+    def __str__(self):
+        return '<Spec %s>' % (self.scheme + '://' + self.netloc + '/' +
+                self.path)
 

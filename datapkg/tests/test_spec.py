@@ -16,14 +16,18 @@ class TestSpec(TestCase):
         self.file_spec = u'file://%s' % self.pkg_path
 
     def test_01_parse_spec_1(self):
-        spec = Spec.parse_spec()
+        cwd = os.getcwd()
+        spec = Spec.parse_spec('file://')
         assert spec.scheme == 'file'
-        assert spec.path == spec.netloc == ''
+        assert spec.netloc == os.path.dirname(cwd), spec
+        assert spec.path == os.path.basename(cwd), spec
 
     def test_01_parse_spec_2(self):
+        path = os.getcwd()
         spec = Spec.parse_spec('.')
         assert spec.scheme == 'file'
-        assert spec.path == '.', spec.path
+        assert spec.netloc == os.path.dirname(path), spec
+        assert spec.path == os.path.basename(path), spec.path
 
     def test_01_parse_spec_3(self):
         spec = Spec.parse_spec(self.index_spec)
