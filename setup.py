@@ -25,7 +25,7 @@ setup(
         'PasteScript>=1.0',
         # 'SQLAlchemy>=0.4',
         # make ckan support obligatory for time being
-        'ckanclient>=0.2',
+        'ckanclient==0.3',
         'urlgrabber>=3.0'
     ],
     entry_points='''

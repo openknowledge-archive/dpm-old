@@ -5,6 +5,14 @@ History
 HEAD
 ====
 
+V0.6 2010-04-28
+===============
+
+  * Fixes for unicode in package metadata (when writing to disk)
+  * Remove use of ast module as only in python 2.5/2.6 
+  * Upgrade to use ckanclient 0.3
+  * Improved python api for usage of datapkg (load_package and load_index)
+
 V0.5 2010-02-12
 ===============
 
