@@ -41,7 +41,18 @@ class Spec(object):
                 netloc = os.path.join(netloc, os.path.dirname(path))
                 path = os.path.basename(path)
         if scheme == 'ckan':
-            # deal with preceding slashes in ckan://...
+            # python >= 2.6.5 changes behaviour of urlsplit for novel url
+            # schemes to be rfc compliant
+            # http://bugs.python.org/issue7904
+            # urlparse.urlsplit(ckan://ckan) gives:
+            # python < 2.6.5
+            # SplitResult(scheme='ckan', netloc='', path='ckan', query='', fragment='')
+            # python >= 2.5.5
+            # SplitResult(scheme='ckan', netloc='ckan', path='', query='', fragment='')
+            if netloc != '': # python >= 2.6.5
+                path = netloc + '/' + path if path else netloc
+                netloc = ''
+            # after urlsplit of ckan://... have path = //... for python < 2.6.5
             while path.startswith('/'):
                 path = path[1:]
             netloc = '/'.join(path.split('/')[:-1])
