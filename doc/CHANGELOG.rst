@@ -5,6 +5,12 @@ History
 HEAD
 ====
 
+V0.6.1 2010-05-04
+=================
+
+  * Bugfix release to address breaking changes in python >= 2.6.5 - see
+    http://bugs.python.org/issue7904
+
 V0.6 2010-04-28
 ===============
 
