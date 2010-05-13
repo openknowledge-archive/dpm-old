@@ -11,8 +11,8 @@ import traceback
 import time
 
 logger = logging.getLogger('datapkg.cli')
-## FIXME
-logging.basicConfig()
+# set this up below
+# logging.basicConfig(level=logging.DEBUG)
 
 import datapkg
 import datapkg.spec
@@ -29,6 +29,12 @@ parser.add_option(
     action='count',
     default=0,
     help='Give more output')
+parser.add_option(
+    '-d', '--debug',
+    dest='debug',
+    default=False,
+    action='store_true',
+    help='Print debug output')
 parser.add_option(
     '-q', '--quiet',
     dest='quiet',
@@ -111,17 +117,22 @@ class Command(object):
             self._config.set('DEFAULT', 'ckan.api_key', self.options.api_key)
         if not self.repository_path:
             self.repository_path = self._config.get('DEFAULT', 'repo.default_path')
-        
+
+        if options.debug:
+            logger.debug('HELLO')
+            logging.basicConfig(level=logging.DEBUG)
 
         # TODO: fix up logger
         level = 1 # Notify
         level += options.verbose
         level -= options.quiet
         self.level = level
+
         complete_log = []
         if options.log:
             log_fp = open_logfile_append(options.log)
-            logger.consumers.append((logger.DEBUG, log_fp))
+            # TODO: add additional listener ...
+            # logger.consumers.append((logger.DEBUG, log_fp))
         else:
             log_fp = None
 
@@ -235,6 +246,9 @@ class ListCommand(Command):
 List registered packages.
 '''
     def run(self, options, args):
+        if not args:
+            print 'You need to supply more arguments. See command help.'
+            return
         spec_from = args[0]
         index, path = self.index_from_spec(spec_from, all_index=True)
         for pkg in index.list():
