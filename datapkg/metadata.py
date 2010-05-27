@@ -15,9 +15,17 @@ class Metadata(dict):
        'download_url',
        'notes',
        'tags',
+       'resources',
        'extras',
+       'relationships',
        ]
-    defaults = { 'tags': [], 'extras': {} }
+    # if not specified '' will be used
+    defaults = {
+        'tags': [],
+        'extras': {},
+        'relationships': [],
+        'resources': []
+        }
 
 
 class MetadataConverter(object):
