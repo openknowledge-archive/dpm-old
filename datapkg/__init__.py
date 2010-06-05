@@ -213,17 +213,18 @@ SOFTWARE.
 class DatapkgException(Exception):
     pass
 
+import datapkg.config
+CONFIG = datapkg.config.load_config()
 
 import datapkg.spec
-def load_index(spec_str, all_index=False, config=None):
+def load_index(spec_str, all_index=False):
     '''Load a `datapkg.index.Index` specified by spec string.
     
     @param all_index: hack param to state that spec is all about index (no
         package name). 
-    @param config: config information
     '''
     spec = datapkg.spec.Spec.parse_spec(spec_str, all_index=all_index)
-    index, path = spec.index_from_spec(config=config)
+    index, path = spec.index_from_spec()
     return index
 
 

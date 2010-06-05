@@ -91,7 +91,7 @@ class Command(object):
 
     def index_from_spec(self, spec_str, all_index=False):
         spec = datapkg.spec.Spec.parse_spec(spec_str, all_index=all_index)
-        return spec.index_from_spec(config=self._config)
+        return spec.index_from_spec()
 
     def _print(self, msg, force=False):
         if self.level >= 1 or force:
@@ -112,11 +112,12 @@ class Command(object):
         self.repository_path = options.repository
         self.verbose = options.verbose
         import datapkg.config
-        self._config = datapkg.config.get_config(options.config)
+        # datapkg.CONFIG now set
+        datapkg.config.load_config(options.config)
         if options.api_key:
-            self._config.set('DEFAULT', 'ckan.api_key', self.options.api_key)
+            datapkg.CONFIG.set('DEFAULT', 'ckan.api_key', self.options.api_key)
         if not self.repository_path:
-            self.repository_path = self._config.get('DEFAULT', 'repo.default_path')
+            self.repository_path = datapkg.CONFIG.get('DEFAULT', 'repo.default_path')
 
         if options.debug:
             logger.debug('HELLO')

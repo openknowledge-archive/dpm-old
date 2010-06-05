@@ -1,6 +1,6 @@
 syntax: glob
 *.pyc
-datapkg.egg-info/*
+*.egg-info/*
 sandbox/*
 TODO.txt
 build/*

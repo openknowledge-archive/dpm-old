@@ -3,17 +3,29 @@ from base import *
 
 # Todo: Tests on these ckan- functions.
 class CkanIndex(IndexBase):
+    '''CKAN index.
 
-    def __init__(self, rest_api_url, api_key=None):
+    Where parameters not provided look them up in config.
+
+    :param url: url for ckan API.
+    :param api_key: API key.
+    '''
+    def __init__(self, url=None, api_key=None):
         self.status_info = ''
-        self.rest_api_url = rest_api_url
-        if self.rest_api_url.endswith('/'):
-            self.rest_api_url = self.rest_api_url[:-1]
+        if url is not None:
+            self.url = url
+        else:
+            self.url = datapkg.CONFIG.get('DEFAULT', 'ckan.url')
+        if api_key is not None:
+            self.api_key = api_key
+        else:
+            self.api_key = datapkg.CONFIG.get('DEFAULT', 'ckan.api_key', None)
+        if self.url.endswith('/'):
+            self.url = self.url[:-1]
         from ckanclient import CkanClient
         service_kwds = {}
-        service_kwds['base_location'] = self.rest_api_url
-        if api_key:
-            service_kwds['api_key'] = api_key
+        service_kwds['base_location'] = self.url
+        service_kwds['api_key'] = self.api_key
         self._print("datapkg: CKAN config: %s" % service_kwds )
         self.ckan = CkanClient(**service_kwds)
 

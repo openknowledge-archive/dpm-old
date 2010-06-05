@@ -63,7 +63,7 @@ class Spec(object):
         spec = Spec(scheme, netloc, path)
         return spec
 
-    def index_from_spec(self, config=None):
+    def index_from_spec(self):
         '''Load an `Index` from a spec.
 
         @return: `Index` and path
@@ -80,13 +80,10 @@ class Spec(object):
         elif self.scheme == 'ckan':
             if self.netloc:
                 ckan_url = self.netloc
+                index = datapkg.index.CkanIndex(ckan_url)
             else:
-                ckan_url = config.get('DEFAULT', 'ckan.url')
-            if config:
-                api_key = config.get('DEFAULT', 'ckan.api_key')
-            index = datapkg.index.CkanIndex(
-                    rest_api_url=ckan_url,
-                    api_key=api_key)
+                # use config provided ckan url
+                index = datapkg.index.CkanIndex()
         else:
             msg = 'Scheme "%s" not recognized' % self.scheme
             raise Exception(msg)
