@@ -1,14 +1,28 @@
 from test_base import *
 
 
-class TestDbIndex(TestSimpleIndex):
+class TestDbIndexSqlite(TestSimpleIndex):
     tmpfile = '/tmp/datapkg.db'
     dburi = 'sqlite:///%s' % tmpfile
 
     def setup(self):
         if os.path.exists(self.tmpfile):
             os.remove(self.tmpfile)
-        self.index = datapkg.index.DbIndex(self.dburi)
+        self.index = datapkg.index.DbIndexSqlite(self.dburi)
+        self.index.init()
+        
+    def test_search(self):
+        pass
+
+
+class TestDbIndexSqlachemy(TestSimpleIndex):
+    tmpfile = '/tmp/datapkg.db'
+    dburi = 'sqlite:///%s' % tmpfile
+
+    def setup(self):
+        if os.path.exists(self.tmpfile):
+            os.remove(self.tmpfile)
+        self.index = datapkg.index.DbIndexSqlalchemy(self.dburi)
         self.index.init()
 
     def test_db_ok(self):
@@ -17,12 +31,12 @@ class TestDbIndex(TestSimpleIndex):
 
     def test_list(self):
         pkgs = self.index.list()
-        assert len(pkgs) == 0
+        assert len(pkgs.all()) == 0
 
         pkg = datapkg.package.Package(name=u'blah')
         self.index.register(pkg)
         pkgs = self.index.list()
-        assert len(pkgs) == 1
+        assert len(pkgs.all()) == 1
 
     def test_get_when_loaded_as_new_and_init_not_called(self):
         pkg_name = u'blah'

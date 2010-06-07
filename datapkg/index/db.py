@@ -1,27 +1,138 @@
+import sqlite3
+try:
+    import json
+except:
+    import simplejson as json
+import uuid
+
+import datapkg.package
 from base import *
 
 
-class DbIndex(IndexBase):
-    '''Database-based index.
+class DbIndexSqlite(IndexBase):
+    '''A simple Database-based index using sqlite with no external library dependencies'''
+    def __init__(self, dburi=None):
+        '''
+        :param dburi: sqlalchemy type db uri (if not provided use db.dburi
+        config variable.
+        '''
+        if dburi is not None: 
+            self.dburi = dburi
+        else:
+            self.dburi = datapkg.CONFIG.get('DEFAULT', 'db.dburi')
+        self.dburi = self.dburi.replace('sqlite://', '')
+    
+    create_script = '''
+    CREATE TABLE package (
+        id TEXT NOT NULL, 
+        name TEXT NOT NULL,
+        metadata TEXT,
+        search_field TEXT,
+        manager_metadata TEXT,
+        PRIMARY KEY (id)
+    );
     '''
-    def __init__(self, dburi):
+
+    @property
+    def conn(self):
+        return sqlite3.connect(self.dburi)
+
+    def init(self):
+        try:
+            # test for table existence
+            arow = self.conn.execute('select * from package limit 1;').fetchall()
+        except sqlite3.OperationalError, inst:
+            self.conn.executescript(self.create_script)
+
+    def _decode(self, metadata):
+        out = json.loads(metadata.replace("\\''", "'"))
+        return out
+
+    def _encode(self, metadata):
+        out = json.dumps(metadata).replace("'", "\\'")
+        return out
+
+    def has(self, name):
+        arow = self.conn.execute('select id from package where name = "%s";' % name).fetchall()
+        return bool(arow)
+
+    def _row_to_package(self, row):
+        pkg = datapkg.package.Package(name=row[0][1], id=row[0][0])
+        for k,v in self._decode(row[2]).items():
+            setattr(pkg,k,v)
+        return pkg
+
+    def get(self, name):
+        # sql injection?
+        results = self.conn.execute('select * from package where name = "%s";' % name).fetchall()
+        if not results:
+            return None
+        else:
+            row = results[0]
+            return self._row_to_package(row)
+
+    def register(self, pkg):
+        metadata = self._encode(pkg.metadata)
+        sql = "INSERT INTO package (id, name, metadata, search_field) " + \
+            "VALUES ('%s', '%s', '%s', '%s');" % (
+                # pkg may not yet have id (new change)
+                getattr(pkg, 'id', uuid.uuid4()), pkg.name, metadata, ''
+                )
+        out = self.conn.executescript(sql)
+        self.conn.close()
+
+    def update(self, pkg):
+        # TODO: update search_field?
+        metadata = self._encode(pkg.metadata)
+        sql = "UPDATE package SET "
+        updates = [
+                ('name', pkg.name),
+                ('metadata', metadata)
+                ]
+        sql += ','.join([ "%s = '%s'" % (col,val) for col,val in updates ])
+        sql += " WHERE name = '%s';" % pkg.name
+        print sql
+        out = self.conn.executescript(sql)
+        self.conn.close()
+
+    def list(self):
+        # TODO: an iterator?
+        rows = self.conn.execute('select * from package').fetchall()
+        return [ self._row_to_package(r) for r in rows ]
+
+    def search(self, query):
+        rows = self.conn.execute("select * from package where name LIKE '%%%s%%'" % query)
+        return [ self._row_to_package(r) for r in rows ]
+
+
+class DbIndexSqlalchemy(IndexBase):
+    '''Database-based index using sqlalchemy.
+    '''
+    def __init__(self, dburi=None):
+        '''
+        :param dburi: sqlalchemy db uri (if not provided use variable from
+        datapkg.CONFIG)
+        '''
         # import here as we do not want to require sqlalchemy
         from sqlalchemy import create_engine
         from sqlalchemy.orm import sessionmaker
-        self.dburi = dburi
+        if dburi is not None: 
+            self.dburi = dburi
+        else:
+            self.dburi = datapkg.CONFIG.get('DEFAULT', 'db.dburi')
         self.engine = create_engine(self.dburi)
-        print self.engine
         Session = sessionmaker()
         Session.configure(bind=self.engine)
         self.session = Session()
 
     def init(self):
         from datapkg.db import dbmetadata
+        dbmetadata.bind = self.engine
+        print self.engine
         dbmetadata.create_all(bind=self.engine)
 
-    # TODO: DEPRECATE or limit number of results
     def list(self):
-        return self.session.query(Package).all()
+        return self.session.query(Package)
 
     def register(self, package):
         self.session.add(package)
@@ -31,12 +142,12 @@ class DbIndex(IndexBase):
         self.session.merge(package)
         self.session.commit()
 
-    def has(self, pkg_name):
-        num = self.session.query(Package).filter_by(name=pkg_name).count()
+    def has(self, name):
+        num = self.session.query(Package).filter_by(name=name).count()
         return num > 0
 
-    def get(self, pkg_name):
-        pkg = self.session.query(Package).filter_by(name=pkg_name).first()
+    def get(self, name):
+        pkg = self.session.query(Package).filter_by(name=name).first()
         # no package may exist with that name
         if pkg:
             self.session.update(pkg)
@@ -49,9 +160,4 @@ class DbIndex(IndexBase):
         q = q.limit(100)
         pkgs = q.all()
         return pkgs
-
-# TODO: 2009-07-31 remove at some point
-# for backwards compatibility
-Index = DbIndex
-
 
