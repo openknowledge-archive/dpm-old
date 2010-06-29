@@ -2,16 +2,15 @@ import os
 import commands
 import tempfile
 import shutil
+import logging
 
 import datapkg.tests.base
-
 import datapkg.cli
 import datapkg.util
 import datapkg.repository
 import datapkg.package
 
-class TestCLI(datapkg.tests.base.TestCase):
-
+class CLIBase(datapkg.tests.base.TestCase):
     @classmethod
     def setup_class(self):
         self.tmpdir = self.make_tmpdir()
@@ -23,7 +22,7 @@ class TestCLI(datapkg.tests.base.TestCase):
             shutil.rmtree(self.tmpdir)
         os.makedirs(self.tmpdir)
         self.cwd = os.getcwd()
-        self.cmd_base = 'datapkg '
+        self.cmd_base = 'datapkg --debug '
 
         self.pkg_name = u'mytestpkg'
         self.pkg_title = u'Test Title'
@@ -46,6 +45,8 @@ class TestCLI(datapkg.tests.base.TestCase):
         # reset cwd or problems in other tests
         os.chdir(self.cwd)
 
+
+class TestCLI(CLIBase):
     def test_1_about(self):
         cmd = 'datapkg about'
         status, output = commands.getstatusoutput(cmd)
@@ -117,12 +118,68 @@ class TestCLI(datapkg.tests.base.TestCase):
 
         # dump
         offset = 'abc.txt'
-        cmd = self.cmd_base + 'dump %s %s' % (self.pkg_path, offset)
+        cmd = self.cmd_base + 'dump %s %s' % ('file://' + self.pkg_path, offset)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
+
+
+class TestWithConfigAndDbIndex(CLIBase):
+    def test_01(self):
+        # setup
+        os.makedirs(self.repo_path)
+        assert os.path.exists(self.repo_path)
+
+        cfg_path = os.path.join(self.tmpdir, 'datapkgrc')
+        cmd = self.cmd_base + 'init config %s' % cfg_path
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        assert os.path.exists(cfg_path)
+
+        # now overwrite config with our test config
+        cfg = datapkg.config.make_default_config(self.repo_path)
+        cfg.write(open(cfg_path, 'w'))
+        datapkg.CONFIG = cfg
+
+        # and set up cmd base to use it 
+        self.cmd_base = self.cmd_base + '--config %s ' % cfg_path
+
+        # TODO: ? move this to cli init?
+        # idx = datapkg.index.get_default_index()
+        # idx.init()
+        cmd = self.cmd_base + 'init index'
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+
+        # register
+        cmd = self.cmd_base + 'register %s' % self.file_spec
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        # check it is there
+        pkg = datapkg.index.get_default_index().get(self.pkg_name)
+        assert pkg.title == self.pkg_title
+
+        # info (check from command line)
+        cmd = self.cmd_base + 'info %s' % self.pkg_name
+        print cmd
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        assert self.pkg_name in output
+
+        # info (check from command line)
+        cmd = self.cmd_base + 'list'
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        assert self.pkg_name in output
+
     
-    # For this need dummy ckan running locally with standard test data
-    def _test_ckan(self):
+class TestCkan(CLIBase):
+    '''For this need dummy ckan running locally with standard test data
+    '''
+    # TODO: set __test__ based on a check of whether local ckan is running
+    __test__ = False
+
+    def test_walkthrough(self):
+        # datapkg.config
         # localckan = 'http://localhost:5000/api/'
         localckan = 'http://test.ckan.net/api/'
         apikey = 'tester'

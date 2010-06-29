@@ -51,8 +51,7 @@ import datapkg.config
 parser.add_option(
     '-c', '--config',
     dest='config',
-    help='Path to config file (if any) - defaults to %default',
-    default=datapkg.config.default_config_path)
+    help='Path to config file (if any) - defaults to %s' % datapkg.config.default_config_path)
 parser.add_option(
     '-r', '--repository',
     dest='repository',
@@ -69,6 +68,8 @@ _commands = {}
 class Command(object):
     name = None
     usage = None
+    min_args = None
+    max_args = None
 
     def __init__(self):
         assert self.name
@@ -102,6 +103,15 @@ class Command(object):
         print
         out = pkg.pretty_print()
         print out
+    
+    def _check_args(self, args):
+        if self.min_args is not None and len(args) < self.min_args:
+            print 'Insufficient arguments. See command help'
+            return False
+        if self.max_args is not None and len(args) > self.max_args:
+            print 'Too many arguments. See command help'
+            return False
+        return True
 
     def main(self, complete_args, args, initial_options):
         options = initial_options
@@ -109,20 +119,22 @@ class Command(object):
         # From pip but not needed by us I think
         # self.merge_options(initial_options, options)
         self.options = options
-        self.repository_path = options.repository
         self.verbose = options.verbose
         import datapkg.config
         # datapkg.CONFIG now set
-        datapkg.config.load_config(options.config)
+        if options.config:
+            datapkg.CONFIG = datapkg.config.load_config(options.config)
         if options.api_key:
             datapkg.CONFIG.set('DEFAULT', 'ckan.api_key', self.options.api_key)
-        if not self.repository_path:
-            self.repository_path = datapkg.CONFIG.get('DEFAULT', 'repo.default_path')
+        if options.repository:
+            datapkg.CONFIG.set('DEFAULT', 'repo.default_path',
+                    options.repository)
 
+        ## set up logging
         if options.debug:
-            logger.debug('HELLO')
             logging.basicConfig(level=logging.DEBUG)
-
+        else:
+            logging.basicConfig(level=logging.WARN)
         # TODO: fix up logger
         level = 1 # Notify
         level += options.verbose
@@ -138,6 +150,8 @@ class Command(object):
             log_fp = None
 
         exit = 0
+        if not self._check_args(args):
+            sys.exit(2)
         try:
             self.run(options, args)
         except:
@@ -171,8 +185,7 @@ For an introduction to datapkg see the manual:
 
     $ datapkg man
 
-About information (including license details) is available via `datapkg about`
-while a full list of commands is provided by `datapkg help`.
+About information (including license details) is available via `datapkg about`.
 '''
     
     def run(self, options, args):
@@ -241,16 +254,18 @@ ManCommand()
 class ListCommand(Command):
     name = 'list'
     summary = 'List registered packages'
+    min_args = 0
+    max_args = 1
     usage = \
-'''%prog {index-spec}
+'''%prog [index-spec]
 
-List registered packages.
+List registered packages. If index-spec is not provided use default index.
 '''
     def run(self, options, args):
-        if not args:
-            print 'You need to supply more arguments. See command help.'
-            return
-        spec_from = args[0]
+        if args:
+            spec_from = args[0]
+        else:
+            spec_from = ''
         index, path = self.index_from_spec(spec_from, all_index=True)
         for pkg in index.list():
             print u'%s -- %s' % (pkg.name, pkg.title)
@@ -261,6 +276,8 @@ ListCommand()
 class SearchCommand(Command):
     name = 'search'
     summary = 'Search registered packages'
+    min_args = 2
+    max_args = 2
     usage = \
 '''%prog {index-spec} {query}
 
@@ -268,10 +285,7 @@ Search registered packages in index-spec.
 '''
     def run(self, options, args):
         spec_from = args[0]
-        if len(args) > 1:
-            query = args[1]
-        else:
-            query = ''
+        query = args[1]
         index, path = self.index_from_spec(spec_from)
         for pkg in index.search(query):
             print u'%s -- %s' % (pkg.name, pkg.title)
@@ -282,6 +296,8 @@ SearchCommand()
 class InfoCommand(Command):
     name = 'info'
     summary = 'Get information about a package'
+    min_args = 1
+    max_args = 2
     usage = \
 '''%prog {package-spec} [manifest]
 
@@ -311,9 +327,11 @@ InfoCommand()
 
 class DumpCommand(Command):
     name = 'dump'
-    summary = 'Dump a resource from a package'
+    summary = 'Dump a file from within package'
+    min_args = 2
+    max_args = 2
     usage = \
-'''%prog {path-or-pkg-name} {path-of-resource-with-pkg}
+'''%prog {pkg-spec} {path-of-resource-within-pkg}
 
 Dump contents of specified resource in specified package to stdout.
 '''
@@ -333,43 +351,54 @@ DumpCommand()
 class InitCommand(Command):
     name = 'init'
     summary = 'Initialise things (config, repository etc)'
+    min_args = 1
+    max_args = 2
     usage = '''%prog {action}
 
-config: Create configuration file at default location (see --config)
+config [location]: Create configuration file at location. If not location
+specified use default (see --config).
+
+index [location]: Initialize an index at location specified in config.
 
 repo: Initialize a repository. The repository will be created at the location
       specified via the --repository option or default location specified by
       config.
-
 '''
 
     def run(self, options, args):
-        if args:
-            action = args[0]
-            method = getattr(self, action)
-            theirargs = args[1:]
-            method(theirargs, options)
-        else:
-            print 'You must supply an action'
+        action = args[0]
+        method = getattr(self, action)
+        theirargs = args[1:]
+        method(theirargs, options)
     
     def repo(self, args, options):
         import datapkg.repository
-        repo = datapkg.repository.Repository(self.repository_path)
+        repo = datapkg.repository.Repository(datapkg.CONFIG.get('DEFAULT', 'repo.default_path'))
         repo.init()
-        msg = 'Repository successfully initialized at %s' % self.repository_path
+        msg = 'Repository successfully initialized at %s' % datapkg.CONFIG.get('DEFAULT', 'repo.default_path')
         self._print(msg)
     
     def config(self, args, options):
         '''Create default config file.'''
         import datapkg.config
-        cfg = datapkg.config.write_default_config()
+        if args:
+            cfg = datapkg.config.write_default_config(args[0])
+        else:
+            cfg = datapkg.config.write_default_config()
     
+    def index(self, args, options):
+        '''Create default index file.'''
+        import datapkg.index
+        datapkg.index.get_default_index().init()
+
 InitCommand()
 
 
 class CreateCommand(Command):
     name = 'create'
     summary = 'Create a package'
+    min_args = 1
+    max_args = 1
     usage = \
 '''%prog <path-or-name>
 
@@ -399,6 +428,8 @@ CreateCommand()
 class RegisterCommand(Command):
     name = 'register'
     summary = 'Register a package'
+    min_args = 1
+    max_args = 2
     usage = \
 '''%prog {src-spec} {dest-spec}
 
@@ -406,10 +437,15 @@ Register package at {src-spec} into index at {dest-spec}.
 '''
 
     def run(self, options, args):
+        logger.debug('RegisterCommand: %s (options: %s)' % (args, options))
         spec_from = args[0]
-        spec_to = args[1]
         index, path = self.index_from_spec(spec_from)
-        index_to, path_to = self.index_from_spec(spec_to, all_index=True)
+        if len(args) == 2:
+            spec_to = args[1]
+            index_to, path_to = self.index_from_spec(spec_to, all_index=True)
+        else:
+            logger.debug('RegisterCommand: Loading default index')
+            index_to = datapkg.index.get_default_index()
         pkg = index.get(path)
         index_to.register(pkg)
 
@@ -419,6 +455,8 @@ RegisterCommand()
 class UpdateCommand(Command):
     name = 'update'
     summary = 'Update a package'
+    min_args = 1
+    max_args = 2
     usage = \
 '''%prog {src-spec} {dest-spec}
 
@@ -427,9 +465,12 @@ As for register.
 
     def run(self, options, args):
         spec_from = args[0]
-        spec_to = args[1]
         index, path = self.index_from_spec(spec_from)
-        index_to, path_to = self.index_from_spec(spec_to)
+        if len(args) > 1:
+            spec_to = args[1]
+            index_to, path_to = self.index_from_spec(spec_to)
+        else:
+            index_to = datapkg.index.get_default_index()
         pkg = index.get(path)
         index_to.update(pkg)
 
@@ -439,6 +480,8 @@ UpdateCommand()
 class InstallCommand(Command):
     name = 'install'
     summary = 'Install a package'
+    min_args = 2
+    max_args = 2
     usage = \
 '''%prog {src-spec} {dest-spec}
 
@@ -448,9 +491,6 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
 '''
 
     def run(self, options, args):
-        if not len(args) >= 2:
-            print('ERROR: insufficient arguments - see help')
-            return 1
         spec_from = args[0]
         spec_to = args[1]
         index, path = self.index_from_spec(spec_from)

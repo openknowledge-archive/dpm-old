@@ -57,7 +57,7 @@ class DbIndexSqlite(IndexBase):
         return bool(arow)
 
     def _row_to_package(self, row):
-        pkg = datapkg.package.Package(name=row[0][1], id=row[0][0])
+        pkg = datapkg.package.Package(name=row[1], id=row[0])
         for k,v in self._decode(row[2]).items():
             setattr(pkg,k,v)
         return pkg
@@ -91,7 +91,6 @@ class DbIndexSqlite(IndexBase):
                 ]
         sql += ','.join([ "%s = '%s'" % (col,val) for col,val in updates ])
         sql += " WHERE name = '%s';" % pkg.name
-        print sql
         out = self.conn.executescript(sql)
         self.conn.close()
 
@@ -128,7 +127,6 @@ class DbIndexSqlalchemy(IndexBase):
     def init(self):
         from datapkg.db import dbmetadata
         dbmetadata.bind = self.engine
-        print self.engine
         dbmetadata.create_all(bind=self.engine)
 
     def list(self):

@@ -3,6 +3,7 @@ import re
 
 class Metadata(dict):
     key_list = [
+       'id',
        'name', 
        'title',
        'version',

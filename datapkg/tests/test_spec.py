@@ -15,60 +15,82 @@ class TestSpec(TestCase):
         self.pkg_path = os.path.join(self.tmpdir, self.pkg_name)
         self.file_spec = u'file://%s' % self.pkg_path
 
-    def test_01_parse_spec_1(self):
+    def test_01_parse_spec_file_1(self):
         cwd = os.getcwd()
         spec = Spec.parse_spec('file://')
         assert spec.scheme == 'file'
         assert spec.netloc == os.path.dirname(cwd), spec
         assert spec.path == os.path.basename(cwd), spec
 
-    def test_01_parse_spec_2(self):
+    def test_01_parse_spec_file_2(self):
         path = os.getcwd()
-        spec = Spec.parse_spec('.')
+        spec = Spec.parse_spec('file://.')
         assert spec.scheme == 'file'
         assert spec.netloc == os.path.dirname(path), spec
         assert spec.path == os.path.basename(path), spec.path
 
-    def test_01_parse_spec_3(self):
+    def test_01_parse_spec_file_3(self):
         spec = Spec.parse_spec(self.index_spec)
         assert spec.scheme == 'file', (spec.scheme,spec.netloc,spec.path)
         assert spec.path == os.path.basename(self.repo_path)
 
-    def test_01_parse_spec_4(self):
-        spec = Spec.parse_spec(self.repo_path)
+    def test_01_parse_spec_file_4(self):
+        spec = Spec.parse_spec(self.repo_spec)
         assert spec.scheme == 'file', (spec.scheme,spec.netloc,spec.path)
         assert spec.path == os.path.basename(self.repo_path)
 
-    def test_01_parse_spec_5(self):
-        spec = Spec.parse_spec(self.repo_path, all_index=True)
+    def test_01_parse_spec_file_5(self):
+        spec = Spec.parse_spec(self.repo_spec, all_index=True)
         assert spec.scheme == 'file', (spec.scheme,spec.netloc,spec.path)
         assert spec.netloc == self.repo_path
         assert spec.path == ''
 
-    def test_01_parse_spec_ckan_1(self):
+    def test_02_parse_spec_ckan_1(self):
         spec = Spec.parse_spec('ckan:datapkgdemo')
         assert spec.scheme == 'ckan', spec.scheme
         assert spec.path == 'datapkgdemo', spec.path
 
-    def test_01_parse_spec_ckan_2(self):
+    def test_02_parse_spec_ckan_2(self):
         spec = Spec.parse_spec('ckan://datapkgdemo')
         assert spec.scheme == 'ckan', spec.scheme
         assert spec.netloc == '', spec.netloc 
         assert spec.path == 'datapkgdemo', spec.path
 
-    def test_01_parse_spec_ckan_3(self):
+    def test_02_parse_spec_ckan_3(self):
         spec = Spec.parse_spec('ckan://test.ckan.net/api/datapkgdemo')
         assert spec.scheme == 'ckan', spec.scheme
         assert spec.netloc == 'http://test.ckan.net/api', spec.netloc
         assert spec.path == 'datapkgdemo', spec.path
 
-    def test_3_index_from_spec(self):
+    def test_02_parse_spec_ckan_1(self):
+        spec = Spec.parse_spec('db://datapkgdemo')
+        assert spec.scheme == 'db', spec.scheme
+        assert spec.path == 'datapkgdemo', spec.path
+
+    def test_03_parse_spec_default(self):
+        spec = Spec.parse_spec('datapkgdemo')
+        assert spec.scheme == 'db', spec.scheme
+        assert spec.path == 'datapkgdemo', spec.path
+
+    def test_04_index_from_spec(self):
         import datapkg.index
         spec = Spec.parse_spec(self.file_spec)
         index, path = spec.index_from_spec()
         assert isinstance(index, datapkg.index.FileIndex)
 
-        spec = Spec.parse_spec('.')
+        spec = Spec.parse_spec('file://.')
         index, path = spec.index_from_spec()
         assert isinstance(index, datapkg.index.FileIndex)
+
+    def test_04_index_from_spec_ckan(self):
+        import datapkg.index
+        spec = Spec.parse_spec('ckan://datapkgdemo')
+        index, path = spec.index_from_spec()
+        assert isinstance(index, datapkg.index.CkanIndex)
+
+    def test_04_index_from_spec_db(self):
+        import datapkg.index
+        spec = Spec.parse_spec('db://datapkgdemo')
+        index, path = spec.index_from_spec()
+        assert isinstance(index, datapkg.index.DbIndexSqlite)
 

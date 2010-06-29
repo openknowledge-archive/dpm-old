@@ -19,7 +19,7 @@ class CkanIndex(IndexBase):
         if api_key is not None:
             self.api_key = api_key
         else:
-            self.api_key = datapkg.CONFIG.get('DEFAULT', 'ckan.api_key', None)
+            self.api_key = datapkg.CONFIG.dictget('DEFAULT', 'ckan.api_key', None)
         if self.url.endswith('/'):
             self.url = self.url[:-1]
         from ckanclient import CkanClient

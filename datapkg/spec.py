@@ -2,17 +2,39 @@ import os
 import urlparse
 
 class Spec(object):
-    '''A "spec" is a string identifying a package.
+    '''A "spec" is a string identifying a package within a package index
+    (or, sometimes, just the index).
     
     It therefore combines index/repository information with an identifier for
     that package within the index. It is directly based on URIs.
 
-    Examples:
+    Spec strings start with as 'scheme' part identifying the type of index and
+    then have additional information used to specify the package (and perhaps
+    the index). For example, for the 3 types of index currently available::
+
         ckan://{package-name}
         file://{index-path}/{package-name}
+        db://{packag-name} 
+    
+    Examples::
 
-    Issues: file specs are ambiguous as to division into index path and package
-    name (if we were allow names to be paths)
+        ckan://datapkgdemo # datapkgdemo package in the CKAN index
+        file:///some/path/on/disk
+        file://. # current directory
+        file://./xyz # relative path xyz from the current directory
+        db://datapkgdemo # datapkgdemo in the (local) database index
+
+    For the convenience of users we also support a default index (set in the
+    config file). This allows one to simply use the package identifier for the
+    spec, e.g.::
+
+        datapkgdemo
+
+    Issues
+    ======
+    
+      * file specs are ambiguous as to division into index path and package
+        name (if we were allow names to be paths)
     '''
     def __init__(self, scheme='file', netloc='', path=''):
         self.scheme = scheme
@@ -21,15 +43,18 @@ class Spec(object):
 
     @classmethod
     def parse_spec(self, spec_str, all_index=False):
-        '''
-        @params spec_str: the spec string.
-        @params all_index: this spec_str is just an index (useful for file
+        '''Parse a a string into a `Spec`.
+
+        :param spec_str: the spec string.
+        :param all_index: this spec_str is just an index (useful for file
         specs)
         '''
         scheme, netloc, path, query, fragment = urlparse.urlsplit(spec_str)
         # case where we just provide a path ...
         if scheme == '':
-            scheme = 'file'
+            # default scheme
+            scheme = 'db'
+
         if scheme == 'file':
             # correct for non-absolute pathes
             path = os.path.abspath(path)
@@ -40,7 +65,7 @@ class Spec(object):
             else:
                 netloc = os.path.join(netloc, os.path.dirname(path))
                 path = os.path.basename(path)
-        if scheme == 'ckan':
+        elif scheme == 'ckan' or scheme == 'db':
             # python >= 2.6.5 changes behaviour of urlsplit for novel url
             # schemes to be rfc compliant
             # http://bugs.python.org/issue7904
@@ -56,23 +81,21 @@ class Spec(object):
             while path.startswith('/'):
                 path = path[1:]
             netloc = '/'.join(path.split('/')[:-1])
-            # we have a path but did not put http:// ...
-            if netloc and not netloc.startswith('http'):
-                netloc = 'http://' + netloc
             path = path.split('/')[-1]
+            if scheme == 'ckan':
+                # we have a path but did not put http:// ...
+                if netloc and not netloc.startswith('http'):
+                    netloc = 'http://' + netloc
+            elif scheme == 'db':
+                if netloc and not netloc.startswith('file'):
+                    netloc = 'file://' + netloc
         spec = Spec(scheme, netloc, path)
         return spec
 
     def index_from_spec(self):
         '''Load an `Index` from a spec.
 
-        @return: `Index` and path
-
-        schemes = [
-            'file',
-            'ckan',
-            'db',
-            ]
+        :return: `Index` and path
         '''
         import datapkg.index
         if self.scheme == 'file':
@@ -84,6 +107,11 @@ class Spec(object):
             else:
                 # use config provided ckan url
                 index = datapkg.index.CkanIndex()
+        elif self.scheme == 'db':
+            if self.netloc:
+                index = datapkg.index.DbIndexSqlite(self.netloc)
+            else:
+                index = datapkg.index.DbIndexSqlite()
         else:
             msg = 'Scheme "%s" not recognized' % self.scheme
             raise Exception(msg)

@@ -33,14 +33,14 @@ class TestDbIndexSqlachemy(TestSimpleIndex):
         pkgs = self.index.list()
         assert len(pkgs.all()) == 0
 
-        pkg = datapkg.package.Package(name=u'blah')
+        pkg = datapkg.package.Package(name=u'blah', id=u'abc')
         self.index.register(pkg)
         pkgs = self.index.list()
         assert len(pkgs.all()) == 1
 
     def test_get_when_loaded_as_new_and_init_not_called(self):
         pkg_name = u'blah'
-        pkg = datapkg.package.Package(name=pkg_name)
+        pkg = datapkg.package.Package(name=pkg_name, id=u'abc')
         self.index.register(pkg)
 
         # clear session so we know this is loaded from db

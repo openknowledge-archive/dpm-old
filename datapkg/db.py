@@ -10,7 +10,7 @@ from sqlalchemy import orm
 dbmetadata = MetaData()
 
 package_table = Table('package', dbmetadata,
-    Column('id', types.Integer, primary_key=True),
+    Column('id', types.UnicodeText, primary_key=True),
     Column('name', types.Unicode(255)),
     Column('installed_path', types.UnicodeText()),
 #     Column('description', types.UnicodeText()),

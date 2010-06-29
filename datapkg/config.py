@@ -6,12 +6,24 @@ default_root_path = os.path.join(os.path.expanduser('~'), '.datapkg')
 default_config_path = os.path.join(os.path.expanduser('~'), '.datapkgrc')
 default_repo_path = os.path.join(default_root_path, 'repository')
 
-def load_config(config_path=default_config_path):
-    '''Load configuration from ini-style config file at `config_path` and set
-    global config variable (datapkg.config) with it (if config file does not
-    exist returns default config (`make_default_config`).
+class Config(ConfigParser.SafeConfigParser):
+    def dictget(self, section, option, default=None):
+        '''Emulate `dict.get` on SafeConfigParser.
 
+        :param section: as on SafeConfigParser.get
+        :param option: ditto
+        :param default: default value if option does not exist
+        '''
+        if self.has_option(section, option):
+            return self.get(section, option)
+        else:
+            return default
+
+def load_config(config_path=default_config_path):
+    '''Load configuration from ini-style config file at `config_path` if it
+    exists else returns default config (`make_default_config`).
     :param config_path: path to config on disk.
+    :return: loaded config.
     '''
     config = None
     if os.path.exists(config_path):
@@ -25,11 +37,12 @@ def load_config(config_path=default_config_path):
 
 def make_default_config(repo_path=default_repo_path):
     '''Create default ConfigParser config.'''
-    cfg = ConfigParser.SafeConfigParser()
+    cfg = Config()
     cfg.set('DEFAULT', 'version', datapkg.__version__)
     cfg.set('DEFAULT', 'ckan.url',  'http://ckan.net/api/')
     cfg.set('DEFAULT', 'ckan.api_key', '')
     cfg.set('DEFAULT', 'repo.default_path', repo_path)
+    cfg.set('DEFAULT', 'db.dburi', 'sqlite://%(repo.default_path)s/index.db')
     return cfg
 
 def write_default_config(path=default_config_path, repo_path=default_repo_path):

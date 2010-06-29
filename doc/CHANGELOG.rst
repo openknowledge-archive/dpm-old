@@ -5,6 +5,13 @@ History
 HEAD
 ====
 
+V0.7 2010-??-??
+===============
+
+  * New sqlite-based DB index (ticket:360)
+  * Improved spec: support for db type index + better documentation
+  * Better configuration management (especially internally)
+
 V0.6.1 2010-05-04
 =================
 
