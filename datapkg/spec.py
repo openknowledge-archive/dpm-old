@@ -1,5 +1,6 @@
 import os
 import urlparse
+import urllib
 
 class Spec(object):
     '''A "spec" is a string identifying a package within a package index
@@ -56,14 +57,16 @@ class Spec(object):
             scheme = 'db'
 
         if scheme == 'file':
-            # correct for non-absolute pathes
+            path = spec_str.split('://')[1]
+            path = urllib.url2pathname(path)
+            path = path.replace('/', os.sep)
             path = os.path.abspath(path)
             # for file netloc is everything up to last name
             if all_index:
-                netloc = os.path.join(netloc, path)
+                netloc = path
                 path = ''
             else:
-                netloc = os.path.join(netloc, os.path.dirname(path))
+                netloc = os.path.join(os.path.dirname(path))
                 path = os.path.basename(path)
         elif scheme == 'ckan' or scheme == 'db':
             # python >= 2.6.5 changes behaviour of urlsplit for novel url

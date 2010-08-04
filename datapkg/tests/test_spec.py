@@ -15,19 +15,27 @@ class TestSpec(TestCase):
         self.pkg_path = os.path.join(self.tmpdir, self.pkg_name)
         self.file_spec = u'file://%s' % self.pkg_path
 
-    def test_01_parse_spec_file_1(self):
+    def test_01_parse_spec_file_1_bare(self):
         cwd = os.getcwd()
         spec = Spec.parse_spec('file://')
         assert spec.scheme == 'file'
         assert spec.netloc == os.path.dirname(cwd), spec
         assert spec.path == os.path.basename(cwd), spec
 
-    def test_01_parse_spec_file_2(self):
+    def test_01_parse_spec_file_2_relative_dot(self):
         path = os.getcwd()
         spec = Spec.parse_spec('file://.')
         assert spec.scheme == 'file'
         assert spec.netloc == os.path.dirname(path), spec
         assert spec.path == os.path.basename(path), spec.path
+
+    def test_01_parse_spec_file_2b_relative(self):
+        path = os.getcwd()
+        spec = Spec.parse_spec('file://jones/abc')
+        assert spec.scheme == 'file'
+        expnetloc = os.path.join(path, 'jones')
+        assert spec.netloc == expnetloc, (expnetloc, spec.netloc)
+        assert spec.path == 'abc', spec.path
 
     def test_01_parse_spec_file_3(self):
         spec = Spec.parse_spec(self.index_spec)
@@ -39,11 +47,17 @@ class TestSpec(TestCase):
         assert spec.scheme == 'file', (spec.scheme,spec.netloc,spec.path)
         assert spec.path == os.path.basename(self.repo_path)
 
-    def test_01_parse_spec_file_5(self):
+    def test_01_parse_spec_file_5_all_index(self):
         spec = Spec.parse_spec(self.repo_spec, all_index=True)
         assert spec.scheme == 'file', (spec.scheme,spec.netloc,spec.path)
         assert spec.netloc == self.repo_path
         assert spec.path == ''
+
+    def test_01_parse_spec_file_6_html_encoding(self):
+        spec = Spec.parse_spec('file:///xy%20z/abc')
+        assert spec.scheme == 'file', spec.scheme
+        assert spec.netloc == '/xy z', spec.netloc
+        assert spec.path == 'abc', spec.path
 
     def test_02_parse_spec_ckan_1(self):
         spec = Spec.parse_spec('ckan:datapkgdemo')
