@@ -29,6 +29,13 @@ We recommend users get started by taking a look at the manual:
 
    manual
 
+You can also use datapkg directly from code via is api:
+
+.. toctree::
+
+   api
+   spec
+
 Getting Started: Developers
 ===========================
 

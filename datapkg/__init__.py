@@ -229,9 +229,11 @@ CONFIG = datapkg.config.load_config()
 
 import datapkg.spec
 def load_index(spec_str, all_index=False):
-    '''Load a `datapkg.index.Index` specified by spec string.
+    '''Load a :class:`datapkg.index.Index` specified by
+    :class:`datapkg.spec.Spec` spec_str.
     
-    @param all_index: hack param to state that spec is all about index (no
+    :param spec_str: a :class:`package spec <datapkg.spec.Spec>`.
+    :param all_index: hack param to state that spec is all about index (no
         package name). 
     '''
     spec = datapkg.spec.Spec.parse_spec(spec_str, all_index=all_index)
@@ -240,7 +242,10 @@ def load_index(spec_str, all_index=False):
 
 
 def load_package(spec_str):
-    '''Load `Package` specified by `spec_str`.
+    '''Load `Package` specified by :class:`package spec <datapkg.spec.Spec>` `spec_str`.
+
+    :param spec_str: a :class:`package spec <datapkg.spec.Spec>`.
+    :return: Package.
     '''
     spec = datapkg.spec.Spec.parse_spec(spec_str)
     index, path = spec.index_from_spec()

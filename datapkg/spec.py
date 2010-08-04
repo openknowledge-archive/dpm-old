@@ -30,7 +30,8 @@ class Spec(object):
     spec, e.g.::
 
         datapkgdemo
-
+    '''
+    '''
     Issues
     ======
     
