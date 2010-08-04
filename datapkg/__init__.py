@@ -29,10 +29,15 @@ Get some information about one of them::
 
 Let's install it (to the current directory)::
 
-    $ datapkg install ckan://iso-3166-2-data .
+    $ datapkg install ckan://iso-3166-2-data file://.
 
 This will download the Package 'iso-3166-2-data' together with its "Resources"
 and unpack it into a directory named 'iso-3166-2-data'.
+
+Note: we specify local file pathes with the file:// prefix. This is avoid
+the ambiguity between a relative file path like 'mypackage' and a package name
+'mypackage' in arguments to datapkg commands. For more on package 'specs' as
+they are called see the dedicated section below.
 
 Note that, if you replace the ckan:// spec with a file:// spec, you can use
 most of the commands for files on disk. For example, if you've downloaded a
@@ -65,7 +70,7 @@ Register it on CKAN::
     # NB: to register on CKAN you'll need to have an api-key
     # This can either be stored in your config file (see datapkg init config)
     # Or you can set it with the --api-key option
-    $ datapkg register MyNewDataPackage ckan://
+    $ datapkg register file://MyNewDataPackage ckan://
 
 Check it has registered ok::
 
@@ -99,15 +104,21 @@ For managing Packages datapkg uses:
     2. Repository: a Registry plus associated storage for association
        Distributions.
 
+
+Package Specs (Specifications)
+==============================
+
 To specify a package (or just an index/repository) we often use a 'package
-spec' (often termed just 'spec'), which have the following form::
+spec' (often termed just 'spec'), which have the following url-like form::
 
     # for CKAN
     ckan://{package-name}
     # on disk
     file://{package-or-index-path}
-    # or even just
-    {package-or-index-path}
+
+The use of a 'naked' spec, i.e. one without any scheme such as ckan:// or
+file://, like 'mypackage' is used for referring to packages with regard to the
+*default* package index.
 
 
 1. Obtaining Material
@@ -165,7 +176,7 @@ location.
 
 Once that is done you register the package on CKAN by doing::
 
-    $ datapkg register {path} ckan://
+    $ datapkg register file://{path} ckan://
 
 
 3. Installing your package
