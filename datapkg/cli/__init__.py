@@ -82,7 +82,6 @@ class Command(object):
                 # -h, --version, etc
                 continue
             self.parser.add_option(option)
-        _commands[self.name] = self
 
     def merge_options(self, initial_options, options):
         for attr in ['log']:
@@ -204,7 +203,6 @@ About information (including license details) is available via `datapkg about`.
         for command in commands:
             print '  %s: %s' % (command.name, command.summary)
 
-HelpCommand()
 
 class AboutCommand(Command):
     name = 'about'
@@ -222,8 +220,6 @@ For more information about datapkg and how to use it run the `man` command.
 ''' % datapkg.__version__
         print about
 
-AboutCommand()
-
 
 class LicenseCommand(Command):
     name = 'license'
@@ -233,8 +229,6 @@ class LicenseCommand(Command):
     def run(self, options, args):
         license = datapkg.__license_full__
         print license
-
-LicenseCommand()
 
 
 class ManCommand(Command):
@@ -247,8 +241,6 @@ class ManCommand(Command):
         print
         print '                   ## DataPkg Manual ##'
         print '\n' + info
-
-ManCommand()
 
 
 class ListCommand(Command):
@@ -270,8 +262,6 @@ List registered packages. If index-spec is not provided use default index.
         for pkg in index.list():
             print u'%s -- %s' % (pkg.name, pkg.title)
 
-ListCommand()
-
 
 class SearchCommand(Command):
     name = 'search'
@@ -289,8 +279,6 @@ Search registered packages in index-spec.
         index, path = self.index_from_spec(spec_from)
         for pkg in index.search(query):
             print u'%s -- %s' % (pkg.name, pkg.title)
-
-SearchCommand()
 
 
 class InfoCommand(Command):
@@ -322,8 +310,6 @@ rebuild the egg-info for changes to show up here.
         else:
             self._print_pkg(pkg)
 
-InfoCommand()
-
 
 class DumpCommand(Command):
     name = 'dump'
@@ -344,8 +330,6 @@ Dump contents of specified resource in specified package to stdout.
         stream = pkg.stream(offset)
         import sys
         sys.stdout.write(stream.read()) 
-
-DumpCommand()
 
 
 class InitCommand(Command):
@@ -391,8 +375,6 @@ repo: Initialize a repository. The repository will be created at the location
         import datapkg.index
         datapkg.index.get_default_index().init()
 
-InitCommand()
-
 
 class CreateCommand(Command):
     name = 'create'
@@ -422,8 +404,6 @@ directory.'''
         self._print(msg)
         datapkg.package.Package.create_on_disk(path)
 
-CreateCommand()
-
 
 class RegisterCommand(Command):
     name = 'register'
@@ -449,8 +429,6 @@ Register package at {src-spec} into index at {dest-spec}.
         pkg = index.get(path)
         index_to.register(pkg)
 
-RegisterCommand()
-
 
 class UpdateCommand(Command):
     name = 'update'
@@ -473,8 +451,6 @@ As for register.
             index_to = datapkg.index.get_default_index()
         pkg = index.get(path)
         index_to.update(pkg)
-
-UpdateCommand()
 
 
 class InstallCommand(Command):
@@ -527,7 +503,12 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
             logger.warn(msg)
             print msg
 
-InstallCommand()
+
+import pkg_resources
+for entry_point in pkg_resources.iter_entry_points('datapkg.cli'):
+    cmd = entry_point.load()
+    cmdinstance = cmd()
+    _commands[cmdinstance.name] = cmdinstance
 
 
 def format_exc(exc_info=None):

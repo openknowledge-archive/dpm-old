@@ -35,6 +35,30 @@ setup(
     
     [console_scripts]
     datapkg=datapkg.cli:main
+
+    [datapkg.cli]
+    help = datapkg.cli:HelpCommand
+    about = datapkg.cli:AboutCommand
+    license = datapkg.cli:LicenseCommand
+    man = datapkg.cli:ManCommand
+    list = datapkg.cli:ListCommand
+    search = datapkg.cli:SearchCommand
+    info = datapkg.cli:InfoCommand
+    dump = datapkg.cli:DumpCommand
+    init = datapkg.cli:InitCommand
+    create = datapkg.cli:CreateCommand
+    register = datapkg.cli:RegisterCommand
+    update = datapkg.cli:UpdateCommand
+    install = datapkg.cli:InstallCommand
+
+    [datapkg.index]
+    file = datapkg.index.base:FileIndex
+    ckan = datapkg.index.ckan:CkanIndex
+    db = datapkg.index.db:DbIndexSqlite
+
+    [datapkg.download]
+
+    [datapkg.storage]
     ''',
     test_suite='nose.collector',
     zip_safe=False,
