@@ -493,20 +493,11 @@ Install a package located {src-spec} to {dest-spec}, e.g.::
         print 'Registering ... '
         install_path = index_to.register(pkg)
         print 'Created on disk at: %s' % install_path
-        resources = set()
-        if pkg.resources:
-            for resource in resources:
-                if resource and isinstance(resource, dict):
-                    url = resource.get("url")
-                    if url: resources.add(url)
         if pkg.download_url:
-            resources.add(pkg.download_url)
-        if resources:
             import datapkg.util
             downloader = datapkg.util.Downloader(install_path)
             print 'Downloading package resources ...'
-            for url in resources:
-                downloader.download(url)
+            downloader.download(pkg.download_url)
         else:
             msg = u'Warning: no resources to install for package %s (no download url)' % pkg.name
             logger.warn(msg)
