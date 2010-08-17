@@ -96,6 +96,7 @@ class Spec(object):
             elif scheme == 'egg':
                 if path and not netloc:
                     netloc, path = path, ''
+                netloc = netloc.strip("/")
                 path = path.lstrip("/")
         spec = Spec(scheme, netloc, path)
         return spec
