@@ -282,3 +282,41 @@ class DistributionOnDiskEggSource(DistributionOnDiskEgg):
         metadata_finder = pkg_resources.PathMetadata(self.dist_path, egg_info)
         return  metadata_finder
 
+def datapkg_sources(dist, attr, value):
+    """
+    This is the implementation for an [egg_info.writers] entrypoint.
+    Datapkg adds an argument to setuptools's setup() function called
+    datapkg_sources. The argument should be a dictionary of the form:
+
+    .. code-block:: python
+
+        setup(
+            ...,
+            datapkg_sources = {
+                "cra2009" : "http://www.hm-treasury.gov.uk/d/cra_2009_db.csv"
+            }
+        )
+
+    The result of this is that there will be a file in the egg called
+    datapkg_sources.spec that looks like this::
+
+        [sources]
+        cra2009=http://www.hm-treasury.gov.uk/d/cra_2009_db.csv
+
+    How do you get at this data? Simple::
+
+    .. code-block:: python
+
+        import pkg_resources
+        dist = pkg_resources.get_distribution("ukgov_treasury_cra")
+        spec = dist.get_metadata("datapkg_sources.spec")
+
+    and 'spec' will be the contents of the file as a string.
+    """
+    if isinstance(value, dict):
+        spec = "[sources]\n"
+        for k,v in value.items():
+            spec += "%s=%s\n" % (k,v)
+    else:
+        spec = value
+    setattr(dist, attr, [spec])

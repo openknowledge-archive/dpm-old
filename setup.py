@@ -32,6 +32,12 @@ setup(
     [paste.paster_create_template]
     datapkg-default=datapkg.templates:DataPkgTemplate
     datapkg-flat=datapkg.templates:DataPkgFlatTemplate
+
+    [distutils.setup_keywords]
+    datapkg_sources=datapkg.pypkgtools:datapkg_sources
+
+    [egg_info.writers]
+    datapkg_sources.spec=setuptools.command.egg_info:write_arg
     
     [console_scripts]
     datapkg=datapkg.cli:main
