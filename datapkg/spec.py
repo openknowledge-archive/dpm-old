@@ -93,6 +93,8 @@ class Spec(object):
             elif scheme == 'db':
                 if netloc and not netloc.startswith('file'):
                     netloc = 'file://' + netloc
+        elif scheme == 'egg':
+            path = path.lstrip("/")
         spec = Spec(scheme, netloc, path)
         return spec
 
@@ -116,6 +118,8 @@ class Spec(object):
                 index = datapkg.index.DbIndexSqlite(self.netloc)
             else:
                 index = datapkg.index.DbIndexSqlite()
+        elif self.scheme == 'egg':
+            index = datapkg.index.EggIndex(self.netloc)
         else:
             msg = 'Scheme "%s" not recognized' % self.scheme
             raise Exception(msg)

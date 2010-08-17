@@ -286,22 +286,27 @@ def datapkg_sources(dist, attr, value):
     """
     This is the implementation for an [egg_info.writers] entrypoint.
     Datapkg adds an argument to setuptools's setup() function called
-    datapkg_sources. The argument should be a dictionary of the form:
+    datapkg_sources. The argument should be string not unlike the 
+    manifest. For example,
 
     .. code-block:: python
 
         setup(
             ...,
-            datapkg_sources = {
-                "cra2009" : "http://www.hm-treasury.gov.uk/d/cra_2009_db.csv"
-            }
+            datapkg_sources = \"""
+                [cra2009]
+                title=HM Treasury's Country and Regional Analysis 2009
+                download_url=http://www.hm-treasury.gov.uk/d/cra_2009_db.csv
+            \"""
         )
-
+        
     The result of this is that there will be a file in the egg called
-    datapkg_sources.spec that looks like this::
+    datapkg_sources.spec with those contents (lines are stripped of
+    whitespace).
 
-        [sources]
-        cra2009=http://www.hm-treasury.gov.uk/d/cra_2009_db.csv
+    The :class:`datapkg.index.egg.EggIndex` class will take the section
+    headers and turn them into the name of the dataset, other keys are
+    passed along unchanged into the resulting package.
 
     How do you get at this data? Simple::
 
@@ -313,10 +318,5 @@ def datapkg_sources(dist, attr, value):
 
     and 'spec' will be the contents of the file as a string.
     """
-    if isinstance(value, dict):
-        spec = "[sources]\n"
-        for k,v in value.items():
-            spec += "%s=%s\n" % (k,v)
-    else:
-        spec = value
-    setattr(dist, attr, [spec])
+    spec = [line.strip() for line in value.split("\n")]
+    setattr(dist, attr, spec)
