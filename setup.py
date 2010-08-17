@@ -61,6 +61,7 @@ setup(
     file = datapkg.index.base:FileIndex
     ckan = datapkg.index.ckan:CkanIndex
     db = datapkg.index.db:DbIndexSqlite
+    egg = datapkg.index.egg:EggIndex
 
     [datapkg.download]
 
