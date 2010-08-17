@@ -1,11 +1,11 @@
-from datapkg.index.base import SimpleIndex
+from datapkg.index.base import IndexBase
 from datapkg.package import Package
 from ConfigParser import ConfigParser
 try: from cStringIO import StringIO
 except ImportError: from StringIO import StringIO
 import pkg_resources
 
-class EggIndex(SimpleIndex):
+class EggIndex(IndexBase):
     """
     This class treats an installed python package as a data
     index. For instructions on creating such a package, what
@@ -30,14 +30,29 @@ class EggIndex(SimpleIndex):
         -rw-r--r--  1 ww  wheel      292 Aug 17 22:37 metadata.txt
     """
     def __init__(self, name):
-        dist = pkg_resources.get_distribution(name)
-        sources = dist.get_metadata("datapkg_sources.spec")
+        try:
+            dist = pkg_resources.get_distribution(name)
+            sources = dist.get_metadata("datapkg_sources.spec")
+        except pkg_resources.DistributionNotFound:
+            raise KeyError("No installed python package named %s" % name)
+        except IOError:
+            raise KeyError("No data sources in %s" % name)
         self.index = ConfigParser()
         self.index.readfp(StringIO(sources))
 
     def list(self):
         return [self.get(name) for name in self.index.sections()]
+
     def get(self, name):
         kwargs = dict((k, self.index.get(name, k)) for k in self.index.options(name))
         kwargs["name"] = name
         return Package(**kwargs)
+
+    def search(self, query):
+        query = query.lower()
+        for package in self.list():
+            if query in package.name.lower() or query in package.title.lower():
+                yield package
+
+    def has(self, name):
+        return name in self.index.sections()

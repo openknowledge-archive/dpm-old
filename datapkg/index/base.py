@@ -8,7 +8,6 @@ from datapkg.package import Package
 
 logger = logging.getLogger('datapkg.index')
 
-
 class IndexBase(object):
     def register(self, package):
         '''Register `package` in the Index.'''
@@ -38,6 +37,9 @@ class IndexBase(object):
         '''Implement `in` operator using `has` method'''
         return self.has(name)
 
+    def __iter__(self, name):
+        '''Implement iteration over the list method'''
+        for package in self.list(): yield package
 
 class SimpleIndex(IndexBase):
     '''In memory Index based on a simple dict.'''
