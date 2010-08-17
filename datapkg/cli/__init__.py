@@ -101,7 +101,7 @@ class Command(object):
         print u'## Package: %s' % pkg.name
         print
         out = pkg.pretty_print()
-        print out
+        print out.encode("utf-8") ## should really chech the users terminal capability
     
     def _check_args(self, args):
         if self.min_args is not None and len(args) < self.min_args:
