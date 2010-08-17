@@ -69,7 +69,7 @@ class Spec(object):
             else:
                 netloc = os.path.join(os.path.dirname(path))
                 path = os.path.basename(path)
-        elif scheme == 'ckan' or scheme == 'db':
+        elif scheme in ('ckan', 'db', 'egg'):
             # python >= 2.6.5 changes behaviour of urlsplit for novel url
             # schemes to be rfc compliant
             # http://bugs.python.org/issue7904
@@ -93,8 +93,10 @@ class Spec(object):
             elif scheme == 'db':
                 if netloc and not netloc.startswith('file'):
                     netloc = 'file://' + netloc
-        elif scheme == 'egg':
-            path = path.lstrip("/")
+            elif scheme == 'egg':
+                if path and not netloc:
+                    netloc, path = path, ''
+                path = path.lstrip("/")
         spec = Spec(scheme, netloc, path)
         return spec
 
