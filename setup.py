@@ -44,18 +44,18 @@ setup(
 
     [datapkg.cli]
     help = datapkg.cli:HelpCommand
-    about = datapkg.cli:AboutCommand
-    license = datapkg.cli:LicenseCommand
-    man = datapkg.cli:ManCommand
-    list = datapkg.cli:ListCommand
-    search = datapkg.cli:SearchCommand
-    info = datapkg.cli:InfoCommand
-    dump = datapkg.cli:DumpCommand
-    init = datapkg.cli:InitCommand
-    create = datapkg.cli:CreateCommand
-    register = datapkg.cli:RegisterCommand
-    update = datapkg.cli:UpdateCommand
-    install = datapkg.cli:InstallCommand
+    about = datapkg.cli.standard:AboutCommand
+    license = datapkg.cli.standard:LicenseCommand
+    man = datapkg.cli.standard:ManCommand
+    list = datapkg.cli.standard:ListCommand
+    search = datapkg.cli.standard:SearchCommand
+    info = datapkg.cli.standard:InfoCommand
+    dump = datapkg.cli.standard:DumpCommand
+    init = datapkg.cli.standard:InitCommand
+    create = datapkg.cli.standard:CreateCommand
+    register = datapkg.cli.standard:RegisterCommand
+    update = datapkg.cli.standard:UpdateCommand
+    install = datapkg.cli.standard:InstallCommand
 
     [datapkg.index]
     file = datapkg.index.base:FileIndex
