@@ -34,10 +34,10 @@ setup(
     datapkg-flat=datapkg.templates:DataPkgFlatTemplate
 
     [distutils.setup_keywords]
-    datapkg_sources=datapkg.pypkgtools:datapkg_sources
+    datapkg_index=datapkg.pypkgtools:datapkg_index
 
     [egg_info.writers]
-    datapkg_sources.spec=setuptools.command.egg_info:write_arg
+    datapkg_index.txt=setuptools.command.egg_info:write_arg
     
     [console_scripts]
     datapkg=datapkg.cli:main

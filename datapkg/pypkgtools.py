@@ -282,7 +282,7 @@ class DistributionOnDiskEggSource(DistributionOnDiskEgg):
         metadata_finder = pkg_resources.PathMetadata(self.dist_path, egg_info)
         return  metadata_finder
 
-def datapkg_sources(dist, attr, value):
+def datapkg_index(dist, attr, value):
     """
     This is the implementation for an [egg_info.writers] entrypoint.
     Datapkg adds an argument to setuptools's setup() function called
@@ -293,7 +293,7 @@ def datapkg_sources(dist, attr, value):
 
         setup(
             ...,
-            datapkg_sources = \"""
+            datapkg_index = \"""
                 [cra2009]
                 title=HM Treasury's Country and Regional Analysis 2009
                 download_url=http://www.hm-treasury.gov.uk/d/cra_2009_db.csv
@@ -301,7 +301,7 @@ def datapkg_sources(dist, attr, value):
         )
         
     The result of this is that there will be a file in the egg called
-    datapkg_sources.spec with those contents (lines are stripped of
+    datapkg_index.txt with those contents (lines are stripped of
     whitespace).
 
     The :class:`datapkg.index.egg.EggIndex` class will take the section
@@ -314,7 +314,7 @@ def datapkg_sources(dist, attr, value):
 
         import pkg_resources
         dist = pkg_resources.get_distribution("ukgov_treasury_cra")
-        spec = dist.get_metadata("datapkg_sources.spec")
+        spec = dist.get_metadata("datapkg_index.txt")
 
     and 'spec' will be the contents of the file as a string.
     """
