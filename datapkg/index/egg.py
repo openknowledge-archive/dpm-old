@@ -10,7 +10,7 @@ class EggIndex(IndexBase):
     This class treats an installed python package as a data
     index. For instructions on creating such a package, what
     needs to go in its setup.py and such, see 
-    :func:`datapkg.pypkgtools.datapkg_sources`. Here we are
+    :func:`datapkg.pypkgtools.datapkg_index`. Here we are
     concerned with how to use such a package.
 
     An example of one such package can be installed like so::
@@ -32,7 +32,7 @@ class EggIndex(IndexBase):
     def __init__(self, name):
         try:
             dist = pkg_resources.get_distribution(name)
-            sources = dist.get_metadata("datapkg_sources.spec")
+            sources = dist.get_metadata("datapkg_index.txt")
         except pkg_resources.DistributionNotFound:
             raise KeyError("No installed python package named %s" % name)
         except IOError:
