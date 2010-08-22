@@ -55,7 +55,7 @@ setup(
     create = datapkg.cli.standard:CreateCommand
     register = datapkg.cli.standard:RegisterCommand
     update = datapkg.cli.standard:UpdateCommand
-    install = datapkg.cli.standard:InstallCommand
+    install = datapkg.cli.download:DownloadCommand
 
     [datapkg.index]
     file = datapkg.index.base:FileIndex

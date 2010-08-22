@@ -20,4 +20,21 @@ class TestCase(object):
         os.makedirs(self.tmpdir)
         return self.tmpdir
 
-        
+#     @classmethod
+#     def make_test_package(self, pkg_name, **kwargs):
+#         import datapkg.package
+#         pkg = datapkg.package.Package(pkg_name, **kwargs)
+#         pkg.manifest['data.csv'] = None
+#         pkg.manifest['data.js'] = {'format': 'json'}
+#         return pkg
+# 
+#     # TODO: finish this off
+#     @classmethod
+#     def make_test_package_on_disk(self, pkg_name, **kwargs):
+#         import datapkg.package
+#         pkg = datapkg.package.Package(pkg_name, **kwargs)
+#         pkg.manifest['data.csv'] = None
+#         pkg.manifest['data.js'] = {'format': 'json'}
+#         # pkg.write(...)
+#         return pkg
+

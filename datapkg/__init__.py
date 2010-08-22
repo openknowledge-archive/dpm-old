@@ -27,17 +27,15 @@ Get some information about one of them::
 
     $ datapkg info ckan://iso-3166-2-data
 
-Let's install it (to the current directory)::
+Let's download it (to the current directory)::
 
-    $ datapkg install ckan://iso-3166-2-data file://.
+    $ datapkg download ckan://iso-3166-2-data .
 
 This will download the Package 'iso-3166-2-data' together with its "Resources"
 and unpack it into a directory named 'iso-3166-2-data'.
 
-Note: we specify local file pathes with the file:// prefix. This is avoid
-the ambiguity between a relative file path like 'mypackage' and a package name
-'mypackage' in arguments to datapkg commands. For more on package 'specs' as
-they are called see the dedicated section below.
+Note: we specify packages using 'package specs' like 'ckan://{name}. For more
+on package 'specs' as they are called see the dedicated section below.
 
 Note that, if you replace the ckan:// spec with a file:// spec, you can use
 most of the commands for files on disk. For example, if you've downloaded a
@@ -182,9 +180,9 @@ Once that is done you register the package on CKAN by doing::
 3. Installing your package
 --------------------------
 
-You can also install a distribution (only onto disk at the moment!)::
+You can also download a distribution (only onto disk at the moment!)::
 
-    $ datapkg install {package-spec} {file-spec}
+    $ datapkg download {package-spec} {path-on-disk}
 
 
 3. For Developers
