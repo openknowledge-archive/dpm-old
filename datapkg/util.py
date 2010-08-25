@@ -27,40 +27,36 @@ import zipfile
 class Downloader(object):
     '''Handling downloading (and unnpacking) of resources.
     '''
+    def download(self, url, dest_dir, **kwargs):
+        '''Download a 'resource' at `url` to a destination directory `dest`.
 
-    def __init__(self,  base_dir='.', **kwargs):
-        '''
-        @param base_dir: default base directory to use for downloading
-        material.
-        '''
-        self.base_dir = os.path.abspath(os.path.expanduser(base_dir))
-        self.cache_dir = os.path.join(self.base_dir, '.download_cache')
-        # makes self.base_dir too ...
-        if not os.path.exists(self.cache_dir):
-            os.makedirs(self.cache_dir)
+        @param dest_dir: destination directory to download to.
+        @param kwargs: as for urlgrabber.urlgrab. NB: by default a progress meter is provided. To disable this pass
+        progress_obj=None as a kwarg. Similarly copy_local set to True for
+        urlgrabber by default.
 
-    def download(self, url, dest=None, **kwargs):
-        '''Download a 'resource' at url to dest.
-
-        @param dest: if dest is None download to self.base_dir.
-        @param kwargs: as for urlgrabber.urlgrab
         @return: path to downloaded file
-
-        Notes: by default a progress meter is provided. To disable this pass
-        progress_obj=None as a kwarg.
 
         TODO: support vcs backend (e.g. svn, hg etc)
         '''
+        link = Link(url)
+        filename = link.filename
+        location = os.path.join(dest_dir, filename)
+        if not os.path.exists(dest_dir):
+            os.makedirs(dest_dir)
+        return self._download(url, location, **kwargs)
+
+    def _download(self, url, path, **kwargs):
+        '''Download url to `path` on disk.
+
+        **kwargs: as for `download`.
+        '''
         ourkwargs = {
-            'progress_obj': urlgrabber.progress.TextMeter()
+            'progress_obj': urlgrabber.progress.TextMeter(),
+            'copy_local': True
             }
         ourkwargs.update(kwargs)
-        location = dest
-        if location is None:
-            link = Link(url)
-            filename = link.filename
-            location = os.path.join(self.base_dir, filename)
-        filename = urlgrabber.urlgrab(url, location, **ourkwargs)
+        filename = urlgrabber.urlgrab(url, path, **ourkwargs)
         return filename
     
     def unpack_file(self, src, dest):

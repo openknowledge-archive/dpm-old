@@ -19,8 +19,8 @@ class TestDownloader(TestCase):
     def setup_class(self):
         # will now have self.tmpdir
         self.make_tmpdir()
-        self.downloader = datapkg.util.Downloader(self.tmpdir)
-        self.base_dir = self.downloader.base_dir
+        self.base_dir = self.tmpdir
+        self.downloader = datapkg.util.Downloader()
         indata_dir = os.path.join(self.tmpdir, 'indata')
         os.makedirs(indata_dir)
         self.csv = os.path.join(indata_dir, 'my.csv')
@@ -35,14 +35,14 @@ class TestDownloader(TestCase):
 
     def test_1_download_csv(self):
         url = 'file://' + urllib.pathname2url(self.csv)
-        out = self.downloader.download(url, copy_local=True)
+        out = self.downloader.download(url, self.base_dir)
         print out
         dest = os.path.join(self.base_dir, 'my.csv')
         assert os.path.exists(dest), dest
 
     def test_2_download_simple_zip(self):
         url = 'file://' + urllib.pathname2url(self.zipped_csv)
-        self.downloader.download(url, copy_local=True)
+        self.downloader.download(url, self.base_dir)
         dest = os.path.join(self.base_dir, 'myzip.zip')
         # unpack case
         # dest = os.path.join(self.base_dir, 'myzip', 'my.csv')
@@ -53,7 +53,7 @@ class TestDownloader(TestCase):
     def test_3_download_targz(self):
         test_url = 'http://knowledgeforge.net/ckan/datapkgdemo-0.1.tar.gz'
 
-        self.downloader.download(test_url)
+        self.downloader.download(test_url, self.base_dir)
         dest = os.path.join(self.base_dir, 'datapkgdemo-0.1.tar.gz')
         assert os.path.exists(dest), dest
 

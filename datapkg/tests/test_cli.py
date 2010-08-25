@@ -98,9 +98,9 @@ class TestCLI(CLIBase):
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
 
-        # install
-        cmd = self.cmd_base + 'install %s %s' % (self.file_spec,
-                self.repo_spec)
+        # download
+        cmd = self.cmd_base + 'download %s %s' % (self.file_spec,
+                self.repo_path)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         print output
