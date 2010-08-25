@@ -1,9 +1,11 @@
-from datapkg.index.base import IndexBase
-from datapkg.package import Package
 from ConfigParser import ConfigParser
 try: from cStringIO import StringIO
 except ImportError: from StringIO import StringIO
 import pkg_resources
+
+from datapkg.index.base import IndexBase
+from datapkg.package import Package
+from datapkg.metadata import Metadata
 
 class EggIndex(IndexBase):
     """
@@ -44,9 +46,15 @@ class EggIndex(IndexBase):
         return [self.get(name) for name in self.index.sections()]
 
     def get(self, name):
-        kwargs = dict((k, self.index.get(name, k)) for k in self.index.options(name))
+        kwargs = dict((k, self.index.get(name, k)) 
+                      for k in self.index.options(name)
+                      if k in Metadata.key_list)
         kwargs["name"] = name
-        return Package(**kwargs)
+        pkg = Package(**kwargs)
+        pkg.extras.update((k, self.index.get(name, k))
+                          for k in self.index.options(name)
+                          if k not in Metadata.key_list)
+        return pkg
 
     def search(self, query):
         query = query.lower()
