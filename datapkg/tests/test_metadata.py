@@ -54,3 +54,8 @@ class TestMetadataConverter:
         outmeta = M.MetadataConverter.normalize_metadata(inmeta)
         assert outmeta['tags'] == ['be', 'here', 'now', 'everyone'], outmeta['tags']
 
+    def test_download_resource(self):
+        inmeta = {'download_url': 'http://xyz.com'}
+        outmeta = M.MetadataConverter.normalize_metadata(inmeta)
+        outmeta['resources'][0]['url'] = inmeta['download_url']
+

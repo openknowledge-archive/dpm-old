@@ -170,7 +170,9 @@ class MetadataConverter(object):
                 newmeta['tags'] = re.findall(r'''["']\s*([^"]*?)\s*["']''', out)
             else:
                 newmeta['tags'] = re.split('[,\s]+', out)
-
+        if 'download_url' in newmeta:
+            # assume resources does not exist
+            newmeta['resources'] = [{'url': newmeta['download_url']}]
         return newmeta
 
     def _extract_extras_from_notes(self):
