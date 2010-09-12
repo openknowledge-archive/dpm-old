@@ -36,7 +36,7 @@ class PackageDownloader(object):
 
         # if datapkg distribution use it first
         datapkgs  = [ r for r in pkg.resources if
-            r['format'].startswith('datapkg') ]
+            r.get('format', '').startswith('datapkg') ]
         for dpkg in datapkgs:
             downloader = self.find_downloader(dpkg)
             if not downloader:
@@ -65,12 +65,12 @@ class PackageDownloader(object):
         downloader.download(resource['url'], dest_path)
 
     def find_downloader(self, resource):
-        format = resource['format']
-        format_type = format.split('/')[0]
+        format_ = resource.get('format', '')
+        format_type = format_.split('/')[0]
         if format_type in [ 'api', 'resource' ]:
             self._print('Unable to retrieve resources of type: %s' % format)
             return None
-        elif resource['format'] in ['datapkg/hg', 'datapkg/git']:
+        elif format_ in ['datapkg/hg', 'datapkg/git']:
             self._print('Unable to retrieve resources of type: %s' % format)
             return None
         else: # treat everything as a retrievable file ...
