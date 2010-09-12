@@ -124,9 +124,9 @@ class Command(object):
         if options.config:
             datapkg.CONFIG = datapkg.config.load_config(options.config)
         if options.api_key:
-            datapkg.CONFIG.set('DEFAULT', 'ckan.api_key', self.options.api_key)
+            datapkg.CONFIG.set('index:ckan', 'ckan.api_key', self.options.api_key)
         if options.repository:
-            datapkg.CONFIG.set('DEFAULT', 'repo.default_path',
+            datapkg.CONFIG.set('datapkg', 'repo.default_path',
                     options.repository)
 
         ## set up logging
@@ -357,9 +357,9 @@ repo: Initialize a repository. The repository will be created at the location
     
     def repo(self, args, options):
         import datapkg.repository
-        repo = datapkg.repository.Repository(datapkg.CONFIG.get('DEFAULT', 'repo.default_path'))
+        repo = datapkg.repository.Repository(datapkg.CONFIG.get('datapkg', 'repo.default_path'))
         repo.init()
-        msg = 'Repository successfully initialized at %s' % datapkg.CONFIG.get('DEFAULT', 'repo.default_path')
+        msg = 'Repository successfully initialized at %s' % datapkg.CONFIG.get('datapkg', 'repo.default_path')
         self._print(msg)
     
     def config(self, args, options):

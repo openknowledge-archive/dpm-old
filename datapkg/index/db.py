@@ -19,7 +19,7 @@ class DbIndexSqlite(IndexBase):
         if dburi is not None: 
             self.dburi = dburi
         else:
-            self.dburi = datapkg.CONFIG.get('DEFAULT', 'db.dburi')
+            self.dburi = datapkg.CONFIG.get('index:db', 'db.dburi')
         self.dburi = self.dburi.replace('sqlite://', '')
     
     create_script = '''
@@ -118,7 +118,7 @@ class DbIndexSqlalchemy(IndexBase):
         if dburi is not None: 
             self.dburi = dburi
         else:
-            self.dburi = datapkg.CONFIG.get('DEFAULT', 'db.dburi')
+            self.dburi = datapkg.CONFIG.get('index:db', 'db.dburi')
         self.engine = create_engine(self.dburi)
         Session = sessionmaker()
         Session.configure(bind=self.engine)

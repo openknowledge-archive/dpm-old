@@ -15,11 +15,11 @@ class CkanIndex(IndexBase):
         if url is not None:
             self.url = url
         else:
-            self.url = datapkg.CONFIG.get('DEFAULT', 'ckan.url')
+            self.url = datapkg.CONFIG.get('index:ckan', 'ckan.url')
         if api_key is not None:
             self.api_key = api_key
         else:
-            self.api_key = datapkg.CONFIG.dictget('DEFAULT', 'ckan.api_key', None)
+            self.api_key = datapkg.CONFIG.dictget('index:ckan', 'ckan.api_key', None)
         if self.url.endswith('/'):
             self.url = self.url[:-1]
         from ckanclient import CkanClient

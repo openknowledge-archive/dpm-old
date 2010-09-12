@@ -38,11 +38,14 @@ def load_config(config_path=default_config_path):
 def make_default_config(repo_path=default_repo_path):
     '''Create default ConfigParser config.'''
     cfg = Config()
-    cfg.set('DEFAULT', 'version', datapkg.__version__)
-    cfg.set('DEFAULT', 'ckan.url',  'http://ckan.net/api/')
-    cfg.set('DEFAULT', 'ckan.api_key', '')
-    cfg.set('DEFAULT', 'repo.default_path', repo_path)
-    cfg.set('DEFAULT', 'db.dburi', 'sqlite://%(repo.default_path)s/index.db')
+    cfg.add_section('datapkg')
+    cfg.add_section('index:ckan')
+    cfg.add_section('index:db')
+    cfg.set('datapkg', 'version', datapkg.__version__)
+    cfg.set('datapkg', 'repo.default_path', repo_path)
+    cfg.set('index:ckan', 'ckan.url',  'http://ckan.net/api/')
+    cfg.set('index:ckan', 'ckan.api_key', '')
+    cfg.set('index:db', 'db.dburi', 'sqlite://%s/index.db' % repo_path)
     return cfg
 
 def write_default_config(path=default_config_path, repo_path=default_repo_path):

@@ -123,9 +123,9 @@ class Command(object):
         if options.config:
             datapkg.CONFIG = datapkg.config.load_config(options.config)
         if options.api_key:
-            datapkg.CONFIG.set('DEFAULT', 'ckan.api_key', self.options.api_key)
+            datapkg.CONFIG.set('index:ckan', 'ckan.api_key', self.options.api_key)
         if options.repository:
-            datapkg.CONFIG.set('DEFAULT', 'repo.default_path',
+            datapkg.CONFIG.set('datapkg', 'repo.default_path',
                     options.repository)
 
         ## set up logging
