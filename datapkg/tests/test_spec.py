@@ -1,6 +1,5 @@
-from datapkg.spec import *
-
 from datapkg.tests.base import TestCase
+from datapkg.spec import *
 
 
 class TestSpec(TestCase):
@@ -87,24 +86,24 @@ class TestSpec(TestCase):
         assert spec.path == 'datapkgdemo', spec.path
 
     def test_04_index_from_spec(self):
-        import datapkg.index
+        from datapkg.index.base import FileIndex
         spec = Spec.parse_spec(self.file_spec)
         index, path = spec.index_from_spec()
-        assert isinstance(index, datapkg.index.FileIndex)
+        assert isinstance(index, FileIndex)
 
         spec = Spec.parse_spec('file://.')
         index, path = spec.index_from_spec()
-        assert isinstance(index, datapkg.index.FileIndex)
+        assert isinstance(index, FileIndex)
 
     def test_04_index_from_spec_ckan(self):
-        import datapkg.index
+        from datapkg.index.ckan import CkanIndex
         spec = Spec.parse_spec('ckan://datapkgdemo')
         index, path = spec.index_from_spec()
-        assert isinstance(index, datapkg.index.CkanIndex)
+        assert isinstance(index, CkanIndex)
 
     def test_04_index_from_spec_db(self):
-        import datapkg.index
+        from datapkg.index.db import DbIndexSqlite
         spec = Spec.parse_spec('db://datapkgdemo')
         index, path = spec.index_from_spec()
-        assert isinstance(index, datapkg.index.DbIndexSqlite)
+        assert isinstance(index, DbIndexSqlite)
 

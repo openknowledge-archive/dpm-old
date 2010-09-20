@@ -96,7 +96,7 @@ class FileIndex(IndexBase):
         #    os.makedirs(self.index_path)
 
     def _simple_index(self):
-        ourindex = datapkg.index.SimpleIndex()
+        ourindex = SimpleIndex()
         for root, dirs, files in os.walk(self.index_path):
             if 'setup.py' in files or 'metadata.txt' in files:
                 try:

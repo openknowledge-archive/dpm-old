@@ -79,7 +79,7 @@ class Spec(object):
             # python >= 2.5.5
             # SplitResult(scheme='ckan', netloc='ckan', path='', query='', fragment='')
             if netloc != '': # python >= 2.6.5
-                path = netloc + '/' + path if path else netloc
+                path = netloc + path if path else netloc
                 netloc = ''
             # after urlsplit of ckan://... have path = //... for python < 2.6.5
             while path.startswith('/'):
@@ -107,25 +107,15 @@ class Spec(object):
         :return: `Index` and path
         '''
         import datapkg.index
-        if self.scheme == 'file':
-            index = datapkg.index.FileIndex(self.netloc)
-        elif self.scheme == 'ckan':
-            if self.netloc:
-                ckan_url = self.netloc
-                index = datapkg.index.CkanIndex(ckan_url)
-            else:
-                # use config provided ckan url
-                index = datapkg.index.CkanIndex()
-        elif self.scheme == 'db':
-            if self.netloc:
-                index = datapkg.index.DbIndexSqlite(self.netloc)
-            else:
-                index = datapkg.index.DbIndexSqlite()
-        elif self.scheme == 'egg':
-            index = datapkg.index.EggIndex(self.netloc)
-        else:
+        index_name = self.scheme
+        index_class = datapkg.index.get_index(self.scheme)
+        if index_class is None:
             msg = 'Scheme "%s" not recognized' % self.scheme
             raise Exception(msg)
+        if self.netloc:
+            index = index_class(self.netloc)
+        else:
+            index = index_class()
         return index, self.path
     
     def __str__(self):

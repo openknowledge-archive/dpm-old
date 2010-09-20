@@ -58,6 +58,7 @@ setup(
     install = datapkg.cli.download:DownloadCommand
 
     [datapkg.index]
+    simple = datapkg.index.base:SimpleIndex
     file = datapkg.index.base:FileIndex
     ckan = datapkg.index.ckan:CkanIndex
     db = datapkg.index.db:DbIndexSqlite

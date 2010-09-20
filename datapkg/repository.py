@@ -3,7 +3,7 @@ import ConfigParser
 import logging
 
 import datapkg
-import datapkg.index
+import datapkg.index.db
 
 logger = logging.getLogger('datapkg.repository')
 
@@ -31,7 +31,7 @@ class DbRepository(object):
         self.installed_path = os.path.join(self.repo_path, 'installed')
         self.index_path = os.path.join(self.repo_path, 'index.db')
         self.index_dburi = 'sqlite:///%s' % self.index_path
-        self.index = datapkg.index.DbIndexSqlite(self.index_dburi)
+        self.index = datapkg.index.db.DbIndexSqlite(self.index_dburi)
 
     def init(self):
         if not os.path.exists(self.repo_path):

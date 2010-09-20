@@ -16,9 +16,9 @@ class TestMisc(TestCase):
         self.file_spec = u'file://%s' % self.pkg_path
 
     def test_load_index(self):
-        import datapkg.index
+        import datapkg.index.base
         index = datapkg.load_index(self.index_spec, all_index=True)
-        assert isinstance(index, datapkg.index.FileIndex)
+        assert isinstance(index, datapkg.index.base.FileIndex)
         assert index.index_path == self.repo_path, (index.index_path,
                 self.repo_path)
     
