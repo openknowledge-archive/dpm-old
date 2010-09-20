@@ -41,6 +41,8 @@ About information (including license details) is available via `datapkg about`.
         commands.sort(key=lambda x: x.name)
         for command in commands:
             print '  %s: %s' % (command.name, command.summary)
+
+
 import pkg_resources
 for entry_point in pkg_resources.iter_entry_points('datapkg.cli'):
     cmd = entry_point.load()
