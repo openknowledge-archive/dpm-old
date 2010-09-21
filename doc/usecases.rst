@@ -1,12 +1,60 @@
+=====================
 Use cases for datapkg
 =====================
 
-Consumer user role
-------------------
+Use cases for DataPkg (or: reasons to use it in the first place)
 
- 1. Install datapkg
- 2. Search remote registry/repo for a package
- 3. Download package on to local disk and unpack::
+These use cases are not necessarily all implemented but are a guide to what we
+are *trying to do*. The first two were the two original use cases at the start
+of the project (and were heavily inspired by debian).
+
+1. Grabbing some data from an index
+===================================
+
+The steps involved::
+
+    $ datapkg index-add file:///....
+    $ datapkg update
+    $ datapkg search "military spending"
+
+    some-id Military Spending 1890-1914
+    some-id-2 Military Spending 1890-1914 (normalized)
+
+    $ datapkg install some-id
+    ...
+    $ datapkg plot some-id
+
+2. Get two different datasets and use them together
+===================================================
+
+What data?
+
+  * Normalize data
+    * Cross country and then convert to standard (e.g. US$, GBP)
+      * Exchange rates
+      * Cost of living
+    * Changes across time and then do real present value
+  * [Plot two different data sources again each other.]
+    * [Government expenditure in different sectors?]
+
+Example code::
+
+    $ datapkg install pkg-a
+    $ datapkg install pkg-b
+    $ datapkg create merged
+      # manual merge
+      # e.g. PPP, GDP
+    $ datapkg register my-merged-package
+
+
+Getting data v2
+===============
+
+Revist basic discovery and usage of data from above.
+
+  1. Install datapkg
+  2. Search remote registry/repo for a package
+  3. Download package on to local disk and unpack::
 
      $ datapkg get [url|name] [path]
 
