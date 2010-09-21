@@ -74,7 +74,12 @@ Check it has registered ok::
 
     $ datapkg info ckan://mynewdatapkg
 
-[Not Yet Functional]: uploading package distributions.
+You can also upload associated package resources to a storage system. For
+example, to register {your-file} with the default storage system associated to
+CKAN in a bucket named after {yourpackagename}::
+
+    # this requires you have created your default datapkgrc config file
+    $ datapkg upload {your-file} ckan://{yourpackagename}/{filename}
 
 
 2. Tutorial

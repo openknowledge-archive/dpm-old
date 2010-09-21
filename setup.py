@@ -56,6 +56,7 @@ setup(
     register = datapkg.cli.standard:RegisterCommand
     update = datapkg.cli.standard:UpdateCommand
     install = datapkg.cli.download:DownloadCommand
+    upload = datapkg.cli.upload:UploadCommand
 
     [datapkg.index]
     simple = datapkg.index.base:SimpleIndex

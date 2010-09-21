@@ -2,44 +2,25 @@
 
 We use the OFS library for talking to backends and this module is just a think
 wrapper around that.
-
-We specify where material is uploaded to using a 'upload spec'
-(upload-spec), which are of the form::
-
-    {upload-dest-id}://BUCKET/LABEL
-
-For example::
-
-    ## default ckan upload
-    ckan://BUCKET/LABEL
-
-    ## an s3 upload destination
-    my-s3://BUCKET/LABEL
-
-    ## local pairtree
-    my-pairtree://BUCKET/LABEL
-
-    ## google storage
-    my-google-storage://BUCKET/LABEL
-
-Upload destinations are specified in your datapkg config file and are of the form::
-
-    [upload:dest-id]
-    ofs.backend = {s3|google|archive.org|...}
-    ## see OFS documentation for a given back
-    {config-option} = {config-value}
 '''
 import datapkg
 import pkg_resources
 
 class Uploader(object):
+    '''Handle uploading to storage backends using OFS.'''
+
     def __init__(self, verbose=False):
         self.verbose = True
 
-    def upload(self, filepath, uploadspec):
-        backend = self.load_ofs_backend(uploadspec)
-        bucket,label = self.get_bucket_label(uploadspec)
-        backend.put_stream(bucket, label, open(filepath))
+    def upload(self, fileobj, upload_spec):
+        '''Upload contents of `fileobj` to location specified by `upload_spec`.
+
+        :param upload_spec: an upload spec see documentation for upload
+        command.
+        '''
+        backend = self.load_ofs_backend(upload_spec)
+        bucket,label = self.get_bucket_label(upload_spec)
+        backend.put_stream(bucket, label, fileobj)
 
     def load_ofs_backend(self, uploadspec):
         uploadid = uploadspec.split(':')[0]

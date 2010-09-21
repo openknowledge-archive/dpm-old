@@ -27,14 +27,14 @@ class CLIBase(datapkg.tests.base.TestCase):
         self.pkg_name = u'mytestpkg'
         self.pkg_title = u'Test Title'
         self.pkg_path = os.path.join(self.tmpdir, self.pkg_name)
-        fp = os.path.join(self.pkg_path, 'abc.txt')
+        self.abc_filepath = os.path.join(self.pkg_path, 'abc.txt')
         pkg = datapkg.package.Package(
             name=self.pkg_name,
             title=self.pkg_title,
-            download_url='file://%s' % fp
+            download_url='file://%s' % self.abc_filepath
             )
         pkg.write(self.pkg_path)
-        fo = open(fp, 'w')
+        fo = open(self.abc_filepath, 'w')
         fo.write('Ideas are cheap, implementation is costly.')
         fo.close()
         self.file_spec = u'file://%s' % self.pkg_path
@@ -47,13 +47,13 @@ class CLIBase(datapkg.tests.base.TestCase):
 
 
 class TestCLI(CLIBase):
-    def test_1_about(self):
+    def test_01_about(self):
         cmd = 'datapkg about'
         status, output = commands.getstatusoutput(cmd)
         exp = 'datapkg version'
         assert exp in output
 
-    def test_4_walkthrough(self):
+    def test_02_walkthrough(self):
         cmd = self.cmd_base + 'list %s' % (self.index_spec)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
@@ -121,6 +121,25 @@ class TestCLI(CLIBase):
         cmd = self.cmd_base + 'dump %s %s' % ('file://' + self.pkg_path, offset)
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
+
+    def test_03_upload(self):
+        # sets up config for uploading and a directory upload_dir
+        self.setup_for_upload()
+        import datapkg
+        # Remember: commands run in a separate process so no access to config
+        # now overwrite config with our test config
+        cfg_path = os.path.join(self.tmpdir, 'datapkgrc')
+        datapkg.CONFIG.write(open(cfg_path, 'w'))
+
+        # and set up cmd base to use it 
+        our_cmd_base = self.cmd_base + '--config %s ' % cfg_path
+
+        cmd = our_cmd_base + 'upload %s %s' % (self.abc_filepath,
+                'mypairtree://mb/abc.txt')
+        status, output = datapkg.util.getstatusoutput(cmd)
+        assert not status, output
+        destpath = os.path.join(self.upload_dir, 'pairtree_root', 'mb', 'obj', 'abc.txt')
+        assert os.path.exists(destpath), destpath
 
 
 class TestWithConfigAndDbIndex(CLIBase):
