@@ -9,6 +9,10 @@ from datapkg.package import Package
 logger = logging.getLogger('datapkg.index')
 
 class IndexBase(object):
+    '''Base class for Index objects, all Index implementations should implement
+    the API defined here.
+    '''
+
     def register(self, package):
         '''Register `package` in the Index.'''
         raise NotImplementedError

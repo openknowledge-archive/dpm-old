@@ -3,6 +3,9 @@ filesystem, database, CKAN).
 '''
 import pkg_resources
 
+from base import IndexBase
+
+
 def get_index(index_name):
     '''Get Index class corresponding to the provided `index_name`.
 

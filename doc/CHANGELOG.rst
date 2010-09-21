@@ -5,6 +5,13 @@ History
 HEAD
 ====
 
+  * (MAJOR) Support for uploading datapkgs (upload.py)
+  * Pluggable and improved package download support
+  * Make datapkg easily extenable
+
+    * Support for adding new Index types with plugins
+    * Support for adding new commands with command plugins
+
 V0.7 2010-??-??
 ===============
 

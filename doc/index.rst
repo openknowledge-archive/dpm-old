@@ -55,6 +55,16 @@ There are also a set of use cases and research on other similar tools:
    usecases
    research
 
+Extending Datapkg
+-----------------
+
+Datapkg has a rich plugin architecture that makes it easy to extend.
+
+.. toctree::
+
+   extending
+
+
 Other material
 ==============
 
