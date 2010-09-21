@@ -41,7 +41,6 @@ def make_default_config(repo_path=default_repo_path):
     cfg.add_section('datapkg')
     cfg.add_section('index:ckan')
     cfg.add_section('index:db')
-    cfg.set('datapkg', 'version', datapkg.__version__)
     cfg.set('datapkg', 'repo.default_path', repo_path)
     cfg.set('index:ckan', 'ckan.url',  'http://ckan.net/api/')
     cfg.set('index:ckan', 'ckan.api_key', '')
