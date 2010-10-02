@@ -27,7 +27,7 @@ def load_config(config_path=default_config_path):
     '''
     config = None
     if os.path.exists(config_path):
-        config = ConfigParser.SafeConfigParser()
+        config = Config()
         config.readfp(open(config_path))
     else:
         # intentionally do not write to disk
