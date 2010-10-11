@@ -74,21 +74,24 @@ class PythonDistribution(DistributionBase):
     '''Datapkg distribution based on python distribution format (based on
     setuptools).
 
-    Metadata:
+    File layout::
 
-      * setup.py: as per standard python approach main 'metadata' goes in
-        python setup.py file with key/value arguments to setup method.
-      * MANIFEST.in: manifest template specifying rules for what files to
-        include in the distribution. For details see:
-        http://docs.python.org/distutils/sourcedist.html#the-manifest-in-template
+        {dist-path}/setup.py
+            # as per standard python approach main 'metadata' goes in python
+            # setup.py file with key/value arguments to setup method.
 
-        * If you want to explicitly list every file you can create a MANIFEST
-          file.
+        {dist-path}/MANIFEST.in
+            # manifest template specifying rules for what files to include in
+            # the distribution. For details see:
+            # http://docs.python.org/distutils/sourcedist.html#the-manifest-in-template
+            # NB: If you want to explicitly list every file you can create a
+            # MANIFEST file.
 
-    Data (and code):
-    
-        * in default ('flat') setup these can be put in same directory as
-          setup.py and in any subdirectories.
+        {dist-path}/{pkgname}/...
+
+            # Data (and code) files. For python to pick up files correctly
+            # they should be in subdirectory named after the package or
+            # subdirectories thereof (e.g. {pkgname}/data
     '''
 
     # TODO: write should write out package metadata ...
@@ -200,17 +203,20 @@ import ConfigParser
 class SimpleDistribution(DistributionBase):
     '''Simple distribution storing metadata in an ini file.
 
-    Metadata:
+    File layout::
+
+        {dist-path}/metadata.txt
     
-      * metadata.txt: package metadata in ini-file format (key = value or key:
-        value with support for line continuations). See
-        http://docs.python.org/library/configparser.html.
-      * Manifest items are inserted as sections with name of ile and prefix
-        'manifest::' e.g. [manifest::myfilename.csv]
+          * metadata.txt: package metadata in ini-file format (key = value or
+            key: value with support for line continuations). See
+            http://docs.python.org/library/configparser.html.
+          * Manifest items are inserted as sections with name of ile and prefix
+            'manifest::' e.g. [manifest::myfilename.csv]
 
-    Data (and code):
+        {dist-path/....
 
-      * Any files you want (specify them in the manifest).
+            # Data (and code): any files you want (specify them in the
+            # manifest).
     '''
     manifest_prefix = 'manifest::'
     keymap = {
