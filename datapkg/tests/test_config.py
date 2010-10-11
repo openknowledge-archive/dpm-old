@@ -4,7 +4,8 @@ import datapkg.config
 class TestConfig:
     def test_make_default_config(self):
         cfg = datapkg.config.make_default_config()
-        assert set(cfg.sections()) == set(['datapkg', 'index:ckan', 'index:db'])
+        assert set(cfg.sections()) == set(['datapkg', 'index:ckan',
+            'index:db', 'upload:ckan']), cfg.sections()
         assert cfg.get('index:ckan', 'ckan.url') == 'http://ckan.net/api/'
 
     def test_dictget(self):
