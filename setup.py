@@ -21,18 +21,12 @@ setup(
     include_package_data=True,
     install_requires=[
         'setuptools>=0.6c',
-        'PasteDeploy>=1.0',
-        'PasteScript>=1.0',
         # 'SQLAlchemy>=0.4',
         # make ckan support obligatory for time being
         'ckanclient==0.3',
         'urlgrabber>=3.0'
     ],
     entry_points='''
-    [paste.paster_create_template]
-    datapkg-default=datapkg.templates:DataPkgTemplate
-    datapkg-flat=datapkg.templates:DataPkgFlatTemplate
-
     [distutils.setup_keywords]
     datapkg_index=datapkg.pypkgtools:datapkg_index
 

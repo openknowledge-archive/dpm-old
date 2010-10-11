@@ -100,22 +100,62 @@ class PythonDistribution(DistributionBase):
 
         @param template: paster template to use
         '''
-        # TODO: import PasteScript direct and use
-        # use no-interactive to avoid querying on vars
-        cmd = 'paster create --no-interactive --template=datapkg-%s ' % template
-        base_path, xxx = Package.info_from_path(path)
-        if base_path:
-            cmd += '--output-dir %s ' % base_path
-        cmd += self.package.name
-        # TODO: catch stdout and only print if error
-        import commands
-        # os.system(cmd)
-        import datapkg.util
-        status, output = datapkg.util.getstatusoutput(cmd)
-        if status:
-            msg = 'Error on attempt to create file structure:\n\n%s' % output
-            raise DatapkgException(msg)
-        return self.package.installed_path
+        dest = path
+        if os.path.exists(path):
+            raise Exception('Destination path already exists: %s' % dest)
+        # python has package dir inside distribution dir
+        pkgdir = os.path.join(dest, self.package.name)
+        os.makedirs(pkgdir)
+        fo = open(os.path.join(pkgdir, '__init__.py'), 'w')
+        fo.write('')
+        fo.close()
+        setuppy = '''from setuptools import setup, find_packages
+
+setup(
+    name='%(name)s',
+    version=0.1,
+    # Name of License for your project
+    # Suitable open licenses can be found at http://www.opendefinition.org/licenses/
+    license='',
+
+    # Title or one-line description of the package
+    description='',
+
+    # URL of project/package homepage
+    url='',
+
+    # Download url for this package if it has a specific location
+    # download_url='',
+
+    # Comma-separated keywords/tags
+    keywords='',
+
+    # Notes or multi-line description for your project (in markdown)
+    long_description="""\n""",
+
+    author='',
+    author_email='',
+
+    ###########################
+    ## Ignore from here onwards
+
+    packages=find_packages(),
+    include_package_data=True,
+    # do not zip up the package into an 'Egg'
+    zip_safe=False,
+)
+
+'''
+        manifest = '''# Follows python MANIFEST.in syntax. See datapkg man for more details
+recursive-include %s *.txt *.csv *.js *.dat
+''' % self.package.name
+        manifestpath = os.path.join(dest, 'MANIFEST.in')
+        setuppypath = os.path.join(dest, 'setup.py')
+        fo = open(manifestpath, 'w')
+        fo.write(manifest)
+        fo = open(setuppypath, 'w')
+        fo.write(setuppy % self.package.metadata)
+        return dest
 
     @classmethod
     def load(self, path):

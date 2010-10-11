@@ -17,13 +17,13 @@ V0.7 2010-10-11
     * Support for adding new Commands with command plugins
     * Support for adding new Distributions with distribution plugins
 
-  * Improved package download support
-
-    * Also now pluggable
-
+  * Improved package download support (also now pluggable)
   * New sqlite-based DB index (ticket:360)
   * Improved spec: support for db type index + better documentation
   * Better configuration management (especially internally)
+  * Reduce dependencies by removing dependency on PasteScript and PasteDeploy
+  * Various minor bugfixes and code improvements
+
 
 V0.6.1 2010-05-04
 =================
