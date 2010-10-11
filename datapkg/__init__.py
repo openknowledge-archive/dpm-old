@@ -1,6 +1,6 @@
 '''datapkg is a tool for easily distributing knowledge and data by using the
 'packaging' concept, which is well established in software distribution. Full
-documentation can be found at: http://knowledgeforge.net/ckan/doc/datapkg/
+documentation can be found at: http://package.python.org/datapkg/
 
 Contents:
     1. Quickstart
