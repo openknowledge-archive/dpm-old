@@ -5,15 +5,25 @@ import os
 from datapkg import DatapkgException
 from datapkg.package import Package
 import datapkg.metadata as M
+import pkg_resources
 
-default_distribution_name = 'datapkg.distribution:IniBasedDistribution'
+def get_distribution(distribution_name):
+    '''Get Distribution class corresponding to the provided `distribution_name`.
 
+    :param distribution_name: distribution name as specified by entry point name (setup.py
+        entry_points) used to specify this distribution.
+    '''
+    # TODO: could speed this up by caching a dictionary of Index classes at
+    # module level
+    for entry_point in pkg_resources.iter_entry_points('datapkg.distribution'):
+        if entry_point.name == distribution_name:
+            cls = entry_point.load()
+            return cls
+
+# TODO: get this from the config file
+default_distribution_name = 'simple'
 def default_distribution():
-    import datapkg.distribution
-    modpath, klassname = datapkg.distribution.default_distribution_name.split(':')
-    mod = __import__(modpath, fromlist=['anyoldthing'])
-    klass = getattr(mod, klassname)
-    return klass
+    return get_distribution('simple')
 
 def load(path):
     '''Load distribution at path.
@@ -24,7 +34,8 @@ def load(path):
     # TODO: replace this with something more pluggable e.g. from entry_points
     distributions = [ PythonDistribution, IniBasedDistribution ]
     errors = []
-    for klass in distributions:
+    for entry_point in pkg_resources.iter_entry_points('datapkg.distribution'):
+        klass = entry_point.load()
         try:
             dist = klass.load(path)
             return dist
@@ -60,6 +71,25 @@ class DistributionBase(object):
 
 
 class PythonDistribution(DistributionBase):
+    '''Datapkg distribution based on python distribution format (based on
+    setuptools).
+
+    Metadata:
+
+      * setup.py: as per standard python approach main 'metadata' goes in
+        python setup.py file with key/value arguments to setup method.
+      * MANIFEST.in: manifest template specifying rules for what files to
+        include in the distribution. For details see:
+        http://docs.python.org/distutils/sourcedist.html#the-manifest-in-template
+
+        * If you want to explicitly list every file you can create a MANIFEST
+          file.
+
+    Data (and code):
+    
+        * in default ('flat') setup these can be put in same directory as
+          setup.py and in any subdirectories.
+    '''
 
     # TODO: write should write out package metadata ...
     def write(self, path, template='default'):
@@ -167,7 +197,21 @@ class PythonDistribution(DistributionBase):
 
 
 import ConfigParser
-class IniBasedDistribution(DistributionBase):
+class SimpleDistribution(DistributionBase):
+    '''Simple distribution storing metadata in an ini file.
+
+    Metadata:
+    
+      * metadata.txt: package metadata in ini-file format (key = value or key:
+        value with support for line continuations). See
+        http://docs.python.org/library/configparser.html.
+      * Manifest items are inserted as sections with name of ile and prefix
+        'manifest::' e.g. [manifest::myfilename.csv]
+
+    Data (and code):
+
+      * Any files you want (specify them in the manifest).
+    '''
     manifest_prefix = 'manifest::'
     keymap = {
         'id': 'name',
@@ -232,3 +276,5 @@ class IniBasedDistribution(DistributionBase):
         full_path = os.path.join(self.package.installed_path, path)
         return open(full_path)
 
+# 2010-10-11 - added for backwards compatibility
+IniBasedDistribution = SimpleDistribution

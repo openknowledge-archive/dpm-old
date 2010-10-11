@@ -65,6 +65,10 @@ setup(
     db = datapkg.index.db:DbIndexSqlite
     egg = datapkg.index.egg:EggIndex
 
+    [datapkg.distribution]
+    simple = datapkg.distribution:SimpleDistribution
+    python = datapkg.distribution:PythonDistribution
+
     [datapkg.download]
 
     [datapkg.storage]

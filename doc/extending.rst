@@ -7,6 +7,8 @@ write your own implementations of:
 
   * Commands - extend datapkg command line interface with new commands
   * Indexes - add new Indexes with which datapkg can communicate
+  * Distribution - add new Distribution types (either for reading or writing or
+    both)
   * Package Resource downloader - add support for downloading different types
     of resources
   * Uploader (via OFS) - upload to different storage backends
@@ -33,6 +35,7 @@ Command Base Class
 ------------------
 
 .. autoclass:: datapkg.cli.Command
+  :members:
 
 
 Index
@@ -61,7 +64,26 @@ Index Base class
 ----------------
 
 .. autoclass:: datapkg.index.base.IndexBase
+  :members:
 
+
+Distributions
+=============
+
+To provide a new Distribution (either for reading, writing or both) for datapkg
+to use you must:
+
+  1. Create a new Distribution class inheriting from
+     :class:`datapkg.distribution.DistributionBase` (see
+     below)
+  2. Add an entry point for your Index class in the `[datapkg.distribution]` section
+     of your setup.py entry_points.
+
+Distribution Base class
+-----------------------
+
+.. autoclass:: datapkg.distribution.DistributionBase
+  :members:
 
 Uploading
 =========

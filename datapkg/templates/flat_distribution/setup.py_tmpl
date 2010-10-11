@@ -16,7 +16,7 @@ setup(
     # Download url for this package if it has a specific location
     # download_url='',
 
-    # Space-separated keywords/tags
+    # Comma-separated keywords/tags
     keywords=${repr(keywords)|empty},
 
     # Notes or multi-line description for your project (in markdown)

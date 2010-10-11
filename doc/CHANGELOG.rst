@@ -5,15 +5,21 @@ History
 HEAD
 ====
 
+
+V0.7 2010-10-11
+===============
+
   * (MAJOR) Support for uploading datapkgs (upload.py)
-  * Pluggable and improved package download support
-  * Make datapkg easily extenable
+  * (MAJOR) Much improved and extended documenation
+  * (MAJOR) Make datapkg easily extenable
 
     * Support for adding new Index types with plugins
-    * Support for adding new commands with command plugins
+    * Support for adding new Commands with command plugins
+    * Support for adding new Distributions with distribution plugins
 
-V0.7 2010-??-??
-===============
+  * Improved package download support
+
+    * Also now pluggable
 
   * New sqlite-based DB index (ticket:360)
   * Improved spec: support for db type index + better documentation
