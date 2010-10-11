@@ -18,13 +18,13 @@ class Metadata(dict):
        'tags',
        'resources',
        'extras',
-       'relationships',
+       # 'relationships',
        ]
     # if not specified '' will be used
     defaults = {
         'tags': [],
         'extras': {},
-        'relationships': [],
+        # 'relationships': [],
         'resources': []
         }
 
