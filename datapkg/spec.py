@@ -2,6 +2,8 @@ import os
 import urlparse
 import urllib
 
+from datapkg import CONFIG
+
 class Spec(object):
     '''A "spec" is a string identifying a package within a package index
     (or, sometimes, just the index).
@@ -55,7 +57,7 @@ class Spec(object):
         # case where we just provide a path ...
         if scheme == '':
             # default scheme
-            scheme = 'db'
+            scheme = CONFIG.get('datapkg', 'index.default')
 
         if scheme == 'file':
             path = spec_str.split('://')[1]
