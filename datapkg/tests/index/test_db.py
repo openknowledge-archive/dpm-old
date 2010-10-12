@@ -17,6 +17,18 @@ class TestDbIndexSqlite(TestSimpleIndex):
     def test_search(self):
         pass
 
+    def test_manager_metadata(self):
+        pkg_name = u'test-manager-metadata'
+        pkg = self._make_package(pkg_name)
+        self.index.register(pkg)
+        out = self.index.get(pkg_name)
+        assert out.installed_path == self.pkg_installed_path, out.installed_path
+        newpath = '/a/new/path'
+        pkg.installed_path = newpath
+        self.index.update(pkg)
+        out = self.index.get(pkg_name)
+        assert out.installed_path == newpath, out.installed_path
+
 
 class TestDbIndexSqlachemy(TestSimpleIndex):
     __test__ = False

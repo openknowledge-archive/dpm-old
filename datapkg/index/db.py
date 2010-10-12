@@ -11,6 +11,7 @@ from base import *
 
 class DbIndexSqlite(IndexBase):
     '''A simple Database-based index using sqlite with no external library dependencies'''
+    __db_version__ = 1
     def __init__(self, dburi=None):
         '''
         :param dburi: sqlalchemy type db uri (if not provided use db.dburi
@@ -31,7 +32,15 @@ class DbIndexSqlite(IndexBase):
         manager_metadata TEXT,
         PRIMARY KEY (id)
     );
-    '''
+
+    CREATE TABLE setting (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        value TEXT
+    );
+
+    INSERT INTO setting (name, value) VALUES ('db_version', '%s');
+    ''' % __db_version__
 
     @property
     def conn(self):
@@ -67,6 +76,9 @@ class DbIndexSqlite(IndexBase):
         pkg = datapkg.package.Package(name=row[1], id=row[0])
         for k,v in self._decode(row[2]).items():
             setattr(pkg,k,v)
+        print row[4]
+        for k,v in self._decode(row[4]).items():
+            setattr(pkg,k,v)
         return pkg
 
     def get(self, name):
@@ -80,10 +92,16 @@ class DbIndexSqlite(IndexBase):
 
     def register(self, pkg):
         metadata = self._encode(pkg.metadata)
-        sql = "INSERT INTO package (id, name, metadata, search_field) " + \
-            "VALUES ('%s', '%s', '%s', '%s');" % (
+        manager_metadata = self._encode(pkg.manager_metadata)
+        sql = '''INSERT INTO package (id, name, metadata, search_field, manager_metadata) 
+    VALUES ('%s', '%s', '%s', '%s', '%s');''' % (
                 # pkg may not yet have id (new change)
-                getattr(pkg, 'id', uuid.uuid4()), pkg.name, metadata, ''
+                getattr(pkg, 'id',
+                uuid.uuid4()),
+                pkg.name,
+                metadata,
+                '',
+                manager_metadata
                 )
         out = self.conn.executescript(sql)
         self.conn.close()
@@ -91,10 +109,12 @@ class DbIndexSqlite(IndexBase):
     def update(self, pkg):
         # TODO: update search_field?
         metadata = self._encode(pkg.metadata)
+        manager_metadata = self._encode(pkg.manager_metadata)
         sql = "UPDATE package SET "
         updates = [
                 ('name', pkg.name),
-                ('metadata', metadata)
+                ('metadata', metadata),
+                ('manager_metadata', manager_metadata),
                 ]
         sql += ','.join([ "%s = '%s'" % (col,val) for col,val in updates ])
         sql += " WHERE name = '%s';" % pkg.name

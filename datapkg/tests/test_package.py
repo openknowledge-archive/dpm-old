@@ -18,6 +18,8 @@ class TestPackage(TestCase):
         self.pkg = datapkg.package.Package(name=self.pkg_name, version=u'1.0')
         self.pkg.manifest['data.csv'] = None
         self.pkg.manifest['data.js'] = {'format': 'json'}
+        self.installed_path = '/random/path'
+        self.pkg.installed_path = self.installed_path
 
     def test_package_name(self):
         name1 = 'abc3'
@@ -62,6 +64,9 @@ class TestPackage(TestCase):
         assert len(self.pkg.manifest) == 2
         assert 'data.csv' in self.pkg.manifest
         assert self.pkg.manifest['data.js']['format'] == 'json'
+    
+    def test_manager_metadata(self):
+        assert self.pkg.manager_metadata['installed_path'] == self.installed_path
 
     def test_info_from_path(self):
         base = os.path.abspath('.')
@@ -79,6 +84,7 @@ class TestPackage(TestCase):
         assert os.path.exists(path)
         assert pkg.installed_path == path
         assert pkg.path == path
+        assert pkg.manager_metadata['installed_path'] == path
 
     def test_pretty_print(self):
         out = self.pkg.pretty_print()

@@ -62,6 +62,13 @@ class Package(object):
     
     metadata = property(_get_metadata)
 
+    manager_metadata_keylist = ['installed_path']
+    def _get_manager_metadata(self):
+        out = [ (k,getattr(self,k)) for k in
+             self.manager_metadata_keylist]
+        return dict(out)
+    manager_metadata = property(_get_manager_metadata)
+
     def update_metadata(self, metadata):
         for k,v in metadata.items():
             setattr(self, k, v)

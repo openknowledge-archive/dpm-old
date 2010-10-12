@@ -19,11 +19,13 @@ class TestSimpleIndex(datapkg.tests.base.TestCase):
     pkg_notes = '''Monthly gold prices (USD) in London from Bundesbank.
 General: Let's put in some quotes "abc", 'abc', "", '.
 * Now a bullet point and semi-colon;'''
+    pkg_installed_path = '/a/random/path'
 
     def _make_package(self, pkg_name):
         pkg = datapkg.package.Package(name=pkg_name, id=self.pkg_id)
         pkg.title = self.pkg_title
         pkg.notes = self.pkg_notes
+        pkg.installed_path = self.pkg_installed_path
         return pkg
 
     def test_together_has_register_update_list(self):
