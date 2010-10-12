@@ -45,11 +45,18 @@ class DbIndexSqlite(IndexBase):
             self.conn.executescript(self.create_script)
 
     def _decode(self, metadata):
-        out = json.loads(metadata.replace("\\''", "'"))
+        if metadata == '':
+            out = {}
+        else:
+            out = json.loads(metadata.decode('utf8').replace("''", "'"))
         return out
 
     def _encode(self, metadata):
-        out = json.dumps(metadata).replace("'", "\\'")
+        out = json.dumps(metadata)
+        out = out.encode('utf8')
+        # see http://www.sqlite.org/faq.html#q14 - sql standard escapes single
+        # quotes with ''
+        out = out.replace("'", "''")
         return out
 
     def has(self, name):

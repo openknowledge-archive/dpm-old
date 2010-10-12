@@ -1,4 +1,4 @@
-import datapkg.index
+import datapkg.index.ckan
 
 
 # TODO: disable this when not online
@@ -7,7 +7,7 @@ class TestCkanIndex:
     
     Don't want to duplicate too much of what is in ckanclient tests
     '''
-    index = datapkg.index.CkanIndex('http://ckan.net/api')
+    index = datapkg.index.ckan.CkanIndex('http://ckan.net/api')
 
     def test_get(self):
         name = u'ckan'

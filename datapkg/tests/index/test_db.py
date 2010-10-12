@@ -1,4 +1,7 @@
-from test_base import *
+import os
+
+from test_base import TestSimpleIndex
+import datapkg.index.db
 
 
 class TestDbIndexSqlite(TestSimpleIndex):
@@ -8,7 +11,7 @@ class TestDbIndexSqlite(TestSimpleIndex):
     def setup(self):
         if os.path.exists(self.tmpfile):
             os.remove(self.tmpfile)
-        self.index = datapkg.index.DbIndexSqlite(self.dburi)
+        self.index = datapkg.index.db.DbIndexSqlite(self.dburi)
         self.index.init()
         
     def test_search(self):
@@ -16,13 +19,15 @@ class TestDbIndexSqlite(TestSimpleIndex):
 
 
 class TestDbIndexSqlachemy(TestSimpleIndex):
+    __test__ = False
+
     tmpfile = '/tmp/datapkg.db'
     dburi = 'sqlite:///%s' % tmpfile
 
     def setup(self):
         if os.path.exists(self.tmpfile):
             os.remove(self.tmpfile)
-        self.index = datapkg.index.DbIndexSqlalchemy(self.dburi)
+        self.index = datapkg.index.db.DbIndexSqlalchemy(self.dburi)
         self.index.init()
 
     def test_db_ok(self):

@@ -3,17 +3,27 @@ import tempfile
 
 import datapkg.tests.base
 import datapkg.index
+import datapkg.index.base
 import datapkg.package
 
 class TestSimpleIndex(datapkg.tests.base.TestCase):
     def setup(self):
-        self.index = datapkg.index.SimpleIndex()
+        self.index = datapkg.index.base.SimpleIndex()
 
     pkg_title = u'Test Title'
     pkg_id = u'574198fe-4bd1-45d2-bd71-4f97fb4f4b4c'
+    # NB: double single quotes ('') do not work yet (str.replace seems too
+    # greedy)
+    # No indent because python ini files (use in FileIndex) do not preserve
+    # leading space and no blank lines for same reason!!
+    pkg_notes = '''Monthly gold prices (USD) in London from Bundesbank.
+General: Let's put in some quotes "abc", 'abc', "", '.
+* Now a bullet point and semi-colon;'''
+
     def _make_package(self, pkg_name):
         pkg = datapkg.package.Package(name=pkg_name, id=self.pkg_id)
         pkg.title = self.pkg_title
+        pkg.notes = self.pkg_notes
         return pkg
 
     def test_together_has_register_update_list(self):
@@ -38,6 +48,9 @@ class TestSimpleIndex(datapkg.tests.base.TestCase):
         assert out.id == self.pkg_id, out.id
         assert out.name == pkg_name
         assert out.title == self.pkg_title
+        print self.pkg_notes
+        print out.notes
+        assert out.notes == self.pkg_notes, out.notes
     
     def test_search(self):
         pkg_name = u'searchtest'
@@ -50,5 +63,5 @@ class TestSimpleIndex(datapkg.tests.base.TestCase):
 class TestFileIndex(TestSimpleIndex):
     def setup(self):
         self.make_tmpdir()
-        self.index = datapkg.index.FileIndex(self.tmpdir)
+        self.index = datapkg.index.base.FileIndex(self.tmpdir)
 
