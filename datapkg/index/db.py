@@ -76,7 +76,6 @@ class DbIndexSqlite(IndexBase):
         pkg = datapkg.package.Package(name=row[1], id=row[0])
         for k,v in self._decode(row[2]).items():
             setattr(pkg,k,v)
-        print row[4]
         for k,v in self._decode(row[4]).items():
             setattr(pkg,k,v)
         return pkg
