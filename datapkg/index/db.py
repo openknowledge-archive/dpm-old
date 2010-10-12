@@ -54,7 +54,7 @@ class DbIndexSqlite(IndexBase):
             self.conn.executescript(self.create_script)
 
     def _decode(self, metadata):
-        if metadata == '':
+        if not metadata:
             out = {}
         else:
             out = json.loads(metadata.decode('utf8').replace("''", "'"))
