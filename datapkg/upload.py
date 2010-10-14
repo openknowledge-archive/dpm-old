@@ -27,7 +27,7 @@ class Uploader(object):
         configsection = 'upload:%s' % uploadid
         uploadinfo = dict(datapkg.CONFIG.items(configsection))
         ofs_type = uploadinfo['ofs.backend']
-        backend = None
+        backend_cls = None
         for entry_point in pkg_resources.iter_entry_points('ofs.backend'):
             if ofs_type == entry_point.name:
                 backend_cls = entry_point.load()
