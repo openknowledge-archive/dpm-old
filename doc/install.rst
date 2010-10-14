@@ -30,7 +30,17 @@ Installation
    NB: f you want to install from source datapkg's mercurial repository is
    here: http://knowledgeforge.net/ckan/datapkg
 
-4. Take a look at the manual::
+4. Extras (e.g. upload capabilities).
+   
+   If you want to use the upload capabilities you will need to install the OFS library::
+
+      $ easy_install ofs
+      # or
+      $ pip install ofs
+
+   You can also install plugins - see the project's home page for a current list.
+
+5. Take a look at the manual::
 
     $ datapkg man
 
