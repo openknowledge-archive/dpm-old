@@ -43,5 +43,6 @@ Upload destinations are specified in your datapkg config file and are of the for
         # is path a package or not?
         upload_spec = args[1]
         uploader = datapkg.upload.Uploader(verbose=True)
+        print 'Uploading, please be patient ...'
         uploader.upload(open(path), upload_spec)
 
