@@ -1,4 +1,6 @@
 import os
+import sys
+import urllib
 import platform
 
 # annoyingly there does not seem to be a single standard way to check you are
@@ -25,15 +27,12 @@ import urlgrabber.progress
 import posixpath
 import zipfile
 class Downloader(object):
-    '''Handling downloading (and unnpacking) of resources.
+    '''Handling downloading (and unnpacking) of urls.
     '''
-    def download(self, url, dest_dir, **kwargs):
+    def download(self, url, dest_dir, progress_bar=True, **kwargs):
         '''Download a 'resource' at `url` to a destination directory `dest`.
 
         @param dest_dir: destination directory to download to.
-        @param kwargs: as for urlgrabber.urlgrab. NB: by default a progress meter is provided. To disable this pass
-        progress_obj=None as a kwarg. Similarly copy_local set to True for
-        urlgrabber by default.
 
         @return: path to downloaded file
 
@@ -44,21 +43,42 @@ class Downloader(object):
         location = os.path.join(dest_dir, filename)
         if not os.path.exists(dest_dir):
             os.makedirs(dest_dir)
-        return self._download(url, location, **kwargs)
+        if progress_bar:
+            reporthook = self._dl_progress
+        else:
+            reporthook = None
+        self._download_count = -1
+        urllib.urlretrieve(url, location, reporthook=reporthook)
+        return location
 
-    def _download(self, url, path, **kwargs):
-        '''Download url to `path` on disk.
-
-        **kwargs: as for `download`.
-        '''
-        ourkwargs = {
-            'progress_obj': urlgrabber.progress.TextMeter(),
-            'copy_local': True
-            }
-        ourkwargs.update(kwargs)
-        filename = urlgrabber.urlgrab(url, path, **ourkwargs)
-        return filename
+    def _dl_progress(self, count, block_size, total_size):
+        def format_size(bytes):
+            if bytes > 1000*1000:
+                return '%.1fMb' % (bytes/1000.0/1000)
+            elif bytes > 10*1000:
+                return '%iKb' % (bytes/1000)
+            elif bytes > 1000:
+                return '%.1fKb' % (bytes/1000.0)
+            else:
+                return '%ib' % bytes
     
+        if count == 0:
+            print('Total size: %s' % format_size(total_size))
+        last_percent = int((count-1)*block_size*100/total_size)
+        # may have downloaded less if count*block_size > total_size
+        maxdownloaded = count * block_size
+        percent = min(int(maxdownloaded*100/total_size), 100)
+        if percent > last_percent:
+            # TODO: is this acceptable? Do we want to do something nicer?
+            sys.stdout.write('%3d%% [%s>%s]\r' % (
+                percent,
+                percent/2 * '=',
+                (50 - percent/2) * ' '
+                ))
+            sys.stdout.flush()
+        if maxdownloaded >= total_size:
+            print('\n')
+
     def unpack_file(self, src, dest):
         # if a zip, targz etc then unpack o/w leave it
         if (filename.endswith('.zip')

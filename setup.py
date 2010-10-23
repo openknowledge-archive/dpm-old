@@ -21,10 +21,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'setuptools>=0.6c',
-        # 'SQLAlchemy>=0.4',
         # make ckan support obligatory for time being
         'ckanclient==0.3',
-        'urlgrabber>=3.0'
     ],
     entry_points='''
     [distutils.setup_keywords]

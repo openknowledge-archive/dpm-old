@@ -9,16 +9,19 @@ HEAD
 V0.7 2010-10-11
 ===============
 
-  * (MAJOR) Support for uploading datapkgs (upload.py)
-  * (MAJOR) Much improved and extended documenation
-  * (MAJOR) Make datapkg easily extenable
+  * MAJOR: Support for uploading datapkgs (upload.py)
+  * MAJOR: Much improved and extended documenation
+  * MAJOR: New sqlite-based DB index giving support for a simple, central,
+    'local' index (ticket:360)
+  * MAJOR: Make datapkg easily extendable
 
     * Support for adding new Index types with plugins
     * Support for adding new Commands with command plugins
     * Support for adding new Distributions with distribution plugins
 
   * Improved package download support (also now pluggable)
-  * New sqlite-based DB index (ticket:360)
+  * Reimplement url download using only python std lib (removing urlgrabber
+    requirment and simplifying installation)
   * Improved spec: support for db type index + better documentation
   * Better configuration management (especially internally)
   * Reduce dependencies by removing dependency on PasteScript and PasteDeploy
