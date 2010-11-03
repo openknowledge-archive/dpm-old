@@ -22,8 +22,6 @@ def getstatusoutput(cmd):
         return commands.getstatusoutput(cmd)
 
 
-import urlgrabber
-import urlgrabber.progress
 import posixpath
 import zipfile
 class Downloader(object):
