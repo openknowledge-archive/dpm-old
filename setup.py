@@ -22,7 +22,7 @@ setup(
     install_requires=[
         'setuptools>=0.6c',
         # make ckan support obligatory for time being
-        'ckanclient==0.3',
+        'ckanclient>=0.3',
     ],
     entry_points='''
     [distutils.setup_keywords]

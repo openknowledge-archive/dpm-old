@@ -5,6 +5,11 @@ History
 HEAD
 ====
 
+V0.7.1 2010-12-02
+=================
+
+  * MINOR: soften dependency on ckanclient to >= 0.3 for better compatibility
+    with CKAN
 
 V0.7 2010-10-11
 ===============
