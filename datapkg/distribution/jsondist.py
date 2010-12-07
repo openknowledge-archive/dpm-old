@@ -31,7 +31,7 @@ class JsonDistribution(DistributionBase):
     def load(self, path):
         '''Load a L{Package} object from a path to a package distribution.
         
-        @return: the package object.
+        @return: the Distribution object.
         '''
         pkg = Package()
         pkg.installed_path = path 
@@ -44,7 +44,7 @@ class JsonDistribution(DistributionBase):
             fo = open(manifest_path)
             pkg.manifest = json.load(fo)
             fo.close()
-        return pkg
+        return self(pkg)
 
     def write(self, path, **kwargs):
         '''Write this distribution to disk at `path`.

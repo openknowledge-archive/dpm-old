@@ -197,7 +197,7 @@ class TestJsonDistribution(TestCase):
             }
         print 'XXX', metafp
         json.dump(datadict, open(metafp, 'w'))
-        pkg = JsonDistribution.load(self.loaddir)
-        assert pkg.name == u'abc'
-        assert pkg.resources[0]['format'] == 'csv'
+        dist = JsonDistribution.load(self.loaddir)
+        assert dist.package.name == u'abc'
+        assert dist.package.resources[0]['format'] == 'csv'
 

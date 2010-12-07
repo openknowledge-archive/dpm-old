@@ -15,7 +15,7 @@ class DistributionBase(object):
     def load(self, path):
         '''Load a L{Package} object from a path to a package distribution.
         
-        @return: the package object.
+        @return: the Distribution object.
         '''
         raise NotImplementedError
 
