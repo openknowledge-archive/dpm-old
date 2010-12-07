@@ -31,8 +31,6 @@ def load(path):
     Cycle through all available distribution types trying to load using each on
     in turn return first one which works.
     '''
-    # TODO: replace this with something more pluggable e.g. from entry_points
-    distributions = [ PythonDistribution, IniBasedDistribution ]
     errors = []
     for entry_point in pkg_resources.iter_entry_points('datapkg.distribution'):
         klass = entry_point.load()
