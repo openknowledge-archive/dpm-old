@@ -19,7 +19,7 @@ class SimpleDistribution(DistributionBase):
           * Manifest items are inserted as sections with name of ile and prefix
             'manifest::' e.g. [manifest::myfilename.csv]
 
-        {dist-path/....
+        {dist-path}/....
 
             # Data (and code): any files you want (specify them in the
             # manifest).
@@ -84,9 +84,6 @@ class SimpleDistribution(DistributionBase):
         cfp.write(fo)
         fo.close()
  
-    def stream(self, path):
-        full_path = os.path.join(self.package.installed_path, path)
-        return open(full_path)
 
 # 2010-10-11 - added for backwards compatibility
 IniBasedDistribution = SimpleDistribution

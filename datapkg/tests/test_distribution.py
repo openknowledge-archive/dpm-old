@@ -1,5 +1,5 @@
 from datapkg.tests.base import *
-from datapkg.distribution import DistributionBase, PythonDistribution, IniBasedDistribution
+from datapkg.distribution import DistributionBase, PythonDistribution, IniBasedDistribution, JsonDistribution
 from datapkg.package import Package
 
 
@@ -166,4 +166,38 @@ title: my graph
         assert 'name = abc' in meta, meta
         assert u'title = \xa3 1000'.encode('utf8') in meta, meta
         assert '[manifest::data.csv]' in meta, meta
+
+
+import json
+class TestJsonDistribution(TestCase):
+    def setUp(self):
+        self.tmpdir = self.make_tmpdir()
+        self.installdir = os.path.join(self.tmpdir, 'installed')
+        self.loaddir = os.path.join(self.tmpdir, 'load')
+        os.makedirs(self.loaddir)
+        self.pkg_name = 'mytestpkg'
+        self.pkg = Package(name=self.pkg_name, version='1.0')
+        self.dist = JsonDistribution(self.pkg)
+
+    def test_write(self):
+        self.dist.write(self.installdir)
+        meta = os.path.join(self.installdir, 'metadata.json')
+        assert os.path.exists(meta), os.listdir(self.installdir)
+        metadata = json.load(open(meta))
+        assert metadata['name'] == self.pkg_name
+
+    def test_load(self):
+        metafp = os.path.join(self.loaddir, 'metadata.json')
+        datadict = {
+            'name': u'abc',
+            'title': 'These are the Jones',
+            'resources': [
+                {'url': 'http://xyz.com', 'format': 'csv'}
+                ]
+            }
+        print 'XXX', metafp
+        json.dump(datadict, open(metafp, 'w'))
+        pkg = JsonDistribution.load(self.loaddir)
+        assert pkg.name == u'abc'
+        assert pkg.resources[0]['format'] == 'csv'
 

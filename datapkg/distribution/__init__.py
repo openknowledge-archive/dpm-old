@@ -9,6 +9,7 @@ import datapkg.metadata as M
 from base import DistributionBase
 from simple import SimpleDistribution, IniBasedDistribution
 from python import PythonDistribution
+from jsondist import JsonDistribution
 
 def get_distribution(distribution_name):
     '''Get Distribution class corresponding to the provided `distribution_name`.

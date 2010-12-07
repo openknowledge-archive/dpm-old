@@ -1,3 +1,5 @@
+import os
+
 class DistributionBase(object):
     # distribution_type = None
 
@@ -20,7 +22,9 @@ class DistributionBase(object):
     def stream(self, path):
         '''Return a fileobj stream for material at `path`.
         '''
-        raise NotImplementedError
+        full_path = os.path.join(self.package.installed_path, path)
+        return open(full_path)
+
 
 
 
