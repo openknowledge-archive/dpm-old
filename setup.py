@@ -13,7 +13,7 @@ setup(
     description=__description__,
     long_description=__description_long__,
     keywords='data, packaging, component, tool',
-    url='http://www.okfn.org/datapkg',
+    url='http://okfn.org/projects/datapkg',
     classifiers=[
     ],
 
@@ -59,8 +59,8 @@ setup(
 
     [datapkg.distribution]
     simple = datapkg.distribution:SimpleDistribution
-    python = datapkg.distribution:PythonDistribution
     json = datapkg.distribution:JsonDistribution
+    python = datapkg.distribution:PythonDistribution
 
     [datapkg.download]
 
