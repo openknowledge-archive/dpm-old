@@ -65,9 +65,26 @@ parser.add_option(
 
 
 class Command(object):
+    '''Base command class that all datapkg Commands should inherit from.
+    
+    An inheriting class provide a `run` method and can define the following
+    class level attributes (documented below):
+
+    * name
+    * summary
+    * usage
+    * min_args
+    * max_args
+    '''
+    #: The name of the command as used on the command line and in help
     name = None
+    #: one line summary of this command (used in printing help)
+    summary = None
+    #: A multiline detailed description of the command
     usage = None
+    #: Minimum number of args to the command (not used if set to None)
     min_args = None
+    #: Maximum number of args to the command (not used if set to None)
     max_args = None
 
     def __init__(self):
@@ -170,6 +187,17 @@ class Command(object):
             except IOError:
                 pass
         sys.exit(exit)
+    
+    def run(self, options, args):
+        '''This is the method inheriting classes should override to implement
+        their command functionality.
+
+        Inheriting classes should *not* call super to this method -- they
+        should just override it.
+
+
+        '''
+        raise NotImplementedError
 
 
 def format_exc(exc_info=None):
