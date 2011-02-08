@@ -5,6 +5,9 @@ History
 HEAD
 ====
 
+  * ResourceDownloader objects and plugin point
+  * Refactor PackageDownloader
+
 V0.7.1 2010-12-02
 =================
 

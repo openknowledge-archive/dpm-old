@@ -10,7 +10,8 @@ logger = logging.getLogger('datapkg.download')
 
 
 class PackageDownloader(object):
-    '''
+    '''Download packages (and their related resources).
+    
     Basic process:
         1. Get package from source index/destination
         2. Read through resources and see if there is a 'datapkg'
@@ -28,27 +29,16 @@ class PackageDownloader(object):
             print msg
 
     def download(self, pkg, dest_path):
+        '''Download the package.
+
+        :param pkg: the package object
+        :param dest_path: the path to download to
+        '''
         self._print('Downloading package to: %s' % dest_path)
         if not pkg.resources:
             msg = u'Warning: no resources to install for package' % pkg.name
             self._print(msg)
             return 1
-
-        # if datapkg distribution use it first
-        datapkgs  = [ r for r in pkg.resources if
-            r.get('format', '').startswith('datapkg') ]
-        for dpkg in datapkgs:
-            downloader = self.find_downloader(dpkg)
-            if not downloader:
-                continue
-
-            self._print('Using datapkg distribution: %s' % dpkg )
-            downloader.download(dpkg['url'], dest_path)
-            # one datapkg is enough - nothing more needed
-            return
-
-        ## if not datapkg
-        ## download first resource then query on all others
 
         self._print('Creating package metadata')
         # cribbed from datapkg/index/base.py:FileIndex
@@ -56,29 +46,69 @@ class PackageDownloader(object):
         dist = datapkg.distribution.IniBasedDistribution(pkg)
         dist.write(dest_path)
 
-        self._print('Downloading package resources ...')
+        self._print('Downloading package resources to %s ...' % dest_path)
+        
         resource = pkg.resources[0]
-        ## HACK: only do this because we have not sorted out file downloader to
-        ## have right interface yet
-        downloader = self.find_downloader(pkg.resources[0])
-        self._print('Downloading package resources: %s' % resource) 
-        downloader.download(resource['url'], dest_path)
+        self._print('Downloading package resource: %s' % resource['url']) 
 
-    def find_downloader(self, resource):
+        success = False
+        for entry_point in pkg_resources.iter_entry_points('datapkg.resource_downloader'):
+            downloader_cls = entry_point.load()
+            downloader = downloader_cls()
+            success = downloader.download(resource, dest_path)
+            if success:
+                break
+        if not success:
+            self._print('Unable to retrieve resource: %s' % resource)
+            return None
+        else:
+            return success
+
+
+class ResourceDownloaderBase(object):
+    '''Base class for (package) resource downloaders which handle the
+    downloading or accessing of (package) resources (i.e. files containing
+    package data, APIs to package data etc).
+
+    To create a new resource downloader and have it used by datapkg:
+
+      1. Create a new class inheriting from
+      :class:`datapkg.download.ResourceDownloaderBase`
+
+      2. Add an entry point in the [datapkg.resource_downloader] entry_points section of
+      your setup.py pointing to this class.
+
+    Many downloaders can be installed to handle different types of resources.
+    Installed downloaders are called in turn with the first one to match being
+    used. The order of calling is determined by order ot
+    pkg_resources.iter_entry_points for the datapkg.resource_downloader entry
+    point.
+    '''
+
+    def download(self, resource, dest_path):
+        '''Download the supplied resource.
+
+        Should be overriden (and not called) by inheriting classes.
+
+        This method should return True if and only if the class can handle
+        (and therefore has handled) the downloaded resource and should return False otherwise
+        (thereby allowing subsequent downloaders to be tried).
+        '''
+        raise NotImplementedError
+    
+
+class ResourceDownloaderSimple(ResourceDownloaderBase):
+    '''Simple resource downloader that retrieves remote files using urllib.'''
+
+    def download(self, resource, dest_path):
+        url = resource['url']
         format_ = resource.get('format', '')
         format_type = format_.split('/')[0]
-        if format_type in [ 'api', 'resource' ]:
-            self._print('Unable to retrieve resources of type: %s' % format)
-            return None
-        elif format_ in ['datapkg/hg', 'datapkg/git']:
-            self._print('Unable to retrieve resources of type: %s' % format)
-            return None
+        if format_type in [ 'api' ]:
+            return False
+        elif format_.startswith('datapkg/'):
+            return False
         else: # treat everything as a retrievable file ...
-            return datapkg.util.Downloader()
-
-        ## TODO: reinstate this
-        ## TODO: ? move this out to module level for performance?
-#         for entry_point in pkg_resources.iter_entry_points('datapkg.download'):
-#             downloader_cls = entry_point.load()
-#             downloader = downloader_cls()
+            downloader = datapkg.util.Downloader()
+            downloader.download(url, dest_path)
 

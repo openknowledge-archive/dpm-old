@@ -62,9 +62,8 @@ setup(
     json = datapkg.distribution:JsonDistribution
     python = datapkg.distribution:PythonDistribution
 
-    [datapkg.download]
-
-    [datapkg.storage]
+    [datapkg.resource_downloader]
+    simple = datapkg.download:ResourceDownloaderSimple 
     ''',
     test_suite='nose.collector',
     zip_safe=False,

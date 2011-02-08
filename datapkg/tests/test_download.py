@@ -46,7 +46,9 @@ class TestPackageDownloader(TestCase):
         dest = os.path.join(ourdest, 'my.csv')
         assert os.path.exists(dest), dest
 
-    def test_02_download_with_datapkg(self):
+    # Temporarily disable (we no longer special-case datapkgs but want to
+    # convert this)
+    def _test_02_download_with_datapkg(self):
         ourdest = os.path.join(self.dest_dir, self.pkg2.name)
         out = self.downloader.download(self.pkg2, ourdest)
         dest = os.path.join(ourdest, 'myzip.zip')

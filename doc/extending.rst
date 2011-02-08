@@ -9,7 +9,7 @@ write your own implementations of:
   * Indexes - add new Indexes with which datapkg can communicate
   * Distribution - add new Distribution types (either for reading or writing or
     both)
-  * Package Resource downloader - add support for downloading different types
+  * (Package) Resource downloader - add support for downloading different types
     of resources
   * Uploader (via OFS) - upload to different storage backends
 
@@ -84,6 +84,14 @@ Distribution Base class
 
 .. autoclass:: datapkg.distribution.DistributionBase
   :members:
+
+
+Resource Downloader
+===================
+
+.. autoclass:: datapkg.download.ResourceDownloaderBase
+  :members:
+
 
 Uploading
 =========
