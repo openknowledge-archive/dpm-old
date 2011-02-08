@@ -15,6 +15,9 @@ class DownloadCommand(Command):
 Install a package specified by {src-spec} to path, e.g.::
 
     download ckan://name path-on-disk
+
+Typically this involves downloading the metadata and retrieving all package
+resources.
 '''
 
     def run(self, options, args):

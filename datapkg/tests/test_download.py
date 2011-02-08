@@ -46,11 +46,10 @@ class TestPackageDownloader(TestCase):
         dest = os.path.join(ourdest, 'my.csv')
         assert os.path.exists(dest), dest
 
-    # Temporarily disable (we no longer special-case datapkgs but want to
-    # convert this)
-    def _test_02_download_with_datapkg(self):
+    def test_02_download_with_multiple_resources(self):
         ourdest = os.path.join(self.dest_dir, self.pkg2.name)
-        out = self.downloader.download(self.pkg2, ourdest)
+        filterfunc = lambda x,y: x.get('format', '').startswith('datapkg')
+        out = self.downloader.download(self.pkg2, ourdest, filterfunc)
         dest = os.path.join(ourdest, 'myzip.zip')
         assert os.path.exists(dest), dest
         dest = os.path.join(ourdest, 'my.csv')

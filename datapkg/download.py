@@ -28,12 +28,21 @@ class PackageDownloader(object):
         if self.verbose:
             print msg
 
-    def download(self, pkg, dest_path):
-        '''Download the package.
+    def download(self, pkg, dest_path, filterfunc=None):
+        '''Download the package to disk (i.e. metadata plus resources)
 
         :param pkg: the package object
         :param dest_path: the path to download to
+        :param filterfunc: [optional] a function filterfunc(resource,
+        order) applied to each package resource together with its order
+        (0,1,...) in the list of package resources that determines whether a
+        download is attempted by returning True (download) or False (no
+        download).
+                           If not provided download all resources.
         '''
+        # download everything
+        if filterfunc is None:
+            filterfunc = lambda x,y: True
         self._print('Downloading package to: %s' % dest_path)
         if not pkg.resources:
             msg = u'Warning: no resources to install for package' % pkg.name
@@ -47,8 +56,12 @@ class PackageDownloader(object):
         dist.write(dest_path)
 
         self._print('Downloading package resources to %s ...' % dest_path)
+
+        for count, resource in enumerate(pkg.resources):
+            if filterfunc(resource, count):
+                self.download_resource(resource, count, dest_path)
         
-        resource = pkg.resources[0]
+    def download_resource(self, resource, count, dest_path):
         self._print('Downloading package resource: %s' % resource['url']) 
 
         success = False
@@ -104,11 +117,10 @@ class ResourceDownloaderSimple(ResourceDownloaderBase):
         url = resource['url']
         format_ = resource.get('format', '')
         format_type = format_.split('/')[0]
-        if format_type in [ 'api' ]:
-            return False
-        elif format_.startswith('datapkg/'):
+        if format_type in [ 'api', 'services' ]:
             return False
         else: # treat everything as a retrievable file ...
             downloader = datapkg.util.Downloader()
             downloader.download(url, dest_path)
+            return True
 
