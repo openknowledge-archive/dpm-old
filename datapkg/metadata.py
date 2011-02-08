@@ -18,7 +18,7 @@ class Metadata(dict):
        'tags',
        'resources',
        'extras',
-       # 'relationships',
+       'relationships',
        ]
     # if not specified '' will be used
     defaults = {
@@ -128,7 +128,10 @@ class MetadataConverter(object):
         if keymap is None:
             keymap = {}
         newmeta = dict(metadata)
-        extras = {}
+        # complete hack to deal with stringification of data
+        if 'extras' in newmeta and newmeta['extras'] == '{}':
+            newmeta['extras'] = {}
+
         if not 'name' in newmeta and 'id' in newmeta:
             newmeta['name'] = newmeta['id']
         if not 'extras' in newmeta:
