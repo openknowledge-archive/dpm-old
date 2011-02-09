@@ -1,6 +1,7 @@
 '''Download packages (or, more accurately, their resources).
 '''
 import logging
+import fnmatch
 
 import pkg_resources
 
@@ -43,11 +44,6 @@ class PackageDownloader(object):
         # download everything
         if filterfunc is None:
             filterfunc = lambda x,y: True
-        self._print('Downloading package to: %s' % dest_path)
-        if not pkg.resources:
-            msg = u'Warning: no resources to install for package' % pkg.name
-            self._print(msg)
-            return 1
 
         self._print('Creating package metadata')
         # cribbed from datapkg/index/base.py:FileIndex
@@ -57,6 +53,12 @@ class PackageDownloader(object):
 
         self._print('Downloading package resources to %s ...' % dest_path)
 
+        if not pkg.resources:
+            msg = u'Warning: no resources to install for package'
+            self._print(msg)
+
+        # reset this attribute for interactive filterfunc
+        self._interactive_status = None
         for count, resource in enumerate(pkg.resources):
             if filterfunc(resource, count):
                 self.download_resource(resource, count, dest_path)
@@ -78,6 +80,49 @@ class PackageDownloader(object):
             return None
         else:
             return success
+
+    def filterfunc_interactive_choice(self, resource, count):
+        '''A filterfunc that interacts with user to determine whether to
+        download the resource.
+        '''
+        if self._interactive_status != None:
+            return self._interactive_status
+        msg = ' Do you want to retrieve this resource? (y/n/a/q/?: '
+        retrieve = None
+        while(retrieve not in ['y', 'n', 'a', 'q']):
+            self._print(' Resource: [%s] %s\n  %s' % (
+                resource.get('format', ''),
+                resource['url'],
+                resource.get('description', '') or 'No description ...'
+                ))
+            retrieve = raw_input(msg)
+            retrieve = retrieve.lower()
+            if retrieve == '?':
+                help_ = 'y = yes, no = no, '
+                help_ += 'a = yes to this and all following, '
+                help_ += 'q = quit (no to this and all following)'
+                print help_
+            elif retrieve == 'y':
+                return True
+            elif retrieve == 'n':
+                return False
+            elif retrieve == 'a':
+                self._interactive_status = True
+                return True
+            elif retrieve == 'q':
+                self._interactive_status = False
+                return False
+
+    @classmethod
+    def make_glob_filterfunc(self, formatpat, urlpat='*'):
+        '''Make a filter function based on a glob-style format_pattern and
+        url_pattern'''
+        def filterfunc(resource, count):
+            match = fnmatch.fnmatch(resource.get('format', '').lower(),
+                    formatpat)
+            match = match and fnmatch.fnmatch(resource['url'], urlpat)
+            return match
+        return filterfunc
 
 
 class ResourceDownloaderBase(object):

@@ -8,9 +8,9 @@ HEAD
   * ResourceDownloader objects and plugin point (#964)
   * Refactor PackageDownloader to use ResourcDownloader and support Resource
     filtering
-  * Retrieval options for package resourcs (#405). Support selection of what
-    resources to download on command line via glob style patterns and in API
-    via arbitrary function
+  * Retrieval options for package resourcs (#405). Support selection of
+    resources to download (on command line or API) via glob style patterns or
+    user interaction.
 
 V0.7.1 2010-12-02
 =================
