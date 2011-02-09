@@ -5,6 +5,8 @@ History
 HEAD
 ====
 
+  * Standardize on JSON-based distribution (and remove ini-based distribution)
+
 V0.8 2011-02-09
 ===============
 

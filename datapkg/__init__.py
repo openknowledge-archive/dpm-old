@@ -155,14 +155,15 @@ First a skeletal distribution on disk::
     $ datapkg create {pkg-name-or-path}
 
 Take a look inside your newly created distribution directory. There should
-be 1 file:
+be 2 files:
 
-  1. metadata.txt. This is an ini-style file that contains metadata in the form
-  of Key: Value.
+  1. package.json. This is a json file that contains the package metadata
+  2. manifest.json. This is a json file giving the file manifest.
 
-Having sorted out the metadata you will actually want to add some material to
-your package. You do this by simply copying material into the distribution
-directory, e.g.::
+For more about the structure of packgae distributions see the :doc:`design` page. 
+
+With the metadata sorted you should add some material to your package. You do
+this by simply copying material into the distribution directory, e.g.::
 
     $ cd {my-new-package}
     $ cp {lots-of-my-data-files} .

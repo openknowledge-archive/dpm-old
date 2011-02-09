@@ -58,7 +58,6 @@ setup(
     egg = datapkg.index.egg:EggIndex
 
     [datapkg.distribution]
-    simple = datapkg.distribution:SimpleDistribution
     json = datapkg.distribution:JsonDistribution
     python = datapkg.distribution:PythonDistribution
 

@@ -48,7 +48,7 @@ class PackageDownloader(object):
         self._print('Creating package metadata')
         # cribbed from datapkg/index/base.py:FileIndex
         import datapkg.distribution
-        dist = datapkg.distribution.IniBasedDistribution(pkg)
+        dist = datapkg.distribution.default_distribution()(pkg)
         dist.write(dest_path)
 
         self._print('Downloading package resources to %s ...' % dest_path)
