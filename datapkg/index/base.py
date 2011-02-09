@@ -101,20 +101,21 @@ class FileIndex(IndexBase):
 
     def _simple_index(self):
         ourindex = SimpleIndex()
+        import datapkg.distribution
         for root, dirs, files in os.walk(self.index_path):
-            if 'setup.py' in files or 'metadata.txt' in files:
-                try:
-                    pkg = Package.load(root)
-                    ourindex.register(pkg)
-                except Exception, inst:
-                    logger.warn('Failed to load package at %s because: %s' % (root,
-                        inst))
+            try:
+                dist = datapkg.distribution.load(root)
+                pkg = dist.package
+                ourindex.register(pkg)
+            except Exception, inst:
+                logger.warn('Failed to load package at %s because: %s' % (root,
+                    inst))
         return ourindex
 
     def register(self, package):
         import datapkg.distribution
         pkg_path = os.path.join(self.index_path, package.name)
-        dist = datapkg.distribution.IniBasedDistribution(package)
+        dist = datapkg.distribution.default_distribution()(package)
         dist.write(pkg_path)
         return pkg_path
 

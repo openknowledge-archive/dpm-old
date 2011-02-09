@@ -7,7 +7,6 @@ from datapkg import DatapkgException
 from datapkg.package import Package
 import datapkg.metadata as M
 from base import DistributionBase
-from simple import SimpleDistribution, IniBasedDistribution
 from python import PythonDistribution
 from jsondist import JsonDistribution
 
@@ -24,10 +23,8 @@ def get_distribution(distribution_name):
             cls = entry_point.load()
             return cls
 
-# TODO: get this from the config file
-default_distribution_name = 'simple'
 def default_distribution():
-    return get_distribution('simple')
+    return get_distribution('json')
 
 def load(path):
     '''Load distribution at path.

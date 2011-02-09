@@ -10,7 +10,7 @@ from base import DistributionBase
 class JsonDistribution(DistributionBase):
     '''Simple distribution storing metadata in json files.
 
-        {dist-path}/metadata.json
+        {dist-path}/package.json
     
           * package metadata in json format.
 
@@ -24,7 +24,7 @@ class JsonDistribution(DistributionBase):
             # manifest).
 
     '''
-    metadata_filename = 'metadata.json'
+    metadata_filename = 'package.json'
     manifest_filename = 'manifest.json'
 
     @classmethod
@@ -54,9 +54,9 @@ class JsonDistribution(DistributionBase):
         metadata_path = os.path.join(path, self.metadata_filename)
         manifest_path = os.path.join(path, self.manifest_filename)
         fo = open(metadata_path, 'w')
-        json.dump(self.package.metadata, fo)
+        json.dump(self.package.metadata, fo, indent=2, sort_keys=True)
         fo.close()
         fo = open(manifest_path, 'w')
-        json.dump(self.package.manifest, fo)
+        json.dump(self.package.manifest, fo, indent=2, sort_keys=True)
         fo.close()
 

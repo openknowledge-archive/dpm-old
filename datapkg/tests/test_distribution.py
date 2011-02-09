@@ -1,5 +1,5 @@
 from datapkg.tests.base import *
-from datapkg.distribution import DistributionBase, PythonDistribution, IniBasedDistribution, JsonDistribution
+from datapkg.distribution import DistributionBase, PythonDistribution, JsonDistribution
 from datapkg.package import Package
 
 
@@ -101,73 +101,6 @@ class TestPythonDistribution(TestCase):
         assert 'mytestpkg2/abc.txt' in pkg.manifest, pkg.manifest
 
 
-class TestIniBasedDistribution:
-    @classmethod
-    def setup_class(self):
-        self.tmpDir = tempfile.mkdtemp()
-        self.title = 'annakarenina'
-        self.dist_path = os.path.join(self.tmpDir, self.title)
-    
-    @classmethod
-    def teardown_class(self):
-        shutil.rmtree(self.tmpDir)
-
-    @classmethod
-    def _make_test_data(self, basePath, title):
-        full_meta = \
-'''[DEFAULT]
-id : %s
-title: %s
-creator: abc
-description: a long description
-comments: here are some additional comments
-requires-compilation: y
-
-[manifest::data.csv]
-title: my csv file
-
-[manifest::xyz.png]
-title: my graph
-'''
-        os.makedirs(basePath)
-        ff = file(os.path.join(basePath, 'metadata.txt'), 'w')
-        metadata = full_meta % (title, title)
-        ff.write(metadata)
-        ff.close()
-
-    def test_load(self):
-        self._make_test_data(self.dist_path, self.title)
-        dist = IniBasedDistribution.load(self.dist_path)
-        pkg = dist.package
-        assert pkg.name == self.title, pkg
-        assert pkg.title == self.title
-        assert u'a long description' in pkg.notes
-        assert u'additional comment' in pkg.notes
-        assert pkg.author == u'abc'
-        assert pkg.extras['requires-compilation'] == 'y'
-        # test manifest
-        assert len(pkg.manifest) == 2
-        assert pkg.manifest['data.csv']['title'] == 'my csv file'
-    
-    def test_write(self):
-        name = 'abc'
-        destpath = os.path.join(self.tmpDir, name)
-        pkg = Package(name='abc')
-        # have % and unicode values
-        pkg.title = u'\xa3 1000 %'
-        pkg.manifest['data.csv'] = {'price': u'\xa3 1000'}
-        dist = IniBasedDistribution(pkg)
-        dist.write(destpath)
-        metapath = os.path.join(destpath, 'metadata.txt')
-        assert os.path.exists(destpath)
-        assert os.path.exists(metapath)
-        meta = file(metapath).read()
-        assert '[DEFAULT]' in meta, meta
-        assert 'name = abc' in meta, meta
-        assert u'title = \xa3 1000'.encode('utf8') in meta, meta
-        assert '[manifest::data.csv]' in meta, meta
-
-
 import json
 class TestJsonDistribution(TestCase):
     def setUp(self):
@@ -181,13 +114,13 @@ class TestJsonDistribution(TestCase):
 
     def test_write(self):
         self.dist.write(self.installdir)
-        meta = os.path.join(self.installdir, 'metadata.json')
+        meta = os.path.join(self.installdir, 'package.json')
         assert os.path.exists(meta), os.listdir(self.installdir)
         metadata = json.load(open(meta))
         assert metadata['name'] == self.pkg_name
 
     def test_load(self):
-        metafp = os.path.join(self.loaddir, 'metadata.json')
+        metafp = os.path.join(self.loaddir, 'package.json')
         datadict = {
             'name': u'abc',
             'title': 'These are the Jones',
