@@ -1,6 +1,6 @@
-'''datapkg is a tool for easily distributing knowledge and data by using the
-'packaging' concept, which is well established in software distribution. Full
-documentation can be found at: http://package.python.org/datapkg/
+'''datapkg is a tool for easily distributing data using the 'packaging'
+concept, which is well established in software distribution. Full documentation
+can be found at: http://package.python.org/datapkg/
 
 Contents:
     1. Quickstart
@@ -196,7 +196,7 @@ You can also download a distribution (only onto disk at the moment!)::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.7.1'
+__version__ = '0.8'
 __description__ = 'datapkg (data package): data packaging system and utilities'
 __description_long__ = __doc__
 __license__ = 'MIT'

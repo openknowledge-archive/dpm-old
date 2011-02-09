@@ -5,8 +5,11 @@ History
 HEAD
 ====
 
+V0.8 2011-02-09
+===============
+
   * ResourceDownloader objects and plugin point (#964)
-  * Refactor PackageDownloader to use ResourcDownloader and support Resource
+  * Refactor PackageDownloader to use ResourceDownloader and support Resource
     filtering
   * Retrieval options for package resourcs (#405). Support selection of
     resources to download (on command line or API) via glob style patterns or
