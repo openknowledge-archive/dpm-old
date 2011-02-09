@@ -24,10 +24,8 @@ def get_distribution(distribution_name):
             cls = entry_point.load()
             return cls
 
-# TODO: get this from the config file
-default_distribution_name = 'simple'
 def default_distribution():
-    return get_distribution('simple')
+    return get_distribution('json')
 
 def load(path):
     '''Load distribution at path.
