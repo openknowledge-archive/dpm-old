@@ -2,8 +2,7 @@
 Welcome to datapkg's documentation!
 ===================================
 
-datapkg is a tool for distributing, discovering and installing knowledge
-(data and content) 'packages'.
+datapkg is a tool for distributing, discovering and installing data 'packages'.
 
 datapkg is a *simple* way to 'package' data building on *existing* packaging
 tools developed for code. datapkg is designed to integrate closely with the
