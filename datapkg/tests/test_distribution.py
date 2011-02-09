@@ -181,13 +181,13 @@ class TestJsonDistribution(TestCase):
 
     def test_write(self):
         self.dist.write(self.installdir)
-        meta = os.path.join(self.installdir, 'metadata.json')
+        meta = os.path.join(self.installdir, 'package.json')
         assert os.path.exists(meta), os.listdir(self.installdir)
         metadata = json.load(open(meta))
         assert metadata['name'] == self.pkg_name
 
     def test_load(self):
-        metafp = os.path.join(self.loaddir, 'metadata.json')
+        metafp = os.path.join(self.loaddir, 'package.json')
         datadict = {
             'name': u'abc',
             'title': 'These are the Jones',
