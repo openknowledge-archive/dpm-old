@@ -60,6 +60,8 @@ class PackageDownloader(object):
         for count, resource in enumerate(pkg.resources):
             if filterfunc(resource, count):
                 self.download_resource(resource, count, dest_path)
+            else:
+                self._print('Skipping package resource: %s' % resource['url'])
         
     def download_resource(self, resource, count, dest_path):
         self._print('Downloading package resource: %s' % resource['url']) 

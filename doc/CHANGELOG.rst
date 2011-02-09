@@ -5,8 +5,12 @@ History
 HEAD
 ====
 
-  * ResourceDownloader objects and plugin point
-  * Refactor PackageDownloader
+  * ResourceDownloader objects and plugin point (#964)
+  * Refactor PackageDownloader to use ResourcDownloader and support Resource
+    filtering
+  * Retrieval options for package resourcs (#405). Support selection of what
+    resources to download on command line via glob style patterns and in API
+    via arbitrary function
 
 V0.7.1 2010-12-02
 =================
@@ -33,6 +37,7 @@ V0.7 2010-10-11
   * Improved spec: support for db type index + better documentation
   * Better configuration management (especially internally)
   * Reduce dependencies by removing dependency on PasteScript and PasteDeploy
+    (#98)
   * Various minor bugfixes and code improvements
 
 
