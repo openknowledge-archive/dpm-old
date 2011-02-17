@@ -67,8 +67,8 @@ parser.add_option(
 class Command(object):
     '''Base command class that all datapkg Commands should inherit from.
     
-    An inheriting class provide a `run` method and can define the following
-    class level attributes (documented below):
+    An inheriting class should provide a `run` method and can define the
+    following class level attributes (documented below):
 
     * name
     * summary
@@ -169,8 +169,10 @@ class Command(object):
             sys.exit(2)
         try:
             self.run(options, args)
-        except:
-            logger.fatal('Exception:\n%s' % format_exc())
+        except Exception, inst:
+            print 'Error: %s\n' % inst
+            print '[** For (lots) more information run with --debug **]'
+            logger.debug('Exception:\n%s' % format_exc())
             exit = 2
         
         if log_fp is not None:
@@ -198,7 +200,8 @@ class Command(object):
         Inheriting classes should *not* call super to this method -- they
         should just override it.
 
-
+        :param options: the comand line options (as extracted by optparse).
+        :param args: the remaining args (so *not* including the command name).
         '''
         raise NotImplementedError
 
