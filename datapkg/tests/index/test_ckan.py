@@ -1,12 +1,13 @@
 import datapkg.index.ckan
 
 
-# TODO: disable this when not online
 class TestCkanIndex:
     '''Read only test.
     
     Don't want to duplicate too much of what is in ckanclient tests
     '''
+    __external__ = True
+
     index = datapkg.index.ckan.CkanIndex('http://ckan.net/api')
 
     def test_get(self):

@@ -15,6 +15,8 @@ def test_getstatusoutput():
 
 
 class TestDownloader(TestCase):
+    __external__ = True
+
     @classmethod
     def setup_class(self):
         # will now have self.tmpdir

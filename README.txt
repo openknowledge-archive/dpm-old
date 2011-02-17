@@ -32,4 +32,8 @@ You need sphinx (python-sphinx) to do this. Now you can build the docs::
 2. Running tests. We suggest you use nose::
 
     nosetests datapkg/tests/
+  
+  To exclude tests depend on access to the internet::
+
+    nosetests -a \!__external__ datapkg/tests
 
