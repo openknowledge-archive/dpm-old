@@ -177,7 +177,10 @@ class Command(object):
             log_fp.close()
         if exit:
             try:
-                log_fn = 'datapkg-log.txt'
+                log_dir = os.path.expanduser('~/.datapkg')
+                if not os.path.exists(log_dir):
+                    os.makedirs(log_dir)
+                log_fn = os.path.join(log_dir, 'datapkg-log.txt')
                 text = '\n'.join(complete_log)
                 # Not sure we need to tell people ...
                 # logger.fatal('Storing complete log in %s' % log_fn)
