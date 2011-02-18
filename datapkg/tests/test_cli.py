@@ -170,7 +170,7 @@ class TestWithConfigAndDbIndex(CLIBase):
         assert not status, output
 
         # register
-        cmd = self.cmd_base + 'register %s' % self.file_spec
+        cmd = self.cmd_base + 'register %s db://' % self.file_spec
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         # check it is there
@@ -178,14 +178,14 @@ class TestWithConfigAndDbIndex(CLIBase):
         assert pkg.title == self.pkg_title
 
         # info (check from command line)
-        cmd = self.cmd_base + 'info %s' % self.pkg_name
+        cmd = self.cmd_base + 'info db://%s' % self.pkg_name
         print cmd
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert self.pkg_name in output
 
         # info (check from command line)
-        cmd = self.cmd_base + 'list'
+        cmd = self.cmd_base + 'list db://'
         status, output = datapkg.util.getstatusoutput(cmd)
         assert not status, output
         assert self.pkg_name in output

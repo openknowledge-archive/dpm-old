@@ -43,7 +43,7 @@ def make_default_config(repo_path=default_repo_path):
     cfg.add_section('index:db')
     cfg.add_section('upload:ckan')
     cfg.set('datapkg', 'repo.default_path', repo_path)
-    cfg.set('datapkg', 'index.default', 'db')
+    cfg.set('datapkg', 'index.default', 'file')
     cfg.set('index:ckan', 'ckan.url',  'http://ckan.net/api/')
     cfg.set('index:ckan', 'ckan.api_key', '')
     cfg.set('index:db', 'db.dburi', 'sqlite://%s/index.db' % repo_path)

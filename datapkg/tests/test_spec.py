@@ -82,7 +82,7 @@ class TestSpec(TestCase):
 
     def test_03_parse_spec_default(self):
         spec = Spec.parse_spec('datapkgdemo')
-        assert spec.scheme == 'db', spec.scheme
+        assert spec.scheme == 'file', spec.scheme
         assert spec.path == 'datapkgdemo', spec.path
 
     def test_04_index_from_spec(self):

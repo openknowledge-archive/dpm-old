@@ -60,7 +60,8 @@ class Spec(object):
             scheme = CONFIG.get('datapkg', 'index.default')
 
         if scheme == 'file':
-            path = spec_str.split('://')[1]
+            if '://' in spec_str:
+                path = spec_str.split('://')[1]
             path = urllib.url2pathname(path)
             path = path.replace('/', os.sep)
             path = os.path.abspath(path)
