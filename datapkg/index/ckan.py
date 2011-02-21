@@ -78,6 +78,11 @@ class CkanIndex(IndexBase):
     def register(self, package):
         package_dict = package.metadata
         package_dict = dict(package_dict)
+        # HACK - CKAN does not like id field or relationships field atm
+        if 'id' in package_dict:
+            del package_dict['id']
+        if 'relationships' in package_dict:
+            del package_dict['relationships']
         # package_dict['tags'] = []
         self.ckan.package_register_post(package_dict)
         self.print_status()
@@ -86,6 +91,11 @@ class CkanIndex(IndexBase):
 
     def update(self, package):
         package_dict = dict(package.metadata)
+        # HACK - CKAN does not like id field or relationships field atm
+        if 'id' in package_dict:
+            del package_dict['id']
+        if 'relationships' in package_dict:
+            del package_dict['relationships']
         self.ckan.package_entity_put(package_dict)
         self.print_status()
         print package_dict['name']
