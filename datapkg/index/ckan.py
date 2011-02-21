@@ -78,14 +78,24 @@ class CkanIndex(IndexBase):
     def register(self, package):
         package_dict = package.metadata
         package_dict = dict(package_dict)
+        # HACK - CKAN does not like id field or relationships field atm
+        if 'id' in package_dict:
+            del package_dict['id']
+        if 'relationships' in package_dict:
+            del package_dict['relationships']
         # package_dict['tags'] = []
         self.ckan.package_register_post(package_dict)
         self.print_status()
-        if self.ckan.last_status != 200:
+        if self.ckan.last_status not in [200,201]:
             raise Exception(self.status_info)
 
     def update(self, package):
         package_dict = dict(package.metadata)
+        # HACK - CKAN does not like id field or relationships field atm
+        if 'id' in package_dict:
+            del package_dict['id']
+        if 'relationships' in package_dict:
+            del package_dict['relationships']
         self.ckan.package_entity_put(package_dict)
         self.print_status()
         print package_dict['name']
@@ -104,7 +114,7 @@ class CkanIndex(IndexBase):
             if self.ckan.last_url_error:
                 print self.ckan.last_url_error
                 self._print("Network error: %s" % self.ckan.last_url_error.reason[1])
-        elif self.ckan.last_status == 200:
+        elif self.ckan.last_status in [200,201]: # 201 for create requests
             pass #self._print("Datapkg operation was a success.")
         elif self.ckan.last_status == 400:
             self._print("Bad request (400). Please check the submission.")
