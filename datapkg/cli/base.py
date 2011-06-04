@@ -20,7 +20,7 @@ import datapkg.spec
 parser = optparse.OptionParser(
     usage='''%prog COMMAND [OPTIONS]
 
-Use "datapkg help" see a list of commands.''',
+Use "help" command to see a list of commands.''',
     version=datapkg.__version__)
 
 parser.add_option(

@@ -33,6 +33,7 @@ setup(
     
     [console_scripts]
     datapkg=datapkg.cli:main
+    dp=datapkg.cli:main
 
     [datapkg.cli]
     help = datapkg.cli:HelpCommand

@@ -197,14 +197,14 @@ You can also download a distribution (only onto disk at the moment!)::
 The easiest thing (which also guarantees up-to-date-ness) is to look through
 the unit tests in ./datapkg/tests/
 '''
-__version__ = '0.8'
+__version__ = '0.9a'
 __description__ = 'datapkg (data package): data packaging system and utilities'
 __description_long__ = __doc__
 __license__ = 'MIT'
 __license_full__ = \
 '''All material is licensed under the MIT License:
 
-Copyright (c) 2005-2010, Open Knowledge Foundation
+Copyright (c) 2005-2011, Open Knowledge Foundation
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
