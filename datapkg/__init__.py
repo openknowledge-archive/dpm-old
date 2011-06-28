@@ -157,7 +157,7 @@ First a skeletal distribution on disk::
 Take a look inside your newly created distribution directory. There should
 be 2 files:
 
-  1. package.json. This is a json file that contains the package metadata
+  1. datapackage.json. This is a json file that contains the package metadata
   2. manifest.json. This is a json file giving the file manifest.
 
 For more about the structure of packgae distributions see the :doc:`design` page. 
