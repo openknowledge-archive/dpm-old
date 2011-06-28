@@ -60,7 +60,6 @@ setup(
 
     [datapkg.distribution]
     json = datapkg.distribution:JsonDistribution
-    python = datapkg.distribution:PythonDistribution
 
     [datapkg.resource_downloader]
     simple = datapkg.download:ResourceDownloaderSimple 
