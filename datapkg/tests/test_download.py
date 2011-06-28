@@ -41,7 +41,7 @@ class TestPackageDownloader(TestCase):
     def test_01_download(self):
         ourdest = os.path.join(self.dest_dir, self.pkg.name)
         out = self.downloader.download(self.pkg, ourdest)
-        dest = os.path.join(ourdest, 'package.json')
+        dest = os.path.join(ourdest, 'datapackage.json')
         assert os.path.exists(dest), dest
         dest = os.path.join(ourdest, 'my.csv')
         assert os.path.exists(dest), dest
