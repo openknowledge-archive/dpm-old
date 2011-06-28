@@ -38,13 +38,30 @@ class JsonDistribution(DistributionBase):
         metadata_path = os.path.join(path, self.metadata_filename)
         manifest_path = os.path.join(path, self.manifest_filename)
         fo = open(metadata_path)
-        pkg.update_metadata(json.load(fo))
+        metadata = json.load(fo)
+        readme_notes = self._get_notes_from_readme(path)
+        if readme_notes:
+            metadata['notes'] = readme_notes
+        pkg.update_metadata(metadata)
         fo.close()
         if os.path.exists(manifest_path):
             fo = open(manifest_path)
             pkg.manifest = json.load(fo)
             fo.close()
         return self(pkg)
+    
+    @classmethod
+    def _get_notes_from_readme(cls, path):
+        files = [ fn for fn in os.listdir(path) if
+                fn.lower().startswith('readme') ]
+        if files:
+            fo = open(os.path.join(path, files[0]))
+            out = fo.read().decode('utf8', 'replace')
+            fo.close()
+            return out
+        else:
+            return ''
+
 
     def write(self, path, **kwargs):
         '''Write this distribution to disk at `path`.
