@@ -6,7 +6,6 @@ import re
 import distutils.dist
 
 import datapkg.metadata
-import datapkg.pypkgtools
 from datapkg import DatapkgException
 
 def normalize_name(name):

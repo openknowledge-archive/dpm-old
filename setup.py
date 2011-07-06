@@ -25,9 +25,6 @@ setup(
         'ckanclient>=0.3',
     ],
     entry_points='''
-    [distutils.setup_keywords]
-    datapkg_index=datapkg.pypkgtools:datapkg_index
-
     [egg_info.writers]
     datapkg_index.txt=setuptools.command.egg_info:write_arg
     
