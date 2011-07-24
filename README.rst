@@ -1,12 +1,13 @@
 Introduction
 ============
 
-datapkg is a tool for distributing, discovering and installing knowledge and
-data 'packages'.
+datapkg is a python library and command line tool for working with `Data Packages`_ and interacting with data hubs like CKAN_.
 
 For more information visit the documentation at:
-http://knowledgeforge.net/ckan/doc/datapkg/
+http://packages.python.org/datapkg/
 
+.. _Data Packages: http://wiki.ckan.net/Data_Package
+.. _CKAN: http://ckan.org/
 
 Installation
 ============
