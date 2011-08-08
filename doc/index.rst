@@ -46,8 +46,7 @@ More information on specific features
 Getting Started: Developers
 ===========================
 
-Source mercurial repository can be found at:
-http://knowledgeforge.net/ckan/datapkg
+Source git repository can be found at: http://github.com/okfn/datapkg
 
 For developers we recommend starting with the design document:
 
