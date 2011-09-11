@@ -62,7 +62,6 @@ class JsonDistribution(DistributionBase):
         else:
             return ''
 
-
     def write(self, path, **kwargs):
         '''Write this distribution to disk at `path`.
         '''
@@ -76,4 +75,13 @@ class JsonDistribution(DistributionBase):
         fo = open(manifest_path, 'w')
         json.dump(self.package.manifest, fo, indent=2, sort_keys=True)
         fo.close()
+        # write README
+        notes = self.package.metadata.get('notes', '')
+        readme_fp = os.path.join(path, 'README.txt')
+        fo = open(readme_fp, 'w')
+        fo.write(notes)
+        fo.close()
+        # create empty 'data' directory
+        datadir = os.path.join(path, 'data')
+        os.makedirs(datadir)
 
