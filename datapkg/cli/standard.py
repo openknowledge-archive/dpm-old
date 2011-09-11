@@ -197,21 +197,16 @@ Create a skeleton data package at path. Package Name will be taken from
 last portion of path. If path simply a name then create in the current
 directory.'''
 
-#     def __init__(self):
-#         super(CreateCommand, self).__init__()
-#         self.parser.add_option(
-#             '-t', '--template',
-#             dest='template',
-#             action='store',
-#             default='default',
-#             help='Specify template to use (default or flat)')
- 
     def run(self, options, args):
+        import datapkg.package
         path = args[0]
-        import datapkg.distribution
-        msg = 'Creating new datapkg: %s' %  path
+        msg = 'Creating datapkg on disk at: %s' %  path
+        self.logger.info(msg)
         self._print(msg)
         datapkg.package.Package.create_on_disk(path)
+        msg = 'Created datapkg on disk at: %s' % path
+        self.logger.info(msg)
+        self._print(msg)
 
 
 class RegisterCommand(Command):

@@ -98,6 +98,7 @@ class Command(object):
                 # -h, --version, etc
                 continue
             self.parser.add_option(option)
+        self.logger = logger
 
     def merge_options(self, initial_options, options):
         for attr in ['log']:
