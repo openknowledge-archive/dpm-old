@@ -30,11 +30,16 @@ The steps involved::
 What data?
 
   * Normalize data
+
     * Cross country and then convert to standard (e.g. US$, GBP)
+
       * Exchange rates
       * Cost of living
+
     * Changes across time and then do real present value
+
   * [Plot two different data sources again each other.]
+
     * [Government expenditure in different sectors?]
 
 Example code::

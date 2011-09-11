@@ -29,15 +29,9 @@ Base Distribution
 .. autoclass:: datapkg.distribution.DistributionBase
   :members:
 
-Simple Distribution
-===================
+Standard Distribution
+=====================
 
-.. autoclass:: datapkg.distribution.SimpleDistribution
-  :members:
-
-Python Distribution
-===================
-
-.. autoclass:: datapkg.distribution.PythonDistribution
+.. autoclass:: datapkg.distribution.JsonDistribution
   :members:
 
