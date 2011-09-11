@@ -5,3 +5,5 @@ TODO.txt
 build/*
 dist/*
 *.orig
+# vim files
+.*.swp
