@@ -27,8 +27,8 @@ Installation
       # OR (with pip) 
       $ pip -E your_virtual_env install datapkg
 
-   NB: f you want to install from source datapkg's mercurial repository is
-   here: http://knowledgeforge.net/ckan/datapkg
+   NB: if you wish to install from source datapkg's git repository is
+   here: https://github.com/okfn/datapkg
 
 4. Extras (e.g. upload capabilities).
    
