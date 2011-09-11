@@ -3,19 +3,13 @@ User Manual
 ===========
 
 datapkg is a command line tool (and library) for quickly and easily
-distributing collections of data concept, which is well established in software
-distribution.  Full documentation can be found at:
-http://package.python.org/datapkg/
+distributing collections of data.
 
-Contents:
-    1. Quickstart
-    2. Tutorial
-
-NB: in what follows items prefixed with $ should be run on the command line.
+.. note:: in what follows items prefixed with $ should be run on the command line.
 
 
-1. Quickstart
-+++++++++++++
+Quickstart
+++++++++++
 
 Obtaining a Package
 ===================
@@ -87,8 +81,8 @@ CKAN in a bucket named after {yourpackagename}::
     $ datapkg upload {your-file} ckan://{yourpackagename}/{filename}
 
 
-2. Tutorial
-+++++++++++
+Tutorial
+++++++++
 
 datapkg has two distinct uses:
 
@@ -129,11 +123,11 @@ file://, like 'mypackage' is used for referring to packages with regard to the
 *default* package index.
 
 
-1. Obtaining Material
-=====================
+Obtaining Material
+==================
 
-1.1 [Optional] Set Up Configuration
------------------------------------
+Set Up Configuration [Optional]
+-------------------------------
 
 You may want to alter the default configuration, for example to specify your
 CKAN apikey. To do this, first set up your local config::
@@ -143,17 +137,17 @@ CKAN apikey. To do this, first set up your local config::
 This will create a .datapkgrc file in your home directory. You can then edit
 this with your favourite text editor.
 
-1.2 Locating and Installing Material
-------------------------------------
+Locating and Installing Material
+--------------------------------
 
 See Quickstart section above.
 
 
-2. Making Your Material Available to Others
-===========================================
+Making Your Material Available to Others
+========================================
 
-2.1 Creating a package (distribution)
--------------------------------------
+Creating a package (distribution)
+---------------------------------
 
 First a skeletal distribution on disk::
 
@@ -174,8 +168,8 @@ this by simply copying material into the distribution directory, e.g.::
     $ cp {lots-of-my-data-files} .
 
 
-2. Register your package
-------------------------
+Register your package
+---------------------
 
 Now you have created a package you will want to make it available.
 
@@ -188,17 +182,26 @@ Once that is done you register the package on CKAN by doing::
     $ datapkg register file://{path} ckan://
 
 
-3. Installing your package
---------------------------
+Installing your package
+-----------------------
 
 You can also download a distribution (only onto disk at the moment!)::
 
     $ datapkg download {package-spec} {path-on-disk}
 
 
-3. For Developers
-=================
+More About the Command Line
++++++++++++++++++++++++++++
 
-The easiest thing (which also guarantees up-to-date-ness) is to look through
-the unit tests in ./datapkg/tests/
-'''
+To get a full list of datapkg's commands::
+
+    $ datapkg help
+
+To get help on a specific command do::
+
+    $ datapkg help {command-name}
+
+For generic help do::
+
+    $ datapkg -h
+
