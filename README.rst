@@ -1,7 +1,8 @@
 Introduction
 ============
 
-datapkg is a python library and command line tool for working with `Data Packages`_ and interacting with data hubs like CKAN_.
+datapkg is a python library and command line tool for working with `Data
+Packages`_ and interacting with data hubs like CKAN_.
 
 For more information visit the documentation at:
 http://packages.python.org/datapkg/

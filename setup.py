@@ -1,7 +1,8 @@
 # from ez_setup import use_setuptools
 # use_setuptools()
 from setuptools import setup, find_packages
-from datapkg import __version__, __license__, __description__, __description_long__
+from datapkg import __version__, __license__, __description__
+__description_long__ = open('README.rst').read()
 
 setup(
     name='datapkg',
