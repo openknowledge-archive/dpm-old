@@ -62,6 +62,7 @@ class CkanIndex(IndexBase):
                 raise
 
     def get(self, name):
+        assert name, 'You need to specify the name of the dataset to get'
         # TODO: convert to return a package object
         self.ckan.package_entity_get(name)
         self.print_status()
