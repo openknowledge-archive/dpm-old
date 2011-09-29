@@ -79,7 +79,7 @@ class JsonDistribution(DistributionBase):
         notes = self.package.metadata.get('notes', '')
         readme_fp = os.path.join(path, 'README.txt')
         fo = open(readme_fp, 'w')
-        fo.write(notes)
+        fo.write(notes.encode('utf8'))
         fo.close()
         # create empty 'data' directory
         datadir = os.path.join(path, 'data')
