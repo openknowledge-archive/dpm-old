@@ -7,7 +7,7 @@ http://packages.python.org/datapkg/
 .. _Data Packages: http://wiki.ckan.net/Data_Package
 .. _CKAN: http://ckan.org/
 '''
-__version__ = '0.9a'
+__version__ = '0.9'
 __description__ = 'datapkg (data package): data packaging system and utilities'
 __license__ = 'MIT'
 __license_full__ = \

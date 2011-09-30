@@ -5,7 +5,13 @@ History
 HEAD
 ====
 
+v0.9 2011-09-30
+===============
+
   * Standardize on JSON-based distribution (and remove ini-based distribution)
+  * Fix various (minor) bugs
+  * Overhaul docs
+  * Breaking change: json package info now in datapackage.json
 
 V0.8 2011-02-09
 ===============
