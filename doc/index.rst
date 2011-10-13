@@ -1,16 +1,19 @@
 ===================================
-Welcome to datapkg's documentation!
+Welcome to dpm's documentation!
 ===================================
 
-datapkg is a tool for distributing, discovering and installing data 'packages'.
+dpm (data package manager) is a command line tool and python library and for
+working with `Data Packages`_ and interacting with data hubs like those powered
+by CKAN_ such http://thedatahub.org/.
 
-datapkg is a *simple* way to 'package' data building on *existing* packaging
-tools developed for code. datapkg is designed to integrate closely with the
-`CKAN (Comprehensive Knowledge Archive Network) <http://www.ckan.net/>`_.
+dpm is a *simple* way to 'package' data building on *existing* packaging tools
+developed for code. By putting data in a package, it gets labelled with
+standardized metadata and can be put in a dpm repository, such as
+http://thedatahub.org/ or a local one. Once in such a repository, the packages
+are easy to find and retrieve.
 
-By putting data in a package, it gets labelled with standardized metadata and
-can be put in a datapkg repository, such as CKAN or a local one. Once in such
-a repository, the packages are easy to find and retrieve.
+.. _Data Packages: http://wiki.ckan.org/Data_Package
+.. _CKAN: http://ckan.org/
 
 Installation
 ============
@@ -28,7 +31,7 @@ We recommend users get started by taking a look at the manual:
 
    manual
 
-Using datapkg from code using the API
+Using dpm from code using the API
 -------------------------------------
 
 .. toctree::
@@ -46,7 +49,7 @@ More information on specific features
 Getting Started: Developers
 ===========================
 
-Source git repository can be found at: http://github.com/okfn/datapkg
+Source git repository can be found at: http://github.com/okfn/dpm
 
 For developers we recommend starting with the design document:
 

@@ -32,11 +32,11 @@ V0.7.1 2010-12-02
 V0.7 2010-10-11
 ===============
 
-  * MAJOR: Support for uploading datapkgs (upload.py)
+  * MAJOR: Support for uploading dpms (upload.py)
   * MAJOR: Much improved and extended documenation
   * MAJOR: New sqlite-based DB index giving support for a simple, central,
     'local' index (ticket:360)
-  * MAJOR: Make datapkg easily extendable
+  * MAJOR: Make dpm easily extendable
 
     * Support for adding new Index types with plugins
     * Support for adding new Commands with command plugins
@@ -64,7 +64,7 @@ V0.6 2010-04-28
   * Fixes for unicode in package metadata (when writing to disk)
   * Remove use of ast module as only in python 2.5/2.6 
   * Upgrade to use ckanclient 0.3
-  * Improved python api for usage of datapkg (load_package and load_index)
+  * Improved python api for usage of dpm (load_package and load_index)
 
 V0.5 2010-02-12
 ===============
@@ -86,7 +86,7 @@ V0.4 2009-12-28
 
   * Major refactoring to simplify and standardize CLI using 'package specs'
   * Support for searching indices from CLI, e.g.::
-        datapkg search ckan:// myquery
+        dpm search ckan:// myquery
   * Simple installation onto disk
   * Overhauled and improved documentation and put docs online
 
@@ -108,7 +108,7 @@ integration with 'write' support especially improved.
   * Create new Index object SimpleIndex
   * Completely overhaul package metadata with support for many additional
     attribues (author, maintainer, extras etc)
-  * Improved, sphinx-built docs (http://knowledgeforge.net/ckan/doc/datapkg/)
+  * Improved, sphinx-built docs (http://knowledgeforge.net/ckan/doc/dpm/)
 
 
 v0.2 2009-03-18

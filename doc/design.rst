@@ -5,18 +5,18 @@ Datapkg Design
 Overview
 ========
 
-The following diagram gives a conceptual overview of the datapkg system. Most,
-though not all, of the classes indicated already exist within datapkg.
+The following diagram gives a conceptual overview of the dpm system. Most,
+though not all, of the classes indicated already exist within dpm.
 
 .. image:: overview.png
   :alt: Diagrammatic overview
 
-The central object in datapkg is a **Package**. A Package consists of:
+The central object in dpm is a **Package**. A Package consists of:
 
   * metadata
   * payload
 
-One important thing to emphasize is that in datapkg the payload is often not
+One important thing to emphasize is that in dpm the payload is often not
 directly available (since it may be very large) but is virtual, being
 represented by, for example, links to the payload or a listing of the items in
 the payload (the manifest). In addition to the basic metadata about a package
@@ -30,7 +30,7 @@ dependencies. Thus a Package main attributes become:
 Distributions are serialized Package on disk (or elsewhere) and handle all
 serialization and deserialization of packages.
 
-  * Other people can provide plugins (datapkg.distribution)
+  * Other people can provide plugins (dpm.distribution)
   * These are tried in turn when loading from disk
 
 Tools include downloaders, unpacking and the command line interface.

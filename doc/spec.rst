@@ -2,5 +2,5 @@
 Package 'Specs' (Specifications)
 ================================
 
-.. autoclass:: datapkg.spec.Spec
+.. autoclass:: dpm.spec.Spec
 

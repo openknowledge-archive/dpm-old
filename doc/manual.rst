@@ -2,7 +2,7 @@
 User Manual
 ===========
 
-datapkg is a command line tool (and library) for quickly and easily
+dpm is a command line tool (and library) for quickly and easily
 distributing collections of data.
 
 .. note:: in what follows items prefixed with $ should be run on the command line.
@@ -17,18 +17,18 @@ Obtaining a Package
 Search for a package in an Index e.g. on CKAN.net::
 
     # let's search for iso country/language codes data (iso 3166 ...)
-    $ datapkg search ckan:// iso
+    $ dpm search ckan:// iso
     ...
     iso-3166-2-data -- Linked ISO 3166-2 Data
     ...
 
 Get some information about one of them::
 
-    $ datapkg info ckan://iso-3166-2-data
+    $ dpm info ckan://iso-3166-2-data
 
 Let's download it (to the current directory)::
 
-    $ datapkg download ckan://iso-3166-2-data .
+    $ dpm download ckan://iso-3166-2-data .
 
 This will download the Package 'iso-3166-2-data' together with its "Resources"
 and unpack it into a directory named 'iso-3166-2-data'.
@@ -40,7 +40,7 @@ Note that, if you replace the ckan:// spec with a file:// spec, you can use
 most of the commands for files on disk. For example, if you've downloaded a
 data package to, say, /tmp/xyz you could do::
 
-    $ datapkg info file:///tmp/xyz
+    $ dpm info file:///tmp/xyz
 
 See the help on indivdual commands for more information.
 
@@ -48,9 +48,9 @@ See the help on indivdual commands for more information.
 Creating and Registering a Package
 ==================================
 
-Create a new data Package on disk using datapkg file layout::
+Create a new data Package on disk using dpm file layout::
 
-    $ datapkg create MyNewDataPackage
+    $ dpm create MyNewDataPackage
 
 Edit the Package's metadata::
 
@@ -65,26 +65,26 @@ Add some data to the Package::
 Register it on CKAN::
 
     # NB: to register on CKAN you'll need to have an api-key
-    # This can either be stored in your config file (see datapkg init config)
+    # This can either be stored in your config file (see dpm init config)
     # Or you can set it with the --api-key option
-    $ datapkg register file://MyNewDataPackage ckan://
+    $ dpm register file://MyNewDataPackage ckan://
 
 Check it has registered ok::
 
-    $ datapkg info ckan://mynewdatapkg
+    $ dpm info ckan://mynewdpm
 
 You can also upload associated package resources to a storage system. For
 example, to register {your-file} with the default storage system associated to
 CKAN in a bucket named after {yourpackagename}::
 
-    # this requires you have created your default datapkgrc config file
-    $ datapkg upload {your-file} ckan://{yourpackagename}/{filename}
+    # this requires you have created your default dpmrc config file
+    $ dpm upload {your-file} ckan://{yourpackagename}/{filename}
 
 
 Tutorial
 ++++++++
 
-datapkg has two distinct uses:
+dpm has two distinct uses:
 
     1. Finding and obtaining data made available *by* others.
     2. Making material available *to* others.
@@ -93,14 +93,14 @@ datapkg has two distinct uses:
 Basic Concepts
 ==============
 
-Before we begin it is useful to understand some basic datapkg concepts:
+Before we begin it is useful to understand some basic dpm concepts:
 
     1. A Package -- the 'package' of data.
     2. A Distribution -- a serialization of the Package and optionally the data
        too (code, database, a book etc) to some concretely addressable form.
        For example: file(s) on disk, an API at a specific url.
 
-For managing Packages datapkg uses:
+For managing Packages dpm uses:
 
     1. A Registry: a list of Package metadata (but not Package payload data)
     2. Repository: a Registry plus associated storage for association
@@ -132,9 +132,9 @@ Set Up Configuration [Optional]
 You may want to alter the default configuration, for example to specify your
 CKAN apikey. To do this, first set up your local config::
 
-    $ datapkg init config
+    $ dpm init config
 
-This will create a .datapkgrc file in your home directory. You can then edit
+This will create a .dpmrc file in your home directory. You can then edit
 this with your favourite text editor.
 
 Locating and Installing Material
@@ -151,7 +151,7 @@ Creating a package (distribution)
 
 First a skeletal distribution on disk::
 
-    $ datapkg create {pkg-name-or-path}
+    $ dpm create {pkg-name-or-path}
 
 Take a look inside your newly created distribution directory. There should
 be 2 files:
@@ -179,7 +179,7 @@ location.
 
 Once that is done you register the package on CKAN by doing::
 
-    $ datapkg register file://{path} ckan://
+    $ dpm register file://{path} ckan://
 
 
 Installing your package
@@ -187,21 +187,21 @@ Installing your package
 
 You can also download a distribution (only onto disk at the moment!)::
 
-    $ datapkg download {package-spec} {path-on-disk}
+    $ dpm download {package-spec} {path-on-disk}
 
 
 More About the Command Line
 +++++++++++++++++++++++++++
 
-To get a full list of datapkg's commands::
+To get a full list of dpm's commands::
 
-    $ datapkg help
+    $ dpm help
 
 To get help on a specific command do::
 
-    $ datapkg help {command-name}
+    $ dpm help {command-name}
 
 For generic help do::
 
-    $ datapkg -h
+    $ dpm -h
 

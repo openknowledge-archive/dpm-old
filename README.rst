@@ -1,13 +1,13 @@
 Introduction
 ============
 
-datapkg is a python library and command line tool for working with `Data
-Packages`_ and interacting with data hubs like CKAN_.
+dpm (data package manager) is a command line tool and python library and for
+working with `Data Packages`_ and interacting with data hubs like CKAN_.
 
 For more information visit the documentation at:
-http://packages.python.org/datapkg/
+http://packages.python.org/dpm/
 
-.. _Data Packages: http://wiki.ckan.net/Data_Package
+.. _Data Packages: http://wiki.ckan.org/Data_Package
 .. _CKAN: http://ckan.org/
 
 Installation
@@ -33,9 +33,9 @@ You need sphinx (python-sphinx) to do this. Now you can build the docs::
 
 2. Running tests. We suggest you use nose::
 
-    nosetests datapkg/tests/
+    nosetests dpm/tests/
   
   To exclude tests depend on access to the internet::
 
-    nosetests -a \!__external__ datapkg/tests
+    nosetests -a \!__external__ dpm/tests
 

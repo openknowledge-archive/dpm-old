@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# datapkg documentation build configuration file, created by
+# dpm documentation build configuration file, created by
 # sphinx-quickstart on Sun Jul 26 14:02:28 2009.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -19,7 +19,7 @@ import sys, os
 # If your extensions (or modules documented by autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.append(os.path.abspath('../datapkg'))
+sys.path.append(os.path.abspath('../dpm'))
 
 # General configuration
 # ---------------------
@@ -41,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'datapkg (data package)'
+project = u'dpm (data package)'
 copyright = u'2010, Open Knowledge Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -159,7 +159,7 @@ html_static_path = ['_static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'datapkgdoc'
+htmlhelp_basename = 'dpmdoc'
 
 
 # Options for LaTeX output
@@ -174,7 +174,7 @@ htmlhelp_basename = 'datapkgdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'datapkg.tex', ur'datapkg Documentation',
+  ('index', 'dpm.tex', ur'dpm Documentation',
    ur'Open Knowledge Foundation', 'manual'),
 ]
 

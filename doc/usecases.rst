@@ -1,5 +1,5 @@
 =====================
-Use cases for datapkg
+Use cases for dpm
 =====================
 
 Use cases for DataPkg (or: reasons to use it in the first place)
@@ -13,16 +13,16 @@ of the project (and were heavily inspired by debian).
 
 The steps involved::
 
-    $ datapkg index-add file:///....
-    $ datapkg update
-    $ datapkg search "military spending"
+    $ dpm index-add file:///....
+    $ dpm update
+    $ dpm search "military spending"
 
     some-id Military Spending 1890-1914
     some-id-2 Military Spending 1890-1914 (normalized)
 
-    $ datapkg install some-id
+    $ dpm install some-id
     ...
-    $ datapkg plot some-id
+    $ dpm plot some-id
 
 2. Get two different datasets and use them together
 ===================================================
@@ -44,12 +44,12 @@ What data?
 
 Example code::
 
-    $ datapkg install pkg-a
-    $ datapkg install pkg-b
-    $ datapkg create merged
+    $ dpm install pkg-a
+    $ dpm install pkg-b
+    $ dpm create merged
       # manual merge
       # e.g. PPP, GDP
-    $ datapkg register my-merged-package
+    $ dpm register my-merged-package
 
 
 Getting data v2
@@ -57,11 +57,11 @@ Getting data v2
 
 Revist basic discovery and usage of data from above.
 
-  1. Install datapkg
+  1. Install dpm
   2. Search remote registry/repo for a package
   3. Download package on to local disk and unpack::
 
-     $ datapkg get [url|name] [path]
+     $ dpm get [url|name] [path]
 
    If specifying name (using a Registry) then:
 

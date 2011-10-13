@@ -20,18 +20,18 @@ Currently, we provide 2 types of basic file distributions:
   * Simple (Ini-Based) Distribution - DEFAULT
   * Python Distribution
 
-It is also easy to extend datapkg to support new distribution types. See
+It is also easy to extend dpm to support new distribution types. See
 Extending Datapkg.
 
 Base Distribution
 =================
 
-.. autoclass:: datapkg.distribution.DistributionBase
+.. autoclass:: dpm.distribution.DistributionBase
   :members:
 
 Standard Distribution
 =====================
 
-.. autoclass:: datapkg.distribution.JsonDistribution
+.. autoclass:: dpm.distribution.JsonDistribution
   :members:
 

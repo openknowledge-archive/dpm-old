@@ -5,15 +5,15 @@ Installation
 
 2. Install setuptools library (and (optional) virtualenv)
 
-3. Install datapkg
+3. Install dpm
    
    Using setuptool's easy_install::
 
-      $ easy_install datapkg
+      $ easy_install dpm
     
    Or to install with pip (http://pypi.python.org/pypi/pip)::
 
-      $ pip install datapkg
+      $ pip install dpm
 
    If you want it in a nice insulated virtualenv do instead::
 
@@ -22,13 +22,13 @@ Installation
 
       # EITHER (with easy_install)
       $ . your_virtual_env/bin/activate
-      $ easy_install datapkg
+      $ easy_install dpm
 
       # OR (with pip) 
-      $ pip -E your_virtual_env install datapkg
+      $ pip -E your_virtual_env install dpm
 
-   NB: if you wish to install from source datapkg's git repository is
-   here: https://github.com/okfn/datapkg
+   NB: if you wish to install from source dpm's git repository is
+   here: https://github.com/okfn/dpm
 
 4. Extras (e.g. upload capabilities).
    
@@ -42,5 +42,5 @@ Installation
 
 5. Take a look at the manual::
 
-    $ datapkg man
+    $ dpm man
 

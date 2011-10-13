@@ -1,8 +1,8 @@
 Datapkg API
 ===========
 
-How to use datapkg from code (python).
+How to use dpm from code (python).
 
-.. autofunction:: datapkg.load_package
-.. autofunction:: datapkg.load_index
+.. autofunction:: dpm.load_package
+.. autofunction:: dpm.load_index
 
