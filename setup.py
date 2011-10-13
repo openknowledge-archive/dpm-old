@@ -1,14 +1,14 @@
 # from ez_setup import use_setuptools
 # use_setuptools()
 from setuptools import setup, find_packages
-from datapkg import __version__, __license__, __description__
+from dpm import __version__, __license__, __description__
 try:
     __description_long__ = open('README.rst').read()
 except:
     __description_long__ = ''
 
 setup(
-    name='datapkg',
+    name='dpm',
     version=__version__,
     # metadata
     author='Open Knowledge Foundation',
@@ -17,7 +17,7 @@ setup(
     description=__description__,
     long_description=__description_long__,
     keywords='data, packaging, component, tool',
-    url='http://okfn.org/projects/datapkg',
+    url='http://okfn.org/projects/dpm',
     classifiers=[
     ],
 
@@ -33,37 +33,36 @@ setup(
     datapkg_index.txt=setuptools.command.egg_info:write_arg
     
     [console_scripts]
-    datapkg=datapkg.cli:main
-    dpm=datapkg.cli:main
+    dpm=dpm.cli:main
 
-    [datapkg.cli]
-    help = datapkg.cli:HelpCommand
-    about = datapkg.cli.standard:AboutCommand
-    license = datapkg.cli.standard:LicenseCommand
-    man = datapkg.cli.standard:ManCommand
-    list = datapkg.cli.standard:ListCommand
-    search = datapkg.cli.standard:SearchCommand
-    info = datapkg.cli.standard:InfoCommand
-    dump = datapkg.cli.standard:DumpCommand
-    init = datapkg.cli.standard:InitCommand
-    create = datapkg.cli.standard:CreateCommand
-    register = datapkg.cli.standard:RegisterCommand
-    update = datapkg.cli.standard:UpdateCommand
-    install = datapkg.cli.download:DownloadCommand
-    upload = datapkg.cli.upload:UploadCommand
+    [dpm.cli]
+    help = dpm.cli:HelpCommand
+    about = dpm.cli.standard:AboutCommand
+    license = dpm.cli.standard:LicenseCommand
+    man = dpm.cli.standard:ManCommand
+    list = dpm.cli.standard:ListCommand
+    search = dpm.cli.standard:SearchCommand
+    info = dpm.cli.standard:InfoCommand
+    dump = dpm.cli.standard:DumpCommand
+    init = dpm.cli.standard:InitCommand
+    create = dpm.cli.standard:CreateCommand
+    register = dpm.cli.standard:RegisterCommand
+    update = dpm.cli.standard:UpdateCommand
+    install = dpm.cli.download:DownloadCommand
+    upload = dpm.cli.upload:UploadCommand
 
-    [datapkg.index]
-    simple = datapkg.index.base:SimpleIndex
-    file = datapkg.index.base:FileIndex
-    ckan = datapkg.index.ckan:CkanIndex
-    db = datapkg.index.db:DbIndexSqlite
-    egg = datapkg.index.egg:EggIndex
+    [dpm.index]
+    simple = dpm.index.base:SimpleIndex
+    file = dpm.index.base:FileIndex
+    ckan = dpm.index.ckan:CkanIndex
+    db = dpm.index.db:DbIndexSqlite
+    egg = dpm.index.egg:EggIndex
 
-    [datapkg.distribution]
-    json = datapkg.distribution:JsonDistribution
+    [dpm.distribution]
+    json = dpm.distribution:JsonDistribution
 
-    [datapkg.resource_downloader]
-    simple = datapkg.download:ResourceDownloaderSimple 
+    [dpm.resource_downloader]
+    simple = dpm.download:ResourceDownloaderSimple 
     ''',
     test_suite='nose.collector',
     zip_safe=False,
