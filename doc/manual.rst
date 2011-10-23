@@ -48,9 +48,9 @@ See the help on indivdual commands for more information.
 Creating and Registering a Package
 ==================================
 
-Create a new data Package on disk using dpm file layout::
+Initialize a new data Package on disk using dpm file layout::
 
-    $ dpm create MyNewDataPackage
+    $ dpm init MyNewDataPackage
 
 Edit the Package's metadata::
 
@@ -65,7 +65,7 @@ Add some data to the Package::
 Register it on CKAN::
 
     # NB: to register on CKAN you'll need to have an api-key
-    # This can either be stored in your config file (see dpm init config)
+    # This can either be stored in your config file (see dpm setup config)
     # Or you can set it with the --api-key option
     $ dpm register file://MyNewDataPackage ckan://
 
@@ -132,7 +132,7 @@ Set Up Configuration [Optional]
 You may want to alter the default configuration, for example to specify your
 CKAN apikey. To do this, first set up your local config::
 
-    $ dpm init config
+    $ dpm setup config
 
 This will create a .dpmrc file in your home directory. You can then edit
 this with your favourite text editor.
@@ -151,10 +151,9 @@ Creating a package (distribution)
 
 First a skeletal distribution on disk::
 
-    $ dpm create {pkg-name-or-path}
+    $ dpm init {pkg-name-or-path}
 
-Take a look inside your newly created distribution directory. There should
-be 2 files:
+Take a look inside your newly data package. There should be 2 files:
 
   1. datapackage.json. This is a json file that contains the package metadata
   2. manifest.json. This is a json file giving the file manifest.

@@ -45,7 +45,7 @@ setup(
     info = dpm.cli.standard:InfoCommand
     dump = dpm.cli.standard:DumpCommand
     init = dpm.cli.standard:InitCommand
-    create = dpm.cli.standard:CreateCommand
+    setup = dpm.cli.standard:SetupCommand
     register = dpm.cli.standard:RegisterCommand
     update = dpm.cli.standard:UpdateCommand
     install = dpm.cli.download:DownloadCommand

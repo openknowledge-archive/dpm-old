@@ -141,9 +141,9 @@ Dump contents of specified resource in specified package to stdout.
         sys.stdout.write(stream.read()) 
 
 
-class InitCommand(Command):
-    name = 'init'
-    summary = 'Initialise things (config, repository etc)'
+class SetupCommand(Command):
+    name = 'setup'
+    summary = 'Setup things (config, repository etc)'
     min_args = 1
     max_args = 2
     usage = '''%prog {action}
@@ -151,9 +151,9 @@ class InitCommand(Command):
 config [location]: Create configuration file at location. If not location
 specified use default (see --config).
 
-index [location]: Initialize an index at location specified in config.
+index [location]: Setup an index at location specified in config.
 
-repo: Initialize a repository. The repository will be created at the location
+repo: Setup a repository. The repository will be created at the location
       specified via the --repository option or default location specified by
       config.
 '''
@@ -168,7 +168,7 @@ repo: Initialize a repository. The repository will be created at the location
         import dpm.repository
         repo = dpm.repository.Repository(dpm.CONFIG.get('dpm', 'repo.default_path'))
         repo.init()
-        msg = 'Repository successfully initialized at %s' % dpm.CONFIG.get('dpm', 'repo.default_path')
+        msg = 'Repository successfully setup at %s' % dpm.CONFIG.get('dpm', 'repo.default_path')
         self._print(msg)
     
     def config(self, args, options):
@@ -185,26 +185,23 @@ repo: Initialize a repository. The repository will be created at the location
         dpm.index.get_default_index().init()
 
 
-class CreateCommand(Command):
-    name = 'create'
-    summary = 'Create a package'
+class InitCommand(Command):
+    name = 'init'
+    summary = 'Initialize a data package'
     min_args = 1
     max_args = 1
     usage = \
 '''%prog <path-or-name>
 
-Create a skeleton data package at path. Package Name will be taken from
+Initialize a data package at path. Package Name will be taken from
 last portion of path. If path simply a name then create in the current
 directory.'''
 
     def run(self, options, args):
         import dpm.package
         path = args[0]
-        msg = 'Creating dpm on disk at: %s' %  path
-        self.logger.info(msg)
-        self._print(msg)
         dpm.package.Package.create_on_disk(path)
-        msg = 'Created dpm on disk at: %s' % path
+        msg = 'Initialized data package on disk at: %s' % path
         self.logger.info(msg)
         self._print(msg)
 
