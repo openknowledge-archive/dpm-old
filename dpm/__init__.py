@@ -2,9 +2,9 @@
 Packages`_ and interacting with data hubs like CKAN_.
 
 For more information visit the documentation at:
-http://packages.python.org/dpm/
+http://readthedocs.org/docs/dpm/
 
-.. _Data Packages: http://wiki.ckan.net/Data_Package
+.. _Data Packages: http://wiki.ckan.net/Data_Packages
 .. _CKAN: http://ckan.org/
 '''
 __version__ = '0.10a'

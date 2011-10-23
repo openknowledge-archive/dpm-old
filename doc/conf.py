@@ -41,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'dpm (data package)'
+project = u'dpm (data package manager)'
 copyright = u'2010, Open Knowledge Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
