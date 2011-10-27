@@ -44,7 +44,7 @@ def make_default_config(repo_path=default_repo_path):
     cfg.add_section('upload:ckan')
     cfg.set('dpm', 'repo.default_path', repo_path)
     cfg.set('dpm', 'index.default', 'file')
-    cfg.set('index:ckan', 'ckan.url',  'http://ckan.net/api/')
+    cfg.set('index:ckan', 'ckan.url',  'http://thedatahub.org/api/')
     cfg.set('index:ckan', 'ckan.api_key', '')
     cfg.set('index:db', 'db.dburi', 'sqlite://%s/index.db' % repo_path)
     cfg.set('index:db', 'db.dburi', 'sqlite://%s/index.db' % repo_path)
