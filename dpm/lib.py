@@ -35,11 +35,6 @@ def index_from_spec(spec_str, all_index=False):
     spec = dpm.spec.Spec.parse_spec(spec_str, all_index=all_index)
     return spec.index_from_spec()
 
-
-def create():
-    """Not yet implemented"""
-    pass
-
 def get_config():
     """Return dpm configuration object
 
@@ -143,13 +138,6 @@ def list(index_spec):
     return packages
 
 
-def register():
-    """
-    Not yet implemented.
-    """
-    pass
-
-
 def search(index_spec, query):
     """Search in the Packages pointed by an Index
 
@@ -178,7 +166,29 @@ def search(index_spec, query):
     return packages
 
 
-def update():
+
+def init():
+    """Not yet implemented"""
     pass
 
+def dump():
+    """Not yet implemented"""
+    pass
+
+def setup():
+    """Not yet implemented"""
+    #TODO split it in 3 different methods
+    pass
+
+def register():
+    """Not yet implemented"""
+    pass
+
+def update():
+    """Not yet implemented"""
+    pass
+
+def upload():
+    """Not yet implemented"""
+    pass
 
