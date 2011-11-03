@@ -1,8 +1,6 @@
-__author__ = 'dgraziotin'
 """
-This module holds what we hope will become the future standard library for dpm, to be used
-by both the command line, the GUI and other projects.
-APIs are documented in each function.
+This is dpm library. It wraps all dpm functionalities inside Python functions.
+For use it, import dpm.lib.
 """
 import dpm
 import dpm.spec
@@ -11,83 +9,69 @@ import dpm.download
 import dpm.config
 import ckanclient
 import os
-import shutil
 
-#TODO should we really export this functionality? can be useful.
 def index_from_spec(spec_str, all_index=False):
+    """Construct a dpm Index, given a spec string.
+
+    :param spec_str:
+        a string in the form of **<scheme>://<package name>**, where
+            - **<scheme>** identifies the type of index to be used
+            - **<package name>** identifies the name of the package.
+            - Example: *ckan://iso-codes*
+    :type spec_str: str
+    
+    :param all_index:
+        this spec_str is just an index (useful for file specs)
+    :type all_index:
+        bool
+
+    :return:
+        (:py:class:`Index <dpm.index.base.IndexBase>`, str) -- str represents the Package (its name)
+
+    :see:
+        - :py:meth:`dpm.spec.Spec.parse_spec`
+        - :py:func:`dpm.spec.index_from_spec`
+    """
     spec = dpm.spec.Spec.parse_spec(spec_str, all_index=all_index)
     return spec.index_from_spec()
 
 
 def create():
+    """Not yet implemented"""
     pass
 
 def get_config():
-    """
-    Returns dpm configuration
+    """Return dpm configuration object
 
-    Return values:
-    None if the configuration does not exist.
-    a dpm.config.Config object on success
+    :return:
+        :py:class:`Config <dpm.config.Config>` -- The current configuration object
+        
+    :see:
+        - :py:mod:`dpm.config`
     """
     return dpm.CONFIG
 
-def download(package_spec, destination_path): #still have to understand this: filter_resources=["*"]):
-    """Download a Package and the connected Resources
+def download(package_spec, destination_path):
+    """Download a `Package <dpm.index.package.Package>` and the connected Resources
 
-    Keyword arguments:
-    package_spec -- a string Spec in the form of <scheme>://<package name>, where:
-                    <scheme> identifies the type of index to be used
-                    <package name> identifies the name of the package
-                    Ex: ckan://iso-codes
-    destination_path -- a string specifying the directory in which to save the package
+    :param package_spec:
+        a string in the form of **<scheme>://<package name>**, where
+            - **<scheme>** identifies the type of index to be used
+            - **<package name>** identifies the name of the package.
+            - Example: *ckan://iso-codes*
+    :type spec_str: str
 
+    :param destination_path:
+        the directory in which to save the package
+    :type destination_path: str
 
-    Return values:
-    True if the operation succeeds
-    The actual dpm design does not let us to specify other values. Must fix this
+    :see:
+        - :py:class:`dpm.download.PackageDownloader`
     """
-    #TODO better return values
+    #TODO filter_resources and filterfunc
+    #TODO add return values?
 
     pkg_downloader = dpm.download.PackageDownloader(verbose=True)
-
-    '''
-    The following are typical dpm download usage
-
-    # download the package specified by ckan://name to path-on-disk
-    # selecting the resources to retrieve interactively
-    download ckan://name path-on-disk
-
-    # download all resources
-    # Note need to quote *
-    download ckan://name path-on-disk "*"
-
-    # download only those resources that have format 'csv' (or 'CSV')
-    download ckan://name path-on-disk csv
-
-    # download only those resources that have format starting xml/
-    download ckan://name path-on-disk xml/*
-
-    # download only those resources that have a url starting http://abc (and any format)
-    download ckan://name path-on-disk "*" http://abc*
-
-    Just the first two work for me now, the other will be supported when I understand them.
-    '''
-
-    #TODO this will probably work someday
-    '''
-    print len(filter_resources)
-    if len(filter_resources) == 1:
-        formatpat = filter_resources[0]
-        urlpat = "*"
-    else:
-        formatpat = filter_resources[0]
-        urlpat = ' '.join(str(item) for item in filter_resources[1:])
-
-    filterfunc = pkg_downloader.make_glob_filterfunc(
-                formatpat,
-                urlpat)
-    '''
 
     filterfunc = None
 
@@ -96,27 +80,34 @@ def download(package_spec, destination_path): #still have to understand this: fi
 
     os_destination_path = os.path.join(destination_path, package.name)
     pkg_downloader.download(package, os_destination_path, filterfunc)
-    return True
 
 
 def info(package_spec, request_for='metadata'):
-    #TODO: a better argument instead of request_for?
-    """Retrieve info on Package
+    """Retrieve information about a :py:class:`Package <dpm.index.package.Package>`
 
-    Keyword arguments:
-    package_spec -- either:
-                    * a string Spec in the form of <scheme>://<package name>, where:
-                    <scheme> identifies the type of index to be used
-                    <package name> identifies the name of the package
-                    Ex: ckan://iso-codes.
-                    * an object of type Package
-    request_for -- a string specifying what to retrieve. Up to know we let choose either for 'metadata'
-                   or for 'manifest'. Default is 'manifest'
+    :param package_spec:
+        - a string in the form of **<scheme>://<package name>**, where
+            - **<scheme>** identifies the type of index to be used
+            - **<package name>** identifies the name of the package.
+            - Example: *ckan://iso-codes*
+        - the :py:class:`Package <dpm.index.package.Package>`
+    :type package_spec: str or :py:class:`dpm.index.package.Package`
 
+    :param request_for:
+        what to retrieve. Possible values:
+        - **metadata**
+        - **manifest**.
+        Default is **manifest**
+    :type request_for: str
 
-    Return values:
-    The package Metadata (or the Manifest)
-    None elsewhere
+    :return:
+        - :py:class:`Metadata <dpm.metadata.Metadata>` -- if *request_for=='metadata'*
+        - :py:class:`Manifest <dpm.package.Manifest>` -- if *request_for=='manifest'*
+        - None -- on un-success
+        
+    :see:
+        - :py:class:`dpm.metadata.Metadata`
+        - :py:class:`dpm.package.Manifest`
     """
     if type(package_spec) == str:
         index, path = index_from_spec(package_spec)
@@ -125,7 +116,7 @@ def info(package_spec, request_for='metadata'):
         package = package_spec
 
     if not type(package) == dpm.package.Package:
-        return None
+        return None #TODO: raise an exception here?
     if request_for == 'metadata':
         return package.metadata
     elif request_for == 'manifest':
@@ -134,16 +125,18 @@ def info(package_spec, request_for='metadata'):
         return package.metadata
 
 
-def list(index_spec=""):
-    """Returns the Packages (not the resources) pointed by an index
+def list(index_spec):
+    """Return the `Packages <dpm.index.package.Package>` (not their resources!) pointed by an index
+    
+    :param index_spec:
+        - a string in the form of **<scheme>://**, where
+            - **<scheme>** identifies the type of index to be used
+            - Example: *ckan://*
+    :type index_spec: str
 
-    Keyword arguments:
-    index_spec -- a string in the form of <scheme>://, where <scheme> identifies the type of index to be used.
-                  Ex: ckan://
-
-    Return values:
-    A list of Packages pointed by the Index
-    Actually, dpm lacks the case in which an exception occurs (see dpm.index.ckan.py.list())
+    :return:
+        - [:py:class:`Package <dpm.package.Package>`] -- A list of Packages pointed by the Index
+        - Actually, dpm lacks the case in which an exception occurs (see :py:meth:`dpm.index.Ckan.list`)
     """
     index, path = index_from_spec(index_spec, all_index=True)
     packages = index.list()
@@ -151,21 +144,28 @@ def list(index_spec=""):
 
 
 def register():
+    """
+    Not yet implemented.
+    """
     pass
 
 
 def search(index_spec, query):
-    """Search a Package
+    """Search in the Packages pointed by an Index
 
-    Keyword arguments:
-    index_spec -- a string in the form of <scheme>://, where <scheme> identifies the type of index to be used.
-                  Ex: ckan://
-    query -- a string specifying the query to be executed.
-             Ex: iso
+    :param index_spec:
+        - a string in the form of **<scheme>://**, where
+            - **<scheme>** identifies the type of index to be used
+            - Example: *ckan://*
+    :type index_spec: str
 
-    Return values:
-    A list of Package object if there are results
-    An empty list elsewhere
+    :param query:
+        a string specifying the query to be executed.
+        Ex: iso
+
+    :return:
+        - [:py:class:`Package <dpm.package.Package>`] -- A list of Packages pointed by the Index satisfying the query
+        - [] -- on no results
     """
     spec_from = index_spec
     index, path = index_from_spec(spec_from)
