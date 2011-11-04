@@ -6,7 +6,7 @@ class TestConfig:
         cfg = dpm.config.make_default_config()
         assert set(cfg.sections()) == set(['dpm', 'index:ckan',
             'index:db', 'upload:ckan']), cfg.sections()
-        assert cfg.get('index:ckan', 'ckan.url') == 'http://ckan.net/api/'
+        assert cfg.get('index:ckan', 'ckan.url') == 'http://thedatahub.org/api/'
 
     def test_dictget(self):
         cfg = dpm.config.Config()
