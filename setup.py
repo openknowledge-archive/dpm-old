@@ -50,6 +50,7 @@ setup(
     update = dpm.cli.standard:UpdateCommand
     install = dpm.cli.download:DownloadCommand
     upload = dpm.cli.upload:UploadCommand
+    push = dpm.cli.push:PushCommand
 
     [dpm.index]
     simple = dpm.index.base:SimpleIndex
