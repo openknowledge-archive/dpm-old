@@ -75,7 +75,7 @@ def push_file(path, webstore_url):
         try:
             table.writerow(dict_, unique_columns=['Date'])
             count += 1
-            if count % 10**power == 0:
+            if count % 2**power == 0:
                 logger.info('Processed %s rows' % count)
                 power += 1
         except:
@@ -85,13 +85,32 @@ def push_file(path, webstore_url):
 class WebstoreTable(object):
     def __init__(self, url):
         parsed = urlparse.urlparse(url)
-        self.username = parsed.username
-        self.password = parsed.password
         newparsed = list(parsed)
-        if self.username:
+        username = parsed.username
+        if username:
             # get rid of username:password@ in netloc
             newparsed[1] = parsed.netloc.split('@')[1]
         self.url = urlparse.urlunparse(newparsed)
+        authorization = self._authorization(username, parsed.password)
+        self._headers = {}
+        self._headers['Content-Type'] = 'application/json'
+        self._headers['Accept'] = 'application/json'
+        if authorization:
+            self._headers['Authorization'] = authorization
+
+    def _authorization(self, username, password):
+        '''Get authorization field for authorization header.
+        
+        If password is None we assume username is in fact API key.
+        '''
+        if username and password:
+            secret = username + ':' + password
+            authorization = 'Basic ' + secret.encode('base64')
+            return authorization
+        elif username: # API key
+            return username
+        else:
+            return ''
 
     def writerow(self, dict_, unique_columns=None):
         if unique_columns:
@@ -99,11 +118,8 @@ class WebstoreTable(object):
             url = self.url + query
         else:
             url = self.url
-        _headers = {}
-        _headers['Content-Type'] = 'application/json'
-        _headers['Accept'] = 'application/json'
         data = json.dumps(dict_)
-        req = urllib2.Request(url, data, _headers)
+        req = urllib2.Request(url, data, self._headers)
         response = urllib2.urlopen(req)
         return response 
 
