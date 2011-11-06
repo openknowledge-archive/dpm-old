@@ -24,6 +24,11 @@ class PushCommand(Command):
 
 Push local package in current directory to remote repository specified in
 .dpm/config. Alternatively push a single file to the webstore.
+
+Examples:
+
+    dpm push data/data.csv http://{api-key}@webstore.org/me/mydatabase/data?unique=Date
+    dpm push
 '''
     
     def run(self, options, args):
@@ -73,7 +78,7 @@ def push_file(path, webstore_url):
     logger.info('Pushing %s to %s' % (path, webstore_url))
     for dict_ in csv.DictReader(open(path)):
         try:
-            table.writerow(dict_, unique_columns=['Date'])
+            table.writerow(dict_)
             count += 1
             if count % 2**power == 0:
                 logger.info('Processed %s rows' % count)
