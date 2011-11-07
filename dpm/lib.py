@@ -46,6 +46,23 @@ def get_config():
     """
     return dpm.CONFIG
 
+def get_package(package_spec):
+    """Return `Package <dpm.index.package.Package>` given its Spec
+
+    :param package_spec:
+        a string in the form of **<scheme>://<package name>**, where
+            - **<scheme>** identifies the type of index to be used
+            - **<package name>** identifies the name of the package.
+            - Example: *ckan://iso-codes*
+            - Example: *file:///home/user/packages/useful-package*
+    :type spec_str: str
+    
+    :return:
+        :py:class:`Package <dpm.package.Package>` -- The Package object
+    """
+    package_index, package_name = index_from_spec(package_spec)
+    return package_index.get(package_name)
+
 def download(package_spec, destination_path):
     """Download a `Package <dpm.index.package.Package>` and the connected Resources
 
@@ -77,47 +94,31 @@ def download(package_spec, destination_path):
     pkg_downloader.download(package, os_destination_path, filterfunc)
 
 
-def info(package_spec, request_for='metadata'):
+def info(package_spec_or_obj):
     """Retrieve information about a :py:class:`Package <dpm.index.package.Package>`
 
-    :param package_spec:
+    :param package_spec_or_obj:
         - a string in the form of **<scheme>://<package name>**, where
             - **<scheme>** identifies the type of index to be used
             - **<package name>** identifies the name of the package.
             - Example: *ckan://iso-codes*
-        - the :py:class:`Package <dpm.index.package.Package>`
+        - the :py:class:`Package <dpm.index.package.Package>` object
     :type package_spec: str or :py:class:`dpm.index.package.Package`
 
-    :param request_for:
-        what to retrieve. Possible values:
-        - **metadata**
-        - **manifest**.
-        Default is **manifest**
-    :type request_for: str
-
     :return:
-        - :py:class:`Metadata <dpm.metadata.Metadata>` -- if *request_for=='metadata'*
-        - :py:class:`Manifest <dpm.package.Manifest>` -- if *request_for=='manifest'*
+        - (:py:class:`Metadata <dpm.metadata.Metadata>`,:py:class:`Manifest <dpm.package.Manifest>`) -- on success
         - None -- on un-success
-        
-    :see:
-        - :py:class:`dpm.metadata.Metadata`
-        - :py:class:`dpm.package.Manifest`
     """
-    if type(package_spec) == str:
-        index, path = index_from_spec(package_spec)
+    if type(package_spec_or_obj) == str:
+        index, path = index_from_spec(package_spec_or_obj)
         package = index.get(path)
-    else: # assume package_spec is of type Package, will check for it next
-        package = package_spec
+    else: # assume package_spec_or_obj is of type Package, will check for it next
+        package = package_spec_or_obj
 
     if not type(package) == dpm.package.Package:
         return None #TODO: raise an exception here?
-    if request_for == 'metadata':
-        return package.metadata
-    elif request_for == 'manifest':
-        return package.manifest
-    else: # fallback
-        return package.metadata
+    
+    return (package.manifest, package.metadata)
 
 
 def list(index_spec):
