@@ -17,20 +17,3 @@ class _TestFileRepository(TestCase):
         self.repo = dpm.repository.FileRepository(self.init_path)
         assert os.path.exists(self.init_path)
 
-
-class TestDbRepository(TestCase):
-    @classmethod
-    def setup_class(self):
-        self.make_tmpdir()
-        self.init_path = os.path.join(self.tmpdir, '.dpm')
-        self.repo = dpm.repository.DbRepository(self.init_path)
-
-    def test_index(self):
-        assert self.repo.index_dburi == 'sqlite:///%s' % self.repo.index_path
-        assert self.repo.index is not None
-
-    def test_init(self):
-        self.repo.init()
-        assert os.path.exists(self.repo.index_path)
-        assert os.path.exists(self.repo.installed_path)
-

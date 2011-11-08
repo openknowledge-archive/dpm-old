@@ -56,7 +56,6 @@ setup(
     simple = dpm.index.base:SimpleIndex
     file = dpm.index.base:FileIndex
     ckan = dpm.index.ckan:CkanIndex
-    db = dpm.index.db:DbIndexSqlite
     egg = dpm.index.egg:EggIndex
 
     [dpm.distribution]

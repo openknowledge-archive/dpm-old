@@ -75,11 +75,6 @@ class TestSpec(TestCase):
         assert spec.netloc == 'http://test.ckan.net/api', spec.netloc
         assert spec.path == 'dpmdemo', spec.path
 
-    def test_02_parse_spec_ckan_1(self):
-        spec = Spec.parse_spec('db://dpmdemo')
-        assert spec.scheme == 'db', spec.scheme
-        assert spec.path == 'dpmdemo', spec.path
-
     def test_03_parse_spec_default(self):
         spec = Spec.parse_spec('dpmdemo')
         assert spec.scheme == 'file', spec.scheme
@@ -100,10 +95,4 @@ class TestSpec(TestCase):
         spec = Spec.parse_spec('ckan://dpmdemo')
         index, path = spec.index_from_spec()
         assert isinstance(index, CkanIndex)
-
-    def test_04_index_from_spec_db(self):
-        from dpm.index.db import DbIndexSqlite
-        spec = Spec.parse_spec('db://dpmdemo')
-        index, path = spec.index_from_spec()
-        assert isinstance(index, DbIndexSqlite)
 

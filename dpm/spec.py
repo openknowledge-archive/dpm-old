@@ -17,7 +17,6 @@ class Spec(object):
 
         ckan://{package-name}
         file://{index-path}/{package-name}
-        db://{packag-name} 
     
     Examples::
 
@@ -25,7 +24,6 @@ class Spec(object):
         file:///some/path/on/disk
         file://. # current directory
         file://./xyz # relative path xyz from the current directory
-        db://dpmdemo # dpmdemo in the (local) database index
 
     For the convenience of users we also support a default index (set in the
     config file). This allows one to simply use the package identifier for the
@@ -72,7 +70,7 @@ class Spec(object):
             else:
                 netloc = os.path.join(os.path.dirname(path))
                 path = os.path.basename(path)
-        elif scheme in ('ckan', 'db', 'egg'):
+        elif scheme in ('ckan', 'egg'):
             # python >= 2.6.5 changes behaviour of urlsplit for novel url
             # schemes to be rfc compliant
             # http://bugs.python.org/issue7904
@@ -93,9 +91,6 @@ class Spec(object):
                 # we have a path but did not put http:// ...
                 if netloc and not netloc.startswith('http'):
                     netloc = 'http://' + netloc
-            elif scheme == 'db':
-                if netloc and not netloc.startswith('file'):
-                    netloc = 'file://' + netloc
             elif scheme == 'egg':
                 if path and not netloc:
                     netloc, path = path, ''

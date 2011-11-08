@@ -141,55 +141,6 @@ class TestCLI(CLIBase):
         destpath = os.path.join(self.upload_dir, 'pairtree_root', 'mb', 'obj', 'abc.txt')
         assert os.path.exists(destpath), destpath
 
-
-class TestWithConfigAndDbIndex(CLIBase):
-    def test_01(self):
-        # setup
-        os.makedirs(self.repo_path)
-        assert os.path.exists(self.repo_path)
-
-        cfg_path = os.path.join(self.tmpdir, 'dpmrc')
-        cmd = self.cmd_base + 'init config %s' % cfg_path
-        status, output = dpm.util.getstatusoutput(cmd)
-        assert not status, output
-        assert os.path.exists(cfg_path)
-
-        # now overwrite config with our test config
-        cfg = dpm.config.make_default_config(self.repo_path)
-        cfg.write(open(cfg_path, 'w'))
-        dpm.CONFIG = cfg
-
-        # and set up cmd base to use it 
-        self.cmd_base = self.cmd_base + '--config %s ' % cfg_path
-
-        # TODO: ? move this to cli init?
-        # idx = dpm.index.get_default_index()
-        # idx.init()
-        cmd = self.cmd_base + 'init index'
-        status, output = dpm.util.getstatusoutput(cmd)
-        assert not status, output
-
-        # register
-        cmd = self.cmd_base + 'register %s db://' % self.file_spec
-        status, output = dpm.util.getstatusoutput(cmd)
-        assert not status, output
-        # check it is there
-        pkg = dpm.index.get_default_index().get(self.pkg_name)
-        assert pkg.title == self.pkg_title
-
-        # info (check from command line)
-        cmd = self.cmd_base + 'info db://%s' % self.pkg_name
-        print cmd
-        status, output = dpm.util.getstatusoutput(cmd)
-        assert not status, output
-        assert self.pkg_name in output
-
-        # info (check from command line)
-        cmd = self.cmd_base + 'list db://'
-        status, output = dpm.util.getstatusoutput(cmd)
-        assert not status, output
-        assert self.pkg_name in output
-
     
 class TestCkan(CLIBase):
     '''For this need dummy ckan running locally with standard test data
