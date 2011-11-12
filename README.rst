@@ -1,14 +1,15 @@
 Introduction
 ============
 
-dpm (data package manager) is a command line tool and python library and for
-working with `Data Packages`_ and interacting with data hubs like CKAN_.
+dpm (data package manager) is a command line tool and python library for
+working with `Data Packages`_ and interacting with data repositories like
+`the Data Hub`_.
 
 For more information visit the documentation at:
 http://readthedocs.org/docs/dpm/
 
-.. _Data Packages: http://wiki.ckan.org/Data_Package
-.. _CKAN: http://ckan.org/
+.. _`Data Packages`: http://wiki.ckan.org/Data_Package
+.. _`the Data Hub`: http://thedatahub.org/
 
 Installation
 ============
