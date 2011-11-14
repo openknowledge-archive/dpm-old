@@ -3,7 +3,7 @@ import tempfile
 import os
 import dpm
 import dpm.index.ckan
-
+from nose.tools import raises
 # A package in CKAN index for testing. It has three resources: two in CKAN storage, one on task3.cc
 CKAN_SPEC = 'ckan://'
 PACKAGE_NAME = 'datapkg-gui-test'
@@ -45,10 +45,30 @@ class TestLib:
         for res in EXPECTED_RESOURCES:
             assert os.path.isfile(pkg_path+os.sep+res)
 
-    def test_config(self):
-        cfg_lib = lib.get_config()
-        cfg_dpm = dpm.CONFIG
-        assert cfg_lib == cfg_dpm # dpm.CONFIG is already tested in test_config.py
+    def test_get_config(self):
+        assert lib.get_config() == dpm.CONFIG.sections()
+        assert dpm.CONFIG.options('index:ckan') == lib.get_config(section="index:ckan")
+        assert dpm.lib.get_config('index:ckan','ckan.url') == 'http://thedatahub.org/api/'
+
+    @raises(ValueError)
+    def test_get_config_error(self):
+        lib.get_config(None, 'index:ckan')
+
+    def test_set_config(self):
+        value = lib.set_config("test:section", "test.option", "testvalue")
+        assert value == "testvalue"
+        assert lib.get_config("test:section") == ["test.option"]
+        #clean up
+        dpm.CONFIG.remove_section("test:section")
+        dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
+
+    def test_delete_config(self):
+        value = lib.set_config("test:section", "test.option", "testvalue")
+        new_value = lib.delete_config("test:section", "test.option")
+        assert new_value == ""
+        #clean up
+        dpm.CONFIG.remove_section("test:section")
+        dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
 
     def test_index_from_spec(self):
         ckan_idx = lib.index_from_spec(CKAN_SPEC)
