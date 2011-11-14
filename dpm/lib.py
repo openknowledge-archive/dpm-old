@@ -35,16 +35,43 @@ def index_from_spec(spec_str, all_index=False):
     spec = dpm.spec.Spec.parse_spec(spec_str, all_index=all_index)
     return spec.index_from_spec()
 
-def get_config():
-    """Return dpm configuration object
+#
+def get_config(section=None, option=None):
+    """Return dpm configuration objects.
+
+    :param section:
+        the name of the section in the ini file, e.g. "index:ckan".
+            - May be omitted only when no other parameters are provided
+            - Must be omitted elsewhere
+    :type section: str
+
+    :param option:
+        the name of the option to be retrieved from the section of the ini file, e.g. 'ckan.api_key'
+            - Can be omitted if a section is provided
+            - Must be omitted if no section is provided
+    :type option: str
+
 
     :return:
-        :py:class:`Config <dpm.config.Config>` -- The current configuration object
-        
-    :see:
-        - :py:mod:`dpm.config`
+        [str, str, .., str] --  The section names of the ini file, when no section and no option are provided
+                                --  e.g. ['dpm', 'index:ckan', 'index:db', 'upload:ckan']
+        [str, str, .., str] -- The option names of the ini file for a given section
+                                -- e.g.['ckan.url', 'ckan.api_key']
+        [str] -- The option value if a valid section and a valid option name are given.
+                                -- e.g. ['http://thedatahub.org/api/']
     """
-    return dpm.CONFIG
+    if not section and not option:
+        return dpm.CONFIG.sections()
+    elif section and not option:
+        options = []
+        for opt, value in dpm.CONFIG.items(section):
+            options.append(opt)
+        return  options
+    elif section and option:
+        return dpm.CONFIG.get(section, option)
+    else:
+        raise ValueError("Please provide no parameters OR just section OR both section and option")
+
 
 def get_package(package_spec):
     """Return `Package <dpm.index.package.Package>` given its Spec
@@ -62,6 +89,7 @@ def get_package(package_spec):
     """
     package_index, package_name = index_from_spec(package_spec)
     return package_index.get(package_name)
+
 
 def download(package_spec, destination_path):
     """Download a `Package <dpm.index.package.Package>` and the connected Resources
@@ -117,7 +145,7 @@ def info(package_spec_or_obj):
 
     if not type(package) == dpm.package.Package:
         return None #TODO: raise an exception here?
-    
+
     return (package.manifest, package.metadata)
 
 
@@ -167,27 +195,31 @@ def search(index_spec, query):
     return packages
 
 
-
 def init():
     """Not yet implemented"""
     pass
 
+
 def dump():
     """Not yet implemented"""
     pass
+
 
 def setup():
     """Not yet implemented"""
     #TODO split it in 3 different methods
     pass
 
+
 def register():
     """Not yet implemented"""
     pass
 
+
 def update():
     """Not yet implemented"""
     pass
+
 
 def upload():
     """Not yet implemented"""

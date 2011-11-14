@@ -3,7 +3,7 @@ import tempfile
 import os
 import dpm
 import dpm.index.ckan
-
+from nose.tools import raises
 # A package in CKAN index for testing. It has three resources: two in CKAN storage, one on task3.cc
 CKAN_SPEC = 'ckan://'
 PACKAGE_NAME = 'datapkg-gui-test'
@@ -46,9 +46,16 @@ class TestLib:
             assert os.path.isfile(pkg_path+os.sep+res)
 
     def test_config(self):
-        cfg_lib = lib.get_config()
-        cfg_dpm = dpm.CONFIG
-        assert cfg_lib == cfg_dpm # dpm.CONFIG is already tested in test_config.py
+        assert lib.get_config() == dpm.CONFIG.sections()
+        options = []
+        for opt, value in dpm.CONFIG.items('index:ckan'):
+            options.append(opt)
+        assert options == lib.get_config(section="index:ckan")
+        assert dpm.lib.get_config('index:ckan','ckan.url') == 'http://thedatahub.org/api/'
+
+    @raises(ValueError)
+    def test_config_error(self):
+        lib.get_config(None, 'index:ckan')
 
     def test_index_from_spec(self):
         ckan_idx = lib.index_from_spec(CKAN_SPEC)
