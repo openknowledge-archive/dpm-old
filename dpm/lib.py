@@ -90,10 +90,28 @@ def set_config(section, option, value=None):
     """
     if section not in get_config():
         dpm.CONFIG.add_section(section)
+    if not value:
+        value = ""
     dpm.CONFIG.set(section, option, value)
     dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
     dpm.CONFIG = dpm.config.load_config()
     return get_config(section, option)
+
+def delete_config(section, option):
+    """Delete a dpm configuration value. This function does not remove a dpm option, it only erases its current value.
+
+    :param section:
+        the name of the section in the ini file, e.g. "index:ckan".
+    :type section: str
+
+    :param option:
+        the name of the option to be retrieved from the section of the ini file, e.g. 'ckan.api_key'
+    :type option: str
+
+    :return:
+        str -- The new option value. That is, an empty string.
+    """
+    return set_config(section,option,"")
         
     
 

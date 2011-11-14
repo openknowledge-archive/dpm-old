@@ -62,6 +62,14 @@ class TestLib:
         dpm.CONFIG.remove_section("test:section")
         dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
 
+    def test_delete_config(self):
+        value = lib.set_config("test:section", "test.option", "testvalue")
+        new_value = lib.delete_config("test:section", "test.option")
+        assert new_value == ""
+        #clean up
+        dpm.CONFIG.remove_section("test:section")
+        dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
+
     def test_index_from_spec(self):
         ckan_idx = lib.index_from_spec(CKAN_SPEC)
         assert type(ckan_idx[0]) == dpm.index.ckan.CkanIndex
