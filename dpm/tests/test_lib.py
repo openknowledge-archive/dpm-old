@@ -45,17 +45,22 @@ class TestLib:
         for res in EXPECTED_RESOURCES:
             assert os.path.isfile(pkg_path+os.sep+res)
 
-    def test_config(self):
+    def test_get_config(self):
         assert lib.get_config() == dpm.CONFIG.sections()
-        options = []
-        for opt, value in dpm.CONFIG.items('index:ckan'):
-            options.append(opt)
-        assert options == lib.get_config(section="index:ckan")
+        assert dpm.CONFIG.options('index:ckan') == lib.get_config(section="index:ckan")
         assert dpm.lib.get_config('index:ckan','ckan.url') == 'http://thedatahub.org/api/'
 
     @raises(ValueError)
-    def test_config_error(self):
+    def test_get_config_error(self):
         lib.get_config(None, 'index:ckan')
+
+    def test_set_config(self):
+        value = lib.set_config("test:section", "test.option", "testvalue")
+        assert value == "testvalue"
+        assert lib.get_config("test:section") == ["test.option"]
+        #clean up
+        dpm.CONFIG.remove_section("test:section")
+        dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
 
     def test_index_from_spec(self):
         ckan_idx = lib.index_from_spec(CKAN_SPEC)

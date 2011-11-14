@@ -63,14 +63,39 @@ def get_config(section=None, option=None):
     if not section and not option:
         return dpm.CONFIG.sections()
     elif section and not option:
-        options = []
-        for opt, value in dpm.CONFIG.items(section):
-            options.append(opt)
-        return  options
+        return dpm.CONFIG.options(section)
     elif section and option:
         return dpm.CONFIG.get(section, option)
     else:
         raise ValueError("Please provide no parameters OR just section OR both section and option")
+
+def set_config(section, option, value=None):
+    """Set a dpm configuration value. If section or option are not already in the config, creates them.
+
+    :param section:
+        the name of the section in the ini file, e.g. "index:ckan".
+    :type section: str
+
+    :param option:
+        the name of the option to be retrieved from the section of the ini file, e.g. 'ckan.api_key'
+    :type option: str
+
+    :param value:
+        the new value for the option. If None, it sets the value as an empty string ''
+    :type option: str
+
+
+    :return:
+        str -- The new option value
+    """
+    if section not in get_config():
+        dpm.CONFIG.add_section(section)
+    dpm.CONFIG.set(section, option, value)
+    dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
+    dpm.CONFIG = dpm.config.load_config()
+    return get_config(section, option)
+        
+    
 
 
 def get_package(package_spec):
