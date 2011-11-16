@@ -1,9 +1,12 @@
 import dpm.lib as lib
 import tempfile
 import os
+import random
+import string
 import dpm
 import dpm.index.ckan
 from nose.tools import raises
+
 # A package in CKAN index for testing. It has three resources: two in CKAN storage, one on task3.cc
 CKAN_SPEC = 'ckan://'
 PACKAGE_NAME = 'datapkg-gui-test'
@@ -77,5 +80,16 @@ class TestLib:
         ckan_idx = lib.index_from_spec(PACKAGE_SPEC)
         assert type(ckan_idx[0]) == dpm.index.ckan.CkanIndex
         assert ckan_idx[1] == PACKAGE_NAME
+
+    def test_init(self):
+        path = tempfile.mkdtemp()
+        package_name = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(10))
+        package = lib.init(path, package_name)
+        assert package.name == package_name
+        package_path = os.path.join(path, package.name)
+        assert os.path.exists(package_path)
+        assert os.path.exists(package_path)
+        assert os.path.isfile(package_path+os.sep+DATAPACKAGE)
+        
         
         
