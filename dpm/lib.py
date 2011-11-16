@@ -177,7 +177,7 @@ def info(package_spec_or_obj):
     :type package_spec: str or :py:class:`dpm.index.package.Package`
 
     :return:
-        - (:py:class:`Metadata <dpm.metadata.Metadata>`,:py:class:`Manifest <dpm.package.Manifest>`) -- on success
+        - (:py:class:`Metadata <dpm.metadata.Metadata>`, :py:class:`Manifest <dpm.package.Manifest>`) -- on success
         - None -- on un-success
     """
     if type(package_spec_or_obj) == str:
@@ -238,9 +238,23 @@ def search(index_spec, query):
     return packages
 
 
-def init():
-    """Not yet implemented"""
-    pass
+def init(path, package_name):
+    """Creates a new package
+
+    :param path:
+        - A local path where the package will be inited.
+        - The path *must not* include the package name as final directory destination, e.g. "/tmp/packages/"
+    :type path: str
+
+    :param package_name:
+            - The name of the package that will be inited
+    :type package_name: str
+
+    :return:
+        - :py:class:`Package <dpm.package.Package>` -- The new Package object stored at package_path
+    """
+    package_path = os.path.join(path, package_name)
+    return dpm.package.Package.create_on_disk(package_path)
 
 
 def dump():
