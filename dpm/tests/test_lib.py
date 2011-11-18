@@ -5,6 +5,7 @@ import random
 import string
 import dpm
 import dpm.index.ckan
+import dpm.package
 from nose.tools import raises
 
 # A package in CKAN index for testing. It has three resources: two in CKAN storage, one on task3.cc
@@ -90,6 +91,32 @@ class TestLib:
         assert os.path.exists(package_path)
         assert os.path.exists(package_path)
         assert os.path.isfile(package_path+os.sep+DATAPACKAGE)
-        
-        
-        
+
+    def test_save(self):
+        path = tempfile.mkdtemp()
+        package_name = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(10))
+
+        inited_package = lib.init(path, package_name)
+        inited_package.author = 'John Doe'
+
+        inited_package = lib.save(inited_package)
+        assert inited_package.installed_path == os.path.join(path, inited_package.name)
+        assert inited_package.author == 'John Doe'
+        #extra check
+        inited_package = dpm.package.Package.load(os.path.join(path, inited_package.name))
+        assert inited_package.author == 'John Doe'
+
+        package_name = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(10))
+        non_inited_package = dpm.package.Package()
+        non_inited_package.author = 'Black Jack'
+        non_inited_package = lib.save(non_inited_package, os.path.join(path, package_name))
+        assert non_inited_package.author == 'Black Jack'
+
+    @raises(ValueError)
+    def test_save_error(self):
+        path = tempfile.mkdtemp()
+        package_name = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(10))
+        non_inited_package = dpm.package.Package()
+        non_inited_package.author = 'John Doe'
+        non_inited_package = lib.save(non_inited_package)
+

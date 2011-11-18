@@ -8,7 +8,7 @@ class TestCkanIndex:
     '''
     __external__ = True
 
-    index = dpm.index.ckan.CkanIndex('http://ckan.net/api')
+    index = dpm.index.ckan.CkanIndex('http://thedatahub.org/api/')
 
     def test_get(self):
         name = u'ckan'

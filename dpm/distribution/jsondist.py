@@ -83,5 +83,5 @@ class JsonDistribution(DistributionBase):
         fo.close()
         # create empty 'data' directory
         datadir = os.path.join(path, 'data')
-        os.makedirs(datadir)
-
+        if not os.path.exists(datadir):
+            os.makedirs(datadir)
