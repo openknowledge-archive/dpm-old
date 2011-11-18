@@ -261,7 +261,7 @@ def init(path, package_name):
 
 def save(package, path=None):
     """Save a Package to disk.
-    
+
     :param package:
         - The package that will be stored to disk.
     :type package: :py:class:`Package <dpm.package.Package>`

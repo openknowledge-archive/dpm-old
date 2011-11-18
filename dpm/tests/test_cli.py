@@ -59,9 +59,9 @@ class TestCLI(CLIBase):
         assert not status, output
         assert not self.pkg_name in output, (cmd, output)
 
-        # create 
+        # init
         create_path = os.path.join(self.tmpdir, 'test-create-xxx')
-        cmd = self.cmd_base + 'create %s' % create_path
+        cmd = self.cmd_base + 'init %s' % create_path
         status, output = dpm.util.getstatusoutput(cmd)
         assert not status, output
         assert os.path.exists(create_path)

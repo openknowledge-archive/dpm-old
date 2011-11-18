@@ -3,7 +3,8 @@ import shutil
 import tempfile
 
 class TestCase(object):
-    system_tmpdir = tempfile.gettempdir()
+    #gettempdir() does not work for me, gives permission errors (dgraziotin)
+    system_tmpdir = tempfile.mkdtemp()
 
     @classmethod
     def set_tmpdir(self):
