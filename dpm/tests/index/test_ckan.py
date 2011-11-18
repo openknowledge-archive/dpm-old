@@ -1,6 +1,7 @@
 import dpm.index.ckan
 
 
+# TODO: mock these rather than rely on external access
 class TestCkanIndex:
     '''Read only test.
     
@@ -16,7 +17,7 @@ class TestCkanIndex:
         assert out.name == name
 
     def test_search(self):
-        out = [ x for x in self.index.search('ckan') ]
-        assert len(out) >= 3, out
-        assert out[0].name in [u'ckan', u'ckanclient'], out[0]
+        out = [ x for x in self.index.search('ckanclient') ]
+        assert len(out) == 1, out
+        assert out[0].name in [u'ckanclient'], out[0]
 
