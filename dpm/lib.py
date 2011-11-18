@@ -152,9 +152,6 @@ def download(package_spec, destination_path):
     :see:
         - :py:class:`dpm.download.PackageDownloader`
     """
-    #TODO filter_resources and filterfunc
-    #TODO add return values?
-
     pkg_downloader = dpm.download.PackageDownloader(verbose=True)
 
     filterfunc = None
@@ -164,6 +161,22 @@ def download(package_spec, destination_path):
 
     os_destination_path = os.path.join(destination_path, package.name)
     pkg_downloader.download(package, os_destination_path, filterfunc)
+
+def load(package_path):
+    '''Load a :py:class:`Package <dpm.package.Package>` stored at path
+
+    :param package_path: The local Package path, e.g. /home/user/packages/iso-codes
+    :type package_path: str
+
+    :return: :py:class:`Package <dpm.package.Package>` -- The corresponding Package object
+    '''
+    #TODO: when this issue (https://github.com/okfn/dpm/issues/28) closes, update this function
+    spec_str = "file://" + package_path
+    spec = dpm.spec.Spec.parse_spec(spec_str)
+    index, path = spec.index_from_spec()
+    package = index.get(path)
+    return package
+
 
 
 def info(package_spec_or_obj):
