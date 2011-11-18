@@ -7,6 +7,7 @@ import dpm.spec
 import dpm.index
 import dpm.download
 import dpm.config
+import dpm.package
 import ckanclient
 import os
 
@@ -208,6 +209,8 @@ def list(index_spec):
     index, path = index_from_spec(index_spec, all_index=True)
     packages = index.list()
     return packages
+    #TODO: will be like this one day, it does not work right now.
+    #return search(index_spec, "")
 
 
 def search(index_spec, query):
@@ -239,7 +242,7 @@ def search(index_spec, query):
 
 
 def init(path, package_name):
-    """Creates a new package
+    """Creates a new empty package
 
     :param path:
         - A local path where the package will be inited.
@@ -255,6 +258,29 @@ def init(path, package_name):
     """
     package_path = os.path.join(path, package_name)
     return dpm.package.Package.create_on_disk(package_path)
+
+def save(package, path=None):
+    """Save a Package to disk.
+    
+    :param package:
+        - The package that will be stored to disk.
+    :type package: :py:class:`Package <dpm.package.Package>`
+
+    :param path:
+        - The path in which the package will be saved
+        - If provided, it takes precedence over package.installed_path
+    :type path: str
+
+    :return:
+        - :py:class:`Package <dpm.package.Package>` -- The Package object stored at package_path
+    """
+    if path:
+        package.installed_path = path
+    if not package.installed_path:
+        raise ValueError("Please either provide a path as parameter os as Package.installed_path")
+    package.dist.write(package.installed_path)
+    package.name = os.path.basename(package.installed_path)
+    return package
 
 
 def dump():
