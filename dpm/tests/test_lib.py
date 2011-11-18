@@ -106,12 +106,6 @@ class TestLib:
         inited_package = dpm.package.Package.load(os.path.join(path, inited_package.name))
         assert inited_package.author == 'John Doe'
 
-        package_name = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(10))
-        non_inited_package = dpm.package.Package()
-        non_inited_package.author = 'Black Jack'
-        non_inited_package = lib.save(non_inited_package, os.path.join(path, package_name))
-        assert non_inited_package.author == 'Black Jack'
-
     @raises(ValueError)
     def test_save_error(self):
         path = tempfile.mkdtemp()

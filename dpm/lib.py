@@ -70,6 +70,7 @@ def get_config(section=None, option=None):
     else:
         raise ValueError("Please provide no parameters OR just section OR both section and option")
 
+
 def set_config(section, option, value=None):
     """Set a dpm configuration value. If section or option are not already in the config, creates them.
 
@@ -94,9 +95,10 @@ def set_config(section, option, value=None):
     if not value:
         value = ""
     dpm.CONFIG.set(section, option, value)
-    dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
+    dpm.CONFIG.write(open(dpm.config.default_config_path, 'w'))
     dpm.CONFIG = dpm.config.load_config()
     return get_config(section, option)
+
 
 def delete_config(section, option):
     """Delete a dpm configuration value. This function does not remove a dpm option, it only erases its current value.
@@ -112,9 +114,7 @@ def delete_config(section, option):
     :return:
         str -- The new option value. That is, an empty string.
     """
-    return set_config(section,option,"")
-        
-    
+    return set_config(section, option, "")
 
 
 def get_package(package_spec):
@@ -259,25 +259,23 @@ def init(path, package_name):
     package_path = os.path.join(path, package_name)
     return dpm.package.Package.create_on_disk(package_path)
 
-def save(package, path=None):
-    """Save a Package to disk.
+
+def save(package):
+    """Save Package changes to disk. The package _must_ already exist on disk. That is, it must be created with dpm.lib.init before.
 
     :param package:
-        - The package that will be stored to disk.
+        - The package that will be updated on disk
     :type package: :py:class:`Package <dpm.package.Package>`
-
-    :param path:
-        - The path in which the package will be saved
-        - If provided, it takes precedence over package.installed_path
-    :type path: str
 
     :return:
         - :py:class:`Package <dpm.package.Package>` -- The Package object stored at package_path
     """
-    if path:
-        package.installed_path = path
-    if not package.installed_path:
-        raise ValueError("Please either provide a path as parameter os as Package.installed_path")
+    try:
+        dpm.load_package("file://" + package.installed_path)
+    except (IOError, TypeError):
+        raise ValueError(
+            "No valid installation path at " + str(package.installed_path) + ". Have you inited the package before?")
+
     package.dist.write(package.installed_path)
     package.name = os.path.basename(package.installed_path)
     return package
