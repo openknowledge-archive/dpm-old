@@ -34,6 +34,9 @@ class TestUploader(TestCase):
         assert bucket == 'mybucket'
         assert label == 'mylabel.csv'
 
+    # TODO: re-enable (2011-11-18)
+    # Disabling as requires ofs and pairtree installed
+    # Plus upload is not that important/functional atm
     def test_02_upload(self):
         destspec = 'mypairtree://mybucket/mylabel.csv'
         self.uploader.upload(self.csv, destspec)

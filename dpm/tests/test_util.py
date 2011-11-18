@@ -52,7 +52,7 @@ class TestDownloader(TestCase):
 
     # requires external access
     # TODO: selectively disable ...
-    def test_3_download_targz(self):
+    def _test_3_download_targz(self):
         test_url = 'http://knowledgeforge.net/ckan/dpmdemo-0.1.tar.gz'
 
         self.downloader.download(test_url, self.base_dir)
