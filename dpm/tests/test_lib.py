@@ -81,3 +81,16 @@ class TestLib:
         non_inited_package.author = 'John Doe'
         non_inited_package = lib.save(non_inited_package)
 
+    def test_load(self):
+        path = tempfile.mkdtemp()
+        package_name = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(10))
+
+        inited_package = lib.init(path, package_name)
+        inited_package.author = 'Jack the Packager'
+
+        inited_package = lib.save(inited_package)
+
+        inited_package = dpm.lib.load(os.path.join(path, inited_package.name))
+        assert inited_package.author == 'Jack the Packager'
+
+
