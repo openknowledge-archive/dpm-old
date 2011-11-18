@@ -35,16 +35,86 @@ def index_from_spec(spec_str, all_index=False):
     spec = dpm.spec.Spec.parse_spec(spec_str, all_index=all_index)
     return spec.index_from_spec()
 
-def get_config():
-    """Return dpm configuration object
+#
+def get_config(section=None, option=None):
+    """Return dpm configuration objects.
+
+    :param section:
+        the name of the section in the ini file, e.g. "index:ckan".
+            - May be omitted only when no other parameters are provided
+            - Must be omitted elsewhere
+    :type section: str
+
+    :param option:
+        the name of the option to be retrieved from the section of the ini file, e.g. 'ckan.api_key'
+            - Can be omitted if a section is provided
+            - Must be omitted if no section is provided
+    :type option: str
+
 
     :return:
-        :py:class:`Config <dpm.config.Config>` -- The current configuration object
-        
-    :see:
-        - :py:mod:`dpm.config`
+        [str, str, .., str] --  The section names of the ini file, when no section and no option are provided
+                                --  e.g. ['dpm', 'index:ckan', 'index:db', 'upload:ckan']
+        [str, str, .., str] -- The option names of the ini file for a given section
+                                -- e.g.['ckan.url', 'ckan.api_key']
+        [str] -- The option value if a valid section and a valid option name are given.
+                                -- e.g. ['http://thedatahub.org/api/']
     """
-    return dpm.CONFIG
+    if not section and not option:
+        return dpm.CONFIG.sections()
+    elif section and not option:
+        return dpm.CONFIG.options(section)
+    elif section and option:
+        return dpm.CONFIG.get(section, option)
+    else:
+        raise ValueError("Please provide no parameters OR just section OR both section and option")
+
+def set_config(section, option, value=None):
+    """Set a dpm configuration value. If section or option are not already in the config, creates them.
+
+    :param section:
+        the name of the section in the ini file, e.g. "index:ckan".
+    :type section: str
+
+    :param option:
+        the name of the option to be retrieved from the section of the ini file, e.g. 'ckan.api_key'
+    :type option: str
+
+    :param value:
+        the new value for the option. If None, it sets the value as an empty string ''
+    :type option: str
+
+
+    :return:
+        str -- The new option value
+    """
+    if section not in get_config():
+        dpm.CONFIG.add_section(section)
+    if not value:
+        value = ""
+    dpm.CONFIG.set(section, option, value)
+    dpm.CONFIG.write(open(dpm.config.default_config_path,'w'))
+    dpm.CONFIG = dpm.config.load_config()
+    return get_config(section, option)
+
+def delete_config(section, option):
+    """Delete a dpm configuration value. This function does not remove a dpm option, it only erases its current value.
+
+    :param section:
+        the name of the section in the ini file, e.g. "index:ckan".
+    :type section: str
+
+    :param option:
+        the name of the option to be retrieved from the section of the ini file, e.g. 'ckan.api_key'
+    :type option: str
+
+    :return:
+        str -- The new option value. That is, an empty string.
+    """
+    return set_config(section,option,"")
+        
+    
+
 
 def get_package(package_spec):
     """Return `Package <dpm.index.package.Package>` given its Spec
@@ -62,6 +132,7 @@ def get_package(package_spec):
     """
     package_index, package_name = index_from_spec(package_spec)
     return package_index.get(package_name)
+
 
 def download(package_spec, destination_path):
     """Download a `Package <dpm.index.package.Package>` and the connected Resources
@@ -106,7 +177,7 @@ def info(package_spec_or_obj):
     :type package_spec: str or :py:class:`dpm.index.package.Package`
 
     :return:
-        - (:py:class:`Metadata <dpm.metadata.Metadata>`,:py:class:`Manifest <dpm.package.Manifest>`) -- on success
+        - (:py:class:`Metadata <dpm.metadata.Metadata>`, :py:class:`Manifest <dpm.package.Manifest>`) -- on success
         - None -- on un-success
     """
     if type(package_spec_or_obj) == str:
@@ -117,7 +188,7 @@ def info(package_spec_or_obj):
 
     if not type(package) == dpm.package.Package:
         return None #TODO: raise an exception here?
-    
+
     return (package.manifest, package.metadata)
 
 
@@ -167,27 +238,45 @@ def search(index_spec, query):
     return packages
 
 
+def init(path, package_name):
+    """Creates a new package
 
-def init():
-    """Not yet implemented"""
-    pass
+    :param path:
+        - A local path where the package will be inited.
+        - The path *must not* include the package name as final directory destination, e.g. "/tmp/packages/"
+    :type path: str
+
+    :param package_name:
+            - The name of the package that will be inited
+    :type package_name: str
+
+    :return:
+        - :py:class:`Package <dpm.package.Package>` -- The new Package object stored at package_path
+    """
+    package_path = os.path.join(path, package_name)
+    return dpm.package.Package.create_on_disk(package_path)
+
 
 def dump():
     """Not yet implemented"""
     pass
+
 
 def setup():
     """Not yet implemented"""
     #TODO split it in 3 different methods
     pass
 
+
 def register():
     """Not yet implemented"""
     pass
 
+
 def update():
     """Not yet implemented"""
     pass
+
 
 def upload():
     """Not yet implemented"""
