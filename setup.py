@@ -48,7 +48,8 @@ setup(
     setup = dpm.cli.standard:SetupCommand
     register = dpm.cli.standard:RegisterCommand
     update = dpm.cli.standard:UpdateCommand
-    install = dpm.cli.download:DownloadCommand
+    download = dpm.cli.download:DownloadCommand
+    clone = dpm.cli.download:DownloadCommand
     upload = dpm.cli.upload:UploadCommand
     push = dpm.cli.push:PushCommand
 
