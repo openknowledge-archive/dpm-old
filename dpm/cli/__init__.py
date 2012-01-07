@@ -37,17 +37,17 @@ About information (including license details) is available via `dpm about`.
             return
         print self.general_usage
         print 'Commands available:'
-        commands = list(set(_commands.values()))
-        commands.sort(key=lambda x: x.name)
+        commands = list(set(_commands.keys()))
+        commands.sort()
         for command in commands:
-            print '  %s: %s' % (command.name, command.summary)
+            print '  %s: %s' % (command, _commands[command].summary)
 
 
 import pkg_resources
 for entry_point in pkg_resources.iter_entry_points('dpm.cli'):
     cmd = entry_point.load()
     cmdinstance = cmd()
-    _commands[cmdinstance.name] = cmdinstance
+    _commands[entry_point.name] = cmdinstance
 
 
 def main(initial_args=None):
