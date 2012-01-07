@@ -1,0 +1,12 @@
+labs_project({
+    "image" : "http://farm7.static.flickr.com/6219/6322529699_ee3122e2b2_t.jpg",
+    "category" : "Tools and Infrastructure",
+    "name" : "DPM",
+    "status" : "Active",
+    "strapline" : "dpm is an user tool for distributing, discovering and installing data (and content) 'packages'.",
+    "description" : "",
+    "link" : "http://okfn.org/projects/datapkg/",
+    "imagename" : "dpm"
+});
+
+
