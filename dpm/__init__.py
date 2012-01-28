@@ -7,7 +7,7 @@ http://readthedocs.org/docs/dpm/
 .. _Data Packages: http://wiki.ckan.net/Data_Packages
 .. _CKAN: http://ckan.org/
 '''
-__version__ = '0.10a'
+__version__ = '0.10'
 __description__ = 'dpm (data package): data packaging system and utilities'
 __license__ = 'MIT'
 __license_full__ = \
