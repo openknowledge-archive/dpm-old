@@ -5,6 +5,14 @@ History
 HEAD
 ====
 
+v0.10 2012-01-29
+================
+
+  * Rename from datapkg to dpm (data package manager)
+  * Support for dpm push for "source" packages
+  * Clean set of library commands to facilitate reuse of dpm from 3rd party
+    code (thanks to @dgraziotin)
+
 v0.9 2011-09-30
 ===============
 
