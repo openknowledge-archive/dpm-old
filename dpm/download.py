@@ -2,6 +2,7 @@
 '''
 import logging
 import fnmatch
+import os
 
 import pkg_resources
 
@@ -50,8 +51,10 @@ class PackageDownloader(object):
         import dpm.distribution
         dist = dpm.distribution.default_distribution()(pkg)
         dist.write(dest_path)
+        # NB: distribution will have already created this directory
+        data_path = os.path.join(dest_path, 'data')
 
-        self._print('Downloading package resources to %s ...' % dest_path)
+        self._print('Downloading package resources to %s ...' % data_path)
 
         if not pkg.resources:
             msg = u'Warning: no resources to install for package'
@@ -61,7 +64,7 @@ class PackageDownloader(object):
         self._interactive_status = None
         for count, resource in enumerate(pkg.resources):
             if filterfunc(resource, count):
-                self.download_resource(resource, count, dest_path)
+                self.download_resource(resource, count, data_path)
             else:
                 self._print('Skipping package resource: %s' % resource['url'])
         
