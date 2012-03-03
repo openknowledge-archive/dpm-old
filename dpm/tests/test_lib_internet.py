@@ -45,8 +45,9 @@ class TestLibInternet:
         download_path = tempfile.mkdtemp()
         lib.download(PACKAGE_SPEC, download_path)
         pkg_path = download_path+os.sep+PACKAGE_NAME
+        data_path = pkg_path+os.sep+"data"
         assert os.path.exists(pkg_path)
         assert os.path.isfile(pkg_path+os.sep+DATAPACKAGE)
-        for res in EXPECTED_RESOURCES:
-            assert os.path.isfile(pkg_path+os.sep+res)
 
+        for res in EXPECTED_RESOURCES:
+            assert os.path.isfile(data_path+os.sep+res)
