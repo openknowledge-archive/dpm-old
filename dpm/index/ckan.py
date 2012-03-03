@@ -19,7 +19,10 @@ class CkanIndex(IndexBase):
         if api_key is not None:
             self.api_key = api_key
         else:
-            self.api_key = dpm.CONFIG.dictget('index:ckan', 'ckan.api_key', None)
+            ckan_url = self.url.rstrip('/api')
+            self.api_key = dpm.CONFIG.dictget('index:%s' % ckan_url, 'api_key', None)
+            if not self.api_key:
+                self.api_key = dpm.CONFIG.dictget('index:ckan', 'ckan.api_key', None)
         if self.url.endswith('/'):
             self.url = self.url[:-1]
         from ckanclient import CkanClient

@@ -1,6 +1,7 @@
 import os
 import urlparse
 import urllib
+import re
 
 from dpm import CONFIG
 
@@ -57,7 +58,25 @@ class Spec(object):
             # default scheme
             scheme = CONFIG.get('dpm', 'index.default')
 
-        if scheme == 'file':
+        if scheme == 'http':
+            # assume this is a ckan instance ...
+            # for ckan netloc = full API url, path = dataset name
+            scheme = 'ckan'
+            # ckan netloc should be full url
+            # TODO: what happens if CKAN instance not at base domain!
+            netloc = 'http://' + netloc
+            path = path.rstrip('/')
+            if path:
+                out = re.match('(/.+)?/dataset/(.+)$', path)
+                if not out:
+                    msg = 'URL is not a path to a CKAN instance or dataset: %s' % spec_str
+                    raise Exception(msg)
+                (offset, name) = out.groups()
+                if offset:
+                    netloc += offset
+                path = name
+            netloc += '/api'
+        elif scheme == 'file':
             if '://' in spec_str:
                 path = spec_str.split('://')[1]
             path = urllib.url2pathname(path)
