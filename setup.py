@@ -27,6 +27,8 @@ setup(
         'setuptools>=0.6c',
         # make ckan support obligatory for time being
         'ckanclient>=0.3',
+        'ofs>=0.1',
+        'pairtree>=0.7.1'
     ],
     entry_points='''
     [egg_info.writers]
