@@ -1,0 +1,16 @@
+Index: dpm-0.10/setup.py
+===================================================================
+--- dpm-0.10.orig/setup.py	2012-02-05 12:04:50.529602518 +0100
++++ dpm-0.10/setup.py	2012-02-05 12:05:02.021602627 +0100
+@@ -23,11 +23,6 @@
+ 
+     packages=find_packages(),
+     include_package_data=True,
+-    install_requires=[
+-        'setuptools>=0.6c',
+-        # make ckan support obligatory for time being
+-        'ckanclient>=0.3',
+-    ],
+     entry_points='''
+     [egg_info.writers]
+     datapkg_index.txt=setuptools.command.egg_info:write_arg

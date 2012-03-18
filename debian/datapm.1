@@ -1,0 +1,250 @@
+.\"Created with GNOME Manpages Editor Wizard
+.\"http://sourceforge.net/projects/gmanedit2
+.TH datapm 1 "February 6, 2012" "" "Data package manager"
+
+.SH NAME
+datapm \- data packaging system and utilities
+
+.SH SYNOPSIS
+.B datapm COMMAND [\fIOPTIONS\fP]
+
+.SH DESCRIPTION
+\fBdatapm\fP (data package manager) is a command line tool and python library and for working with Data Packages and interacting with data hubs like those powered by CKAN
+
+.SH COMMANDS
+.PP
+.B about
+.RS 4
+About \fBdatapm\fP
+.RE
+
+.PP
+.B clone \fIsrc-spec\fP \fIpath\fP [\fIformat-pattern\fP] [\fIurl-pattern\fP]
+.RS 4
+Download a package (i.e. metadata and resources) specified by \fIsrc-spec\fP to \fIpath\fP
+
+Resources to retrieve are selected interactively if no \fIformat-pattern\fP is given.
+If provided, the optional glob-style \fIformat-pattern\fP and \fIurl-pattern\fP arguments are matched against the format and url of the resource to determine whether it should be retrieved.
+.RE
+
+.PP
+.B download \fIsrc-spec\fP \fIpath\fP [\fIformat-pattern\fP] [\fIurl-pattern\fP]
+.RS 4
+Download a package (i.e. metadata and resources) specified by \fIsrc-spec\fP to \fIpath\fP
+
+Resources to retrieve are selected interactively if no \fIformat-pattern\fP is given.
+If provided, the optional glob-style \fIformat-pattern\fP and \fIurl-pattern\fP arguments are matched against the format and url of the resource to determine whether it should be retrieved.
+.RE
+
+.PP
+.B dump \fIpkg-spec\fP \fIpath-of-resource-within-pkg\fP
+.RS 4
+Dump contents of specified resource in specified package to stdout.
+.RE
+
+.PP
+.B help
+.RS 4
+Show available commands
+.RE
+
+.PP
+.B info \fIpackage-spec\fP [\fImanifest\fP]
+.RS 4
+Get information about a package (print package metadata). If \fImanifest\fP specified then show manifest info rather than package metadata.
+
+WARNING: if you change the metadata for a python distribution you may need to rebuild the egg-info for changes to show up here.
+.RE
+
+.PP
+.B init [\fIpath-or-name\fP]
+.RS 4
+Initialize a data package at path. Package Name will be taken from last portion of path. If path simply a name then create in the current directory.
+.RE
+
+.PP
+.B license
+.RS 4
+Show the license
+.RE
+
+.PP
+.B list [\fIindex-spec\fP]
+.RS 4
+List registered packages. If \fIindex-spec\fP is not provided use default index.
+.RE
+
+.PP
+.B man
+.RS 4
+Show the manual
+.RE
+
+.PP
+.B push [\fIsource-file\fP] [\fIwebstore-url\fP]
+.RS 4
+Push local package in current directory to remote repository specified in \fI.dpm/config\fP. Alternatively push a single file to the webstore.
+.RE
+
+.PP
+.B register \fsrc-spec\fp \fIdest-spec\fP
+.RS 4
+Register package at \fIsrc-spec\fP into index at \fIdest-spec\fP.
+.RE
+
+.PP
+.B search \fIindex-spec\fP \fIquery\fP
+.RS 4
+Search registered packages in  \fIindex-spec\fP.
+.RE
+
+.PP
+.B setup \fIaction\fP
+.RS 4
+\fIconfig\fP [\fIlocation\fP]: Create configuration file at \fIlocation\fP. If not \fIlocation\fP specified use default (see --config).
+.RE
+
+.RS 4
+\fIindex\fP [\fIlocation\fP]: Setup an index at location specified in config.
+.RE
+
+.RS 4
+\fIrepo\fP: Setup a repository. The repository will be created at the location specified via the --repository option or default location specified by config.
+.RE
+.RE
+
+.PP
+.B update \fIsrc-spec\fP \fIdest-spec\fP
+.RS 4
+As for register.
+.RE
+
+.PP
+.B upload \fIpath\fP \fIupload-spec\fP
+.RS 4
+Upload a file or package at \fIpath\fP to \fIupload-spec\fP. The \fIupload-spec\fP are of the form:
+
+    upload-dest-id://BUCKET/LABEL
+
+For example:
+
+    ## default ckan upload
+    ckan://BUCKET/LABEL
+
+    ## an s3 upload destination
+    my-s3://BUCKET/LABEL
+
+    ## local pairtree
+    my-pairtree://BUCKET/LABEL
+
+    ## google storage
+    my-google-storage://BUCKET/LABEL
+
+Upload destinations are specified in your datapm config file and are of the form:
+
+    [upload:dest-id]
+    ofs.backend = s3|google|archive.org|...
+    ## see OFS documentation for a given backend
+    config-option = config-value
+.RE
+
+.SH OPTIONS
+.PP
+\fB\-\-version\fR
+.RS 4
+show program's version number and exit
+.RE
+
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+show this help message and exit
+.RE
+
+.PP
+\fB\-v\fR, \fB\-\-verbose\fR
+.RS 4
+Give more output
+.RE
+
+.PP
+\fB\-d\fR, \fB\-\-debug\fR
+.RS 4
+Print debug output
+.RE
+
+.PP
+\fB\-q\fR, \fB\-\-quiet\fR
+.RS 4
+Give less output
+.RE
+
+.PP
+\fB\-\-log=\fP\fIFILENAME\fP
+.RS 4
+Log file where a complete (maximum verbosity) record will be kept
+.RE
+
+.PP
+\fB\-c CONFIG\fR, \fB\-\-config=\fP\fICONFIG\fP
+.RS 4
+Path to config file (if any) - defaults to $HOME/.dpmrc
+.RE
+
+.PP
+\fB\-r REPOSITORY\fR, \fB\-\-repository=\fP\fIREPOSITORY\fP
+.RS 4
+Path to repository - overrides value in config
+.RE
+
+.PP
+\fB\-k API_KEY\fR, \fB\-\-api\-key=\fP\fIAPI_KEY\fP
+.RS 4
+CKAN API Key (overrides value in config)
+.RE                      
+
+.SH CONFIGURATION FILE
+ [dpm]
+ repo.default_path = $HOME/.dpm/repository
+ index.default = file
+
+ [index:ckan]
+ ckan.url = http://thedatahub.org/api/
+ ckan.api_key = 
+
+ [index:db]
+ db.dburi = sqlite://$HOME/.datapm/repository/index.db
+
+ [upload:ckan]
+ ofs.backend = reststore
+ host = http://storage.ckan.net
+
+.SH FILES
+.I ~/.dpmrc
+.RS
+Per user \fBdatapm\fP configuration file.
+
+.SH EXAMPLES
+Grabbing some data from an index
+.br
+    \fBdatapm\fP index-add \fIfile:///....\fP
+    \fBdatapm\fP update
+    \fBdatapm\fP search "\fImilitary spending\fP"
+      \fIsome-id\fP Military Spending 1890-1914
+      \fIsome-id-2\fP Military Spending 1890-1914 (normalized)
+    \fBdatapm\fP install \fIsome-id\fP
+    \fBdatapm\fP plot \fIsome-id\fP
+.br
+
+Get two different datasets and use them together
+.br
+    \fBdatapm\fP install \fIpkg-a\fP
+    \fBdatapm\fP install \fIpkg-b\fP
+    \fBdatapm\fP create merged
+      # manual merge
+      # e.g. PPP, GDP
+    \fBdatapm\fP register \fImy-merged-package\fP
+.br
+
+.SH SEE ALSO
+For more information visit the documentation at: \fIhttp://readthedocs.org/docs/dpm\fR
