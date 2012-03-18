@@ -1,0 +1,25 @@
+Source: datapm
+Section: text
+Priority: optional
+Maintainer: J. Félix Ontañón <fontanon@emergya.es>
+Build-Depends: 
+ debhelper (>= 7), 
+ quilt,
+ python-all-dev, 
+ python-support, 
+ python-setuptools (>=0.6c),
+Standards-Version: 3.9.2
+Homepage: http://okfn.org/projects/dpm
+Vcs-Browser: https://github.com/okfn/dpm
+
+Package: datapm
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, 
+ python-ckanclient (>= 0.3), 
+ python-sqlalchemy, 
+ python-simplejson, 
+ python-sqlite
+Description: Data packaging system and utilities
+ datapm, data package manager, is a command line tool and python library for
+ working with Data Packages and interacting with data repositories like
+ the Data Hub.

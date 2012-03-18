@@ -1,0 +1,78 @@
+Index: dpm-0.10/dpm/cli/__init__.py
+===================================================================
+--- dpm-0.10.orig/dpm/cli/__init__.py	2012-03-18 18:20:22.850545445 +0100
++++ dpm-0.10/dpm/cli/__init__.py	2012-03-18 17:51:25.000000000 +0100
+@@ -21,9 +21,9 @@
+ 
+ For an introduction to dpm see the manual:
+ 
+-    $ dpm man
++    $ datapm man
+ 
+-About information (including license details) is available via `dpm about`.
++About information (including license details) is available via `datapm about`.
+ '''
+     
+     def run(self, options, args):
+@@ -55,7 +55,7 @@
+         initial_args = sys.argv[1:]
+     options, args = parser.parse_args(initial_args)
+     if not args:
+-        parser.error('You must give a command (use "dpm help" see a list of commands)')
++        parser.error('You must give a command (use "datapm help" see a list of commands)')
+     command = args[0].lower()
+     if command not in _commands:
+         parser.error('No command by the name %s %s' % (os.path.basename(sys.argv[0]), command))
+Index: dpm-0.10/dpm/cli/standard.py
+===================================================================
+--- dpm-0.10.orig/dpm/cli/standard.py	2012-03-18 18:20:25.806545473 +0100
++++ dpm-0.10/dpm/cli/standard.py	2012-03-18 17:51:25.000000000 +0100
+@@ -17,13 +17,13 @@
+ class AboutCommand(Command):
+     name = 'about'
+     usage = '%prog'
+-    summary = 'About dpm'
++    summary = 'About datapm'
+ 
+     def run(self, options, args):
+         about = \
+-'''dpm version %s.
++'''datapm version %s.
+ 
+-dpm is Open Knowledge and Open Source. For copyright and license details
++datapm is Open Knowledge and Open Source. For copyright and license details
+ run the 'license' command.
+ 
+ For more information about dpm and how to use it run the `man` command.
+Index: dpm-0.10/dpm/__init__.py
+===================================================================
+--- dpm-0.10.orig/dpm/__init__.py	2012-03-18 18:20:28.434545499 +0100
++++ dpm-0.10/dpm/__init__.py	2012-03-18 17:57:58.402532000 +0100
+@@ -1,4 +1,4 @@
+-'''dpm is a python library and command line tool for working with `Data
++'''datapm is a python library and command line tool for working with `Data
+ Packages`_ and interacting with data hubs like CKAN_.
+ 
+ For more information visit the documentation at:
+Index: dpm-0.10/setup.py
+===================================================================
+--- dpm-0.10.orig/setup.py	2012-03-18 18:20:30.594545520 +0100
++++ dpm-0.10/setup.py	2012-03-18 17:51:25.000000000 +0100
+@@ -8,7 +8,7 @@
+     __description_long__ = ''
+ 
+ setup(
+-    name='dpm',
++    name='datapm',
+     version=__version__,
+     # metadata
+     author='Open Knowledge Foundation',
+@@ -28,7 +28,7 @@
+     datapkg_index.txt=setuptools.command.egg_info:write_arg
+     
+     [console_scripts]
+-    dpm=dpm.cli:main
++    datapm=dpm.cli:main
+ 
+     [dpm.cli]
+     help = dpm.cli:HelpCommand

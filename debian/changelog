@@ -1,0 +1,5 @@
+datapm (0.10-1) unstable; urgency=low
+
+  * Initial release (Closes: #664566)
+
+ -- J. Félix Ontañón <fontanon@emergya.es>  Sun, 18 Mar 2012 11:15:20 +0100
