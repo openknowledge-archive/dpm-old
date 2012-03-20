@@ -82,6 +82,7 @@ class PackageDownloader(object):
             self._print('Unable to retrieve resource: %s' % resource)
             return None
         else:
+            self._print('Downloaded OK: %s' % resource['url']) 
             return success
 
     def filterfunc_interactive_choice(self, resource, count):
