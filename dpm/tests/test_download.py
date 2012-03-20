@@ -43,15 +43,15 @@ class TestPackageDownloader(TestCase):
         out = self.downloader.download(self.pkg, ourdest)
         dest = os.path.join(ourdest, 'datapackage.json')
         assert os.path.exists(dest), dest
-        dest = os.path.join(ourdest, 'my.csv')
+        dest = os.path.join(ourdest, 'data', 'my.csv')
         assert os.path.exists(dest), dest
 
     def test_02_download_with_multiple_resources(self):
         ourdest = os.path.join(self.dest_dir, self.pkg2.name)
         filterfunc = lambda x,y: x.get('format', '').startswith('dpm')
         out = self.downloader.download(self.pkg2, ourdest, filterfunc)
-        dest = os.path.join(ourdest, 'myzip.zip')
+        dest = os.path.join(ourdest, 'data', 'myzip.zip')
         assert os.path.exists(dest), dest
-        dest = os.path.join(ourdest, 'my.csv')
+        dest = os.path.join(ourdest, 'data', 'my.csv')
         assert not os.path.exists(dest), dest
 
