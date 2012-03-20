@@ -31,7 +31,11 @@ Let's download it (to the current directory)::
     $ dpm download ckan://iso-3166-2-data .
 
 This will download the Package 'iso-3166-2-data' together with its "Resources"
-and unpack it into a directory named 'iso-3166-2-data'.
+and unpack it into a directory named 'iso-3166-2-data'.  The resources are 
+contained inside the 'data' directory:: 
+
+    $ ls iso-3166-2-data/data
+    AD   place
 
 Note: we specify packages using 'package specs' like 'ckan://{name}. For more
 on package 'specs' as they are called see the dedicated section below.
