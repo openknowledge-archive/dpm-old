@@ -62,6 +62,15 @@ class Downloader(object):
     
         if count == 0:
             print('Total size: %s' % format_size(total_size))
+        if total_size <= 0:
+            # no info on total size so rather than percents just show total
+            # downloaded
+            downloaded = int((count-1)*block_size)
+            downloaded = format_size(downloaded)
+            sys.stdout.write('%s \r' % downloaded)
+            sys.stdout.flush()
+            return
+
         last_percent = int((count-1)*block_size*100/total_size)
         # may have downloaded less if count*block_size > total_size
         maxdownloaded = count * block_size
@@ -74,8 +83,6 @@ class Downloader(object):
                 (50 - percent/2) * ' '
                 ))
             sys.stdout.flush()
-        if maxdownloaded >= total_size:
-            print('\n')
 
     def unpack_file(self, src, dest):
         # if a zip, targz etc then unpack o/w leave it
