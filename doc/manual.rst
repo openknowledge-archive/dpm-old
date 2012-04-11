@@ -49,33 +49,33 @@ data package to, say, /tmp/xyz you could do::
 See the help on indivdual commands for more information.
 
 
-Creating and Registering a Package
-==================================
+Creating and Registering a Dataset / Data Package
+=================================================
 
-Initialize a new data Package on disk using dpm file layout::
+Initialize a new data Data Package on disk using dpm file layout::
 
-    $ dpm init MyNewDataPackage
+    $ dpm init my-new-dataset
 
 Edit the Package's metadata::
 
-    $ vim MyNewDataPackage/setup.py
+    $ vim my-new-dataset/datapackage.json
 
-Add some data to the Package::
-
-    $ cp mydata.csv MyNewDataPackage
-    $ cp mydata.js MyNewDataPackage
-    $ etc ...
-
-Register it on CKAN::
+Register it on the CKAN instance your are using::
 
     # NB: to register on CKAN you'll need to have an api-key
     # This can either be stored in your config file (see dpm setup config)
     # Or you can set it with the --api-key option
-    $ dpm register file://MyNewDataPackage ckan://
+    $ dpm register file://my-new-dataset ckan://
 
 Check it has registered ok::
 
     $ dpm info ckan://mynewdpm
+
+Add some data to the Package::
+
+    $ cp mydata.csv my-new-dataset
+    $ cp mydata.js my-new-dataset
+    $ etc ...
 
 You can also upload associated package resources to a storage system. For
 example, to register {your-file} with the default storage system associated to
