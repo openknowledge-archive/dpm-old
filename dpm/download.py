@@ -46,11 +46,13 @@ class PackageDownloader(object):
         if filterfunc is None:
             filterfunc = lambda x,y: True
 
-        self._print('Creating package metadata')
+        self._print('Creating package at: %s' % dest_path)
+        self._print('Downloading package info ...')
         # cribbed from dpm/index/base.py:FileIndex
         import dpm.distribution
         dist = dpm.distribution.default_distribution()(pkg)
         dist.write(dest_path)
+        self._print('Downloading package info: Done')
         # NB: distribution will have already created this directory
         data_path = os.path.join(dest_path, 'data')
 

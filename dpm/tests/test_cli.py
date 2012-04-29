@@ -100,7 +100,7 @@ class TestCLI(CLIBase):
 
         # download
         cmd = self.cmd_base + 'download %s %s "*"' % (self.file_spec,
-                self.repo_path)
+                os.path.join(self.repo_path, self.pkg_name))
         status, output = dpm.util.getstatusoutput(cmd)
         assert not status, output
         print output

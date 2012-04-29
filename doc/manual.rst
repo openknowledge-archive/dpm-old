@@ -28,7 +28,7 @@ Get some information about one of them::
 
 Let's download it (to the current directory)::
 
-    $ dpm download ckan://iso-3166-2-data .
+    $ dpm download ckan://iso-3166-2-data
 
 This will download the Package 'iso-3166-2-data' together with its "Resources"
 and unpack it into a directory named 'iso-3166-2-data'.  The resources are 
