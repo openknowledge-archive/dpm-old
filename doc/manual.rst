@@ -157,12 +157,12 @@ First a skeletal distribution on disk::
 
     $ dpm init {pkg-name-or-path}
 
-Take a look inside your newly data package. There should be 2 files:
+Take a look inside your newly-created data package. There should be 2 files:
 
   1. datapackage.json. This is a json file that contains the package metadata
   2. manifest.json. This is a json file giving the file manifest.
 
-For more about the structure of packgae distributions see the :doc:`design` page. 
+For more about the structure of package distributions see the :doc:`design` page. 
 
 With the metadata sorted you should add some material to your package. You do
 this by simply copying material into the distribution directory, e.g.::
